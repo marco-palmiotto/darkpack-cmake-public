@@ -30,6 +30,7 @@ set(EXTERNAL_LIBS
     gfortran 
     gsl 
     gslcblas
+    marty-lha
 )
 # Define the list of compile options (if needed)
 set(COMPILE_LINK_FLAGS
@@ -38,11 +39,14 @@ set(COMPILE_LINK_FLAGS
     -lgfortran
     -lgsl
     -lgslcblas
+    -lmarty-lha
 )
 # Set global compilation flags (applied to all targets)
 set(GENERIC_FLAGS "-Wall -Wextra -Wpedantic -Wno-deprecated-declarations -fPIC")
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${GENERIC_FLAGS}")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GENERIC_FLAGS}")
+set(MATH_OPTI_FLAGS "-fno-math-errno -ffinite-math-only -fno-rounding-math -fno-signaling-nans -fcx-limited-range -fexcess-precision=fast -fno-signed-zeros -fno-trapping-math -fassociative-math -freciprocal-math")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${GENERIC_FLAGS} ${MATH_OPTI_FLAGS}")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GENERIC_FLAGS} ${MATH_OPTI_FLAGS} -Wshadow "
+)
 # Debug mode flags (applied when building with Debug configuration)
 set(DEBUG_FLAGS "-g -O0") # Enable debug symbols, disable optimization
 set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} ${DEBUG_FLAGS}")
@@ -148,5 +152,3 @@ target_link_libraries(${EXEC_MAIN_NAME} PRIVATE
     ${EXTERNAL_LIBS}
     ${INVARIANT_LIB_NAME}
 )
-
-

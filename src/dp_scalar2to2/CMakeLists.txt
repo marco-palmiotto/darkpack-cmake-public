@@ -12,7 +12,7 @@ endfunction()
 project(dp_${__SPEC_LIB_NAME__} VERSION 1.0 LANGUAGES C CXX)
 set(EXEC_MAIN_NAME main_final.x)
 
-set(INVARIANT_LIB_NAME MathLib)
+set(INVARIANT_LIB_NAME DPMathLib)
 
 set(SPEC_LIB_PATH ${PROJECT_SOURCE_DIR}/../${__SPEC_LIB_NAME__})
 set(TEMPLATED_LIB_PATH ${PROJECT_SOURCE_DIR}/../TemplatedLib)
@@ -26,7 +26,7 @@ set(INVARIANT_LIB_PATH ${INVARIANT_LIB_HEADER_PATH}/build/lib)
 # Define the list of external libraries
 set(EXTERNAL_LIBS
     pthread 
-    looptools 
+    ooptools 
     gfortran 
     gsl 
     gslcblas
@@ -140,9 +140,9 @@ install(FILES ${LIB_CXX_HEADERS} DESTINATION ${CMAKE_BINARY_DIR}/include/${PROJE
 install(FILES ${LIB_C_HEADERS} DESTINATION ${CMAKE_BINARY_DIR}/include/${PROJECT_NAME}/C)
 
 # For the executables
-# Manual link to the path of the libraries
+#    Manual link to the path of the libraries
 target_link_directories(${EXEC_MAIN_NAME}  PRIVATE ${CMAKE_BINARY_DIR}/lib/)
-# Manual link of the library
+#    Manual link of the library
 target_link_libraries(${EXEC_MAIN_NAME} PRIVATE
     ${PROJECT_NAME} 
     ${EXTERNAL_LIBS}

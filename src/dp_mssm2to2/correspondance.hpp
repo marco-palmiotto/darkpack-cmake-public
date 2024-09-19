@@ -1,8 +1,7 @@
-#ifndef INLCUDED_CORRESPONDANCE
-#define INLCUDED_CORRESPONDANCE
+#pragma once
 
-#ifndef cplusplus__
-#define cplusplus__
+#ifndef __cplusplus
+#define __cplusplus
 #endif
 
 #include "mssm2to2.h"
@@ -533,4 +532,3 @@ inline double getMassFirst(const int p, const param_t &input)
 }// End of getMassFirst
 }//End of namespace corr
 }//End of namespace mssm2to2
-#endif

@@ -213,4 +213,5 @@ cd $auxfolder_model
 generate_param_t_comparison 
 generate_copy_to_c_struct
 cd $curdir
+cp $auxfolder/blank_files/compare.hpp $auxfolder_model/compare.hpp
 

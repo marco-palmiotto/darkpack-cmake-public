@@ -51,3 +51,4 @@ compile_commands.json
 CTestTestfile.cmake
 _deps
 CMakeUserPresets.json
+src/models/auxiliary_library/scalar2to2/compare.hpp

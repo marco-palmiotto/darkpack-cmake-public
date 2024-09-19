@@ -1,4 +1,6 @@
-#pragma once
+#ifndef LESHOUCESFROMMARTY_INCLUDED
+#define LESHOUCESFROMMARTY_INCLUDED
+
 
 #ifndef __cplusplus
 #define __cplusplus
@@ -30,3 +32,4 @@ namespace scalar2to2::readmodule
   Param_t ReadLHA(const std::string name);
 
 }
+#endif

@@ -1,6 +1,8 @@
 #ifndef MODEL_MSSM
 #define MODEL_MSSM
-#pragma once
+#ifndef LESHOUCESFROMMARTY_INCLUDED
+#define LESHOUCESFROMMARTY_INCLUDED
+
 
 #include "congfig.hpp"
 #include "process.hpp"
@@ -32,3 +34,4 @@ void createwidthsfile(const Param_t &param, const std::string &namefile);
 
 
 }
+#endif

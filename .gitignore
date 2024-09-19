@@ -4,6 +4,8 @@
 */.directory
 *.directory
 
+src/models/*2to2*/
+
 # Prerequisites
 *.d
 

@@ -1,0 +1,13 @@
+#pragma once
+
+#ifndef __cplusplus
+#define __cplusplus
+#endif
+
+#include "config.hpp"
+#include "params.h"
+
+namespace __SPEC_LIB_NAME__{
+  
+  param_t::param_t(const param_t &other)
+  {

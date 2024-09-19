@@ -263,7 +263,7 @@ namespace pdgValue
 
     // CKM matrix assignment from Wolfenstein values
     /***************************************************************/
-    const inline static complex_t I{0.0,1.0};
+    // const inline static complex_t I{0.0,1.0};
 
     const inline static real_t s12=ckm_lambda;
     const inline static real_t s23=ckm_A*ckm_lambda*ckm_lambda;

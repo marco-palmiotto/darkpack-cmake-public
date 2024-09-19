@@ -200,14 +200,14 @@ generate_copy_to_c_struct()
 
   echo "}" >> $outputfile
 
-  echo "} // End of namespace __SPEC_LIB_NAME__" >> $outputfile
+  echo "} // End of namespace $libname" >> $outputfile
 }
 
 
 
 [ -d "$auxfolder_model" ] || mkdir -p "$auxfolder_model"
 
-echo "Generating compare.cpp and copy_to_c_struct.h"
+echo "Generating compare.cpp and copy_to_c_struct.hpp"
 curdir=$(pwd)
 cd $auxfolder_model
 generate_param_t_comparison 

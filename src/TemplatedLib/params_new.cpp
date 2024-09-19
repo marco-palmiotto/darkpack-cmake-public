@@ -1,6 +1,6 @@
 #include "params_new.hpp"
 #include "correspondance.hpp"
-#include "compare.h"
+#include "compare.hpp"
 #include "leshouchesfrommarty.hpp"
 
 #define MIN(X, Y) ( ( X < Y ) ? X : Y )

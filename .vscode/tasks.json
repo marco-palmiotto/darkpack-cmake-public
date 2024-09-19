@@ -1,0 +1,32 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "configure",
+            "type": "shell",
+            "command": "cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_BUILD_TYPE=Debug -S src -B build",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": [],
+            "detail": "Run CMake to configure the project"
+        },
+        {
+            "label": "install-lib",
+            "type": "shell",
+            "command": "cmake --install build",
+            "dependsOn": "configure", // Ensures the configure happens before installation
+            "problemMatcher": [],
+            "detail": "Install the libraries"
+        },
+        {
+            "label": "build",
+            "type": "shell",
+            "command": "make -C build -j8", // Executes in the build folder
+            "dependsOn": "install-lib", // Ensures installation of the libraries happens before building
+            "problemMatcher": ["$gcc"],
+            "detail": "Build the project using make"
+        }
+    ]
+}

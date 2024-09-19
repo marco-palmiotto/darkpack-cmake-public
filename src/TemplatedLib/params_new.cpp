@@ -6,7 +6,7 @@
 #define MIN(X, Y) ( ( X < Y ) ? X : Y )
 
 // #define DEBUG
-namespace scalar2to2
+namespace __SPEC_LIB_NAME__
 {
   Param_t::Param_t(const std::string filename)
   {
@@ -203,4 +203,4 @@ namespace scalar2to2
     darkpackparam_t::print(out);
     param_t::print(out);
   }
-} // End of namespace scalar2to2
+} // End of namespace __SPEC_LIB_NAME__

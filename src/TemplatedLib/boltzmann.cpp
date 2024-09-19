@@ -5,7 +5,7 @@
 template <typename T>
 static inline T SQUARE(const T x) {return x*x;}
 
-namespace scalar2to2 
+namespace __SPEC_LIB_NAME__ 
 {
 
 void BoltzmannSolver::reset_prevs()
@@ -1111,4 +1111,4 @@ real_t BoltzmannSolver::relic_density()
 }
 
 /*--------------------------------------------------------------*/
-} //end of namespace scalar2to2
+} //end of namespace __SPEC_LIB_NAME__

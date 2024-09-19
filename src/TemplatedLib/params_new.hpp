@@ -12,7 +12,7 @@
 
 // #define DEBUG
 
-namespace scalar2to2
+namespace __SPEC_LIB_NAME__
 {
 
 inline real_t get_value( mty::lha::LHAFileData data, const std::string block, const int N)
@@ -575,17 +575,17 @@ class Timer
     }
 };
 
-} // end of namespace scalar2to2
+} // end of namespace __SPEC_LIB_NAME__
 
 
 
-inline std::ostream& operator << (std::ostream& out, const scalar2to2::param_t &par)
+inline std::ostream& operator << (std::ostream& out, const __SPEC_LIB_NAME__::param_t &par)
 {
   par.print(out); 
   return out;
 }
 
-inline std::ostream& operator << (std::ostream& out, const scalar2to2::Param_t &par)
+inline std::ostream& operator << (std::ostream& out, const __SPEC_LIB_NAME__::Param_t &par)
 {
   par.Print(out); 
   return out;

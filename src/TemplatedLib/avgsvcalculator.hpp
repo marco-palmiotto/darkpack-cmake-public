@@ -14,7 +14,7 @@
 
 // #define DEBUG
 
-namespace scalar2to2
+namespace __SPEC_LIB_NAME__
 {
 constexpr const short unsigned int NlowTsv = 10;
 constexpr const std::array<std::array<real_t, NlowTsv+1>,NlowTsv+1> CoefflowTsv=
@@ -238,9 +238,9 @@ class AvgSvCalculator
 
 };// End of AvgSvCalculator
 
-} // End of namespace scalar2to2
+} // End of namespace __SPEC_LIB_NAME__
 
-inline std::ostream& operator << (std::ostream& out , const scalar2to2::AvgSvCalculator &var)
+inline std::ostream& operator << (std::ostream& out , const __SPEC_LIB_NAME__::AvgSvCalculator &var)
 {
   var.print(out);
   return out;

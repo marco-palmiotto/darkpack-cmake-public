@@ -7,7 +7,7 @@
 #include "avgsvcalculator.hpp"
 #include "relicparam.hpp"
 
-namespace scalar2to2
+namespace __SPEC_LIB_NAME__
 {
 
 class BoltzmannSolver : public AvgSvCalculator, public Relicparam_t
@@ -77,9 +77,9 @@ class BoltzmannSolver : public AvgSvCalculator, public Relicparam_t
     real_t relic_density();
 };
 
-} // End of namespace scalar2to2
+} // End of namespace __SPEC_LIB_NAME__
 
-inline std::ostream& operator << (std::ostream& out , const scalar2to2::BoltzmannSolver &var)
+inline std::ostream& operator << (std::ostream& out , const __SPEC_LIB_NAME__::BoltzmannSolver &var)
 {
   var.print(out);
   return out;

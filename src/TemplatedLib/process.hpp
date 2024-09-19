@@ -11,7 +11,7 @@
 
 // #define DEBUG_COPY
 // #define DEBUG
-namespace scalar2to2
+namespace __SPEC_LIB_NAME__
 {
 struct Insertion
 {
@@ -199,4 +199,4 @@ inline std::ostream& operator << (std::ostream &out , const Process2to2& proc)
   return out;
 }
 
-}// end of namespace scalar2to2
+}// end of namespace __SPEC_LIB_NAME__

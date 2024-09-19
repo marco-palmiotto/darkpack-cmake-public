@@ -7,7 +7,7 @@
 #include "params_new.hpp"
 #include <vector>
 
-namespace scalar2to2
+namespace __SPEC_LIB_NAME__
 {
 
 constexpr const static int NTABMAX=1000;
@@ -209,15 +209,15 @@ struct Relicparam_t
 
 real_t neutN(const real_t &T);
 
-}// end of namespace scalar2to2
+}// end of namespace __SPEC_LIB_NAME__
 
-inline std::ostream& operator << (std::ostream& out, const scalar2to2::DataWithTemperature_t &var)
+inline std::ostream& operator << (std::ostream& out, const __SPEC_LIB_NAME__::DataWithTemperature_t &var)
 {
   var.print(out);
   return out;
 }
 
-inline std::ostream& operator << (std::ostream& out , const scalar2to2::Relicparam_t &var)
+inline std::ostream& operator << (std::ostream& out , const __SPEC_LIB_NAME__::Relicparam_t &var)
 {
   var.print_relicparam(out);
   return out;

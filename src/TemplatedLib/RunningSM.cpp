@@ -1,6 +1,6 @@
 #include "RunningSM.hpp"
 #define OUTPATH ""
-namespace scalar2to2
+namespace __SPEC_LIB_NAME__
 {
 
 //Mathematical macros
@@ -1260,4 +1260,4 @@ void TestRunningMasses( RunningSM * const run, Param_t &input)
   std::cout << "Closing the files\n";
   for(int i = 0; i <7 ; i++) file[i].close();
 }
-} // end of namespace scalar2to2
+} // end of namespace __SPEC_LIB_NAME__

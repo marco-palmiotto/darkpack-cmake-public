@@ -14,7 +14,7 @@ static inline unsigned int kdelta(const int i, const int j)
   return static_cast<unsigned int>(i==j);
 }
 
-namespace scalar2to2
+namespace __SPEC_LIB_NAME__
 {
   
 inline real_t getContributionSingle(Process2to2 p, 
@@ -1684,4 +1684,4 @@ real_t AvgSvCalculator::getAverageSigmav_coan(const real_t &T)
 }
 
 
-} // Enf of namespace scalar2to2
+} // Enf of namespace __SPEC_LIB_NAME__

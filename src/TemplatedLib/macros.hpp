@@ -22,5 +22,5 @@
 // #define alphaem  		0.007297353 /* fine-structure constant */
 
 #include "params_new.hpp"
-using namespace scalar2to2::mathematicalconstants;
-using namespace scalar2to2::pdg2016Value;
+using namespace __SPEC_LIB_NAME__::mathematicalconstants;
+using namespace __SPEC_LIB_NAME__::pdg2016Value;

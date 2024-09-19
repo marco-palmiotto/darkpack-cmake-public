@@ -5,7 +5,7 @@
 template <typename T>
 static inline T SQUARE(const T x) {return x*x;}
 
-namespace scalar2to2
+namespace __SPEC_LIB_NAME__
 {
 
 void Relicparam_t::setQCDeosModel(const int x)
@@ -1085,4 +1085,4 @@ real_t neutN(const real_t &T)
   return std::exp(logNz);
 }
 
-} // end of namespace scalar2to2
+} // end of namespace __SPEC_LIB_NAME__

@@ -2,7 +2,7 @@
 #include "copy_to_c_struct.hpp"
 
 // #define DEBUG
-namespace scalar2to2
+namespace __SPEC_LIB_NAME__
 {
 
 #ifndef GEVTOPBARN
@@ -672,4 +672,4 @@ Process2to2& Process2to2::operator=(const Process2to2 &other)
 
 #undef BASIC_INITIALISATION
 
-}//end of namespace scalar2to2
+}//end of namespace __SPEC_LIB_NAME__

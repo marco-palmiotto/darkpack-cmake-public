@@ -18,7 +18,7 @@
 #include <future>
 
 
-namespace scalar2to2
+namespace __SPEC_LIB_NAME__
 {
 
 struct RunningSM{
@@ -153,9 +153,9 @@ struct RunningSM{
 
 void TestRunningMasses( RunningSM * const run, Param_t &input);
 
-} // End of namespace scalar2to2
+} // End of namespace __SPEC_LIB_NAME__
 
-inline std::ostream& operator << (std::ostream& out, const scalar2to2::RunningSM &var)
+inline std::ostream& operator << (std::ostream& out, const __SPEC_LIB_NAME__::RunningSM &var)
 {
   var.print(out);
   return out;

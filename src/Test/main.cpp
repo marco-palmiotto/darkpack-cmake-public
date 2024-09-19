@@ -1,27 +1,10 @@
-#include "MathLib/add.hpp"
-#include "MathLib/subtract.hpp"
-#include "MathLib/modulo.h"
-#include "MathLib/multiply.h"
-#include "FinalLib/entity.h"
-#include <iostream>
+#include "dp_scalar2to2/config.hpp"
+#include "dp_scalar2to2/params_new.hpp"
+using namespace scalar2to2;
 
-int main()
-{
-
-  int a=2, b=3, c=5;
-
-  std::cout << "Using add library: 2+3= " << MathLib::add(a,b) << '\n';
-
-  std::cout << "Using subtract library: 2-3= " << MathLib::subtract(a,b) << '\n';
-
-  std::cout << "Using add C library: 5 % 3= " << modulo(c,b) << '\n';
-  
-  std::cout << "Using multiply C library: 5 * 3= " << multiply(c,b) << '\n';
-
-  spec::entity_t e(0,0,0);
-  spec::display(e);
-  spec::move(e, 1, -1, 0);
-  spec::display(e);
-  return 0;
-   
+int main(int argn, const char ** args) {
+    std::cout << "DarkPack version " << __SPEC_LIB_NAME__VERSION_MAJOR << '.' << __SPEC_LIB_NAME__VERSION_MINOR << '\n';
+    std::cout << "Running " << args[0]<< " with " << argn << " argument(s).\n";
+    // std::cout << "I=" << I << '\n';
+    return 0;
 }

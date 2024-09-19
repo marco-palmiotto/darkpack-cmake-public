@@ -66,4 +66,4 @@ target_compile_options(${PROJECT_NAME} PRIVATE ${COMPILE_LINK_FLAGS})
 # Copying the headers of the C++ lib
 install(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/ DESTINATION ${CMAKE_BINARY_DIR}/include/${PROJECT_NAME})
 # Copying the headers of the C lib
-install(FILES ${LIB_C_HEADERS} DESTINATION ${CMAKE_BINARY_DIR}/include/${PROJECT_NAME}/C)
+install(FILES ${LIB_C_HEADERS} DESTINATION ${CMAKE_BINARY_DIR}/include/${PROJECT_NAME})

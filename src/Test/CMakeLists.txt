@@ -2,10 +2,27 @@ cmake_minimum_required(VERSION 3.10)
 
 project(test)
 
-set(INVARIANT_LIB_NAME MathLib)
+set(INVARIANT_LIB_NAME DPMathLib)
 
-set(LIB_NAME_1 FinalLib)
+set(LIB_NAME_1 dp_scalar2to2)
 set(EXEC_NAME_0 main_test.x)
+
+# Define the list of external libraries
+set(EXTERNAL_LIBS
+    pthread 
+    ooptools 
+    gfortran 
+    gsl 
+    gslcblas
+)
+# Define the list of compile options (if needed)
+set(COMPILE_LINK_FLAGS
+    -lpthread
+    -looptools
+    -lgfortran
+    -lgsl
+    -lgslcblas
+)
 
 # Using the installed path for the invariant library's header
 set(INVARIANT_LIB_HEADER_PATH ${CMAKE_BINARY_DIR}/include/${INVARIANT_LIB_NAME})  
@@ -22,4 +39,4 @@ target_include_directories(${EXEC_NAME_0} PUBLIC
 # 2. manual link to the path of the libraries
 target_link_directories(${EXEC_NAME_0} PRIVATE ${CMAKE_BINARY_DIR}/lib/)
 # 3. manual link of the library
-target_link_libraries(${EXEC_NAME_0} ${INVARIANT_LIB_NAME} ${LIB_NAME_1})
+target_link_libraries(${EXEC_NAME_0} ${INVARIANT_LIB_NAME} ${EXTERNAL_LIBS} ${LIB_NAME_1}) 

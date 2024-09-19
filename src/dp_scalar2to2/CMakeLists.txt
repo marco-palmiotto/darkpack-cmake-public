@@ -137,7 +137,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 # Copying the headers of the C++ library
 install(FILES ${LIB_CXX_HEADERS} DESTINATION ${CMAKE_BINARY_DIR}/include/${PROJECT_NAME})
 # Copying the headers of the C library
-install(FILES ${LIB_C_HEADERS} DESTINATION ${CMAKE_BINARY_DIR}/include/${PROJECT_NAME}/C)
+install(FILES ${LIB_C_HEADERS} DESTINATION ${CMAKE_BINARY_DIR}/include/${PROJECT_NAME})
 
 # For the executables
 #    Manual link to the path of the libraries

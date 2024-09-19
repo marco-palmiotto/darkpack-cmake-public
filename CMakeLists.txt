@@ -20,8 +20,7 @@ set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} ${RELEASE_FLAGS}")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${RELEASE_FLAGS}")
 
 # Add subdirectories (add subprojects here, like your libraries and tests)
-add_subdirectory(src/MathLib)
-add_subdirectory(src/scalar2to2)
+add_subdirectory(src/DPMathLib)
 add_subdirectory(src/dp_scalar2to2)
 add_subdirectory(src/Test)
 

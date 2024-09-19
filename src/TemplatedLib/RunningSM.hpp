@@ -4,7 +4,7 @@
 #define __cplusplus
 #endif
 
-#include "scalar2to2.h"
+#include "config.hpp"
 #include "params_new.hpp"
 #include "correspondance.hpp"
 #include <ctime>

@@ -3,9 +3,8 @@
 #ifndef __cplusplus
 #define __cplusplus
 #endif
-
+#include "config.hpp"
 #include "cparams.h"
-#include "scalar2to2.h"
 #include "correspondance.hpp"
 #include "marty/lha/lha.h"
 #include <chrono>

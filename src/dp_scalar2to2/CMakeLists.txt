@@ -96,7 +96,7 @@ file(GLOB INVARIANT_LIB_HEADER_FILES ${INVARIANT_LIB_HEADER_PATH}/*.h
             
 # Defining all the targets:
     # Add the library and include all the .cpp files
-add_library(${PROJECT_NAME} ${LIB_CXX_SOURCES})
+add_library(${PROJECT_NAME} ${LIB_CXX_SOURCES} ${LIB_C_SOURCES})
     # Add the executable
 add_executable(${EXEC_MAIN_NAME} script/main.cpp)
 

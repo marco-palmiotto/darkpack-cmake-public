@@ -112,12 +112,12 @@ ccomplex_return_t c_sumSqAmpl_sd_L_anti_sd_R_to_anti_u_u(
     const ccomplex_t IT_0054 = IT_0037*IT_0053;
     const ccomplex_t IT_0055 = (0 + _Complex_I*1)*m_C_1;
     const ccomplex_t IT_0056 = IT_0039*IT_0054*IT_0055;
-    const ccomplex_t IT_0057 = (0 + _Complex_I*1.4142135623731)*m_u*V_u2*V_ud
+    const ccomplex_t IT_0057 = (0 + _Complex_I*1)*m_C_2;
+    const ccomplex_t IT_0058 = (0 + _Complex_I*1.4142135623731)*m_u*V_u2*V_ud
       *e_em*IT_0000*IT_0002*IT_0026;
-    const ccomplex_t IT_0058 = 0.5*IT_0057;
-    const ccomplex_t IT_0059 = IT_0044*IT_0058;
-    const ccomplex_t IT_0060 = (0 + _Complex_I*1)*m_C_2;
-    const ccomplex_t IT_0061 = IT_0046*IT_0059*IT_0060;
+    const ccomplex_t IT_0059 = 0.5*IT_0058;
+    const ccomplex_t IT_0060 = IT_0044*IT_0059;
+    const ccomplex_t IT_0061 = IT_0046*IT_0057*IT_0060;
     const ccomplex_t IT_0062 = m_u*IT_0041;
     const ccomplex_t IT_0063 = m_u*IT_0048;
     const ccomplex_t IT_0064 = -IT_0056 + -IT_0061 + IT_0062 + IT_0063;

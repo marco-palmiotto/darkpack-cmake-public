@@ -65,7 +65,7 @@ namespace corr{
        C_2
    };
 
-#include "susysm.h"
+#include "smBsm.hpp"
 inline const std::array<std::string,TOTAL_PARTICLES+1> part_names={" ",
         "G",
         "W",

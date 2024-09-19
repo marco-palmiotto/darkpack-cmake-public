@@ -127,10 +127,10 @@ ccomplex_return_t c_sumSqAmpl_su_L_anti_sd_R_to_A0_Hp(
       (m_sb_2 + (0 + _Complex_I*-1)*Gamma_b2) + reg_prop, -1);
     const ccomplex_t IT_0057 = IT_0055*IT_0056;
     const ccomplex_t IT_0058 = (0 + _Complex_I*1)*IT_0057;
-    const ccomplex_t IT_0059 = (0 + _Complex_I*1.4142135623731)*m_d*m_u*V_ud
-      *e_em*IT_0000*IT_0003*IT_0006*IT_0008;
+    const ccomplex_t IT_0059 = m_u*e_em*mu_h*IT_0000*IT_0008;
     const ccomplex_t IT_0060 = 0.5*IT_0059;
-    const ccomplex_t IT_0061 = m_u*e_em*mu_h*IT_0000*IT_0008;
+    const ccomplex_t IT_0061 = (0 + _Complex_I*1.4142135623731)*m_d*m_u*V_ud
+      *e_em*IT_0000*IT_0003*IT_0006*IT_0008;
     const ccomplex_t IT_0062 = 0.5*IT_0061;
     const ccomplex_t IT_0063 = IT_0060*IT_0062;
     const ccomplex_t IT_0064 = cpow((-2)*s_13 + IT_0018 + IT_0038 + -m_su_R*

@@ -205,24 +205,24 @@ ccomplex_return_t c_sumSqAmpl_sb_2_anti_sb_2_to_h_H0(
       *m_sb_2*Gamma_b2 + reg_prop, -1);
     const ccomplex_t IT_0106 = IT_0102*IT_0105;
     const ccomplex_t IT_0107 = (0 + _Complex_I*1)*IT_0106;
-    const ccomplex_t IT_0108 = cpow((-2)*s_13 + IT_0032 + IT_0049 + -m_sd_R*
-      (m_sd_R + (0 + _Complex_I*-1)*Gamma_dr) + reg_prop, -1);
-    const ccomplex_t IT_0109 = (0 + _Complex_I*1.4142135623731)*A_b*V_tb*V_td
+    const ccomplex_t IT_0108 = cpow((-2)*s_13 + IT_0032 + IT_0049 + -m_ss_R*
+      (m_ss_R + (0 + _Complex_I*-1)*Gamma_sr) + reg_prop, -1);
+    const ccomplex_t IT_0109 = (0 + _Complex_I*1.4142135623731)*A_b*V_tb*V_ts
       *IT_0001*conj(U_sb_01);
     const ccomplex_t IT_0110 = (-0.5)*IT_0109;
     const ccomplex_t IT_0111 = (0 + _Complex_I*1.4142135623731)*A_b*V_tb*conj
-      (V_td)*IT_0002*U_sb_01;
+      (V_ts)*IT_0002*U_sb_01;
     const ccomplex_t IT_0112 = 0.5*IT_0111;
     const ccomplex_t IT_0113 = IT_0110*IT_0112;
     const ccomplex_t IT_0114 = IT_0108*IT_0113;
     const ccomplex_t IT_0115 = (0 + _Complex_I*1)*IT_0114;
-    const ccomplex_t IT_0116 = cpow((-2)*s_13 + IT_0032 + IT_0049 + -m_ss_R*
-      (m_ss_R + (0 + _Complex_I*-1)*Gamma_sr) + reg_prop, -1);
-    const ccomplex_t IT_0117 = (0 + _Complex_I*1.4142135623731)*A_b*V_tb*V_ts
+    const ccomplex_t IT_0116 = cpow((-2)*s_13 + IT_0032 + IT_0049 + -m_sd_R*
+      (m_sd_R + (0 + _Complex_I*-1)*Gamma_dr) + reg_prop, -1);
+    const ccomplex_t IT_0117 = (0 + _Complex_I*1.4142135623731)*A_b*V_tb*V_td
       *IT_0001*conj(U_sb_01);
     const ccomplex_t IT_0118 = (-0.5)*IT_0117;
     const ccomplex_t IT_0119 = (0 + _Complex_I*1.4142135623731)*A_b*V_tb*conj
-      (V_ts)*IT_0002*U_sb_01;
+      (V_td)*IT_0002*U_sb_01;
     const ccomplex_t IT_0120 = 0.5*IT_0119;
     const ccomplex_t IT_0121 = IT_0118*IT_0120;
     const ccomplex_t IT_0122 = IT_0116*IT_0121;

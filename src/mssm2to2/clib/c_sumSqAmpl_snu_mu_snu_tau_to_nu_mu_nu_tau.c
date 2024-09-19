@@ -91,8 +91,8 @@ ccomplex_return_t c_sumSqAmpl_snu_mu_snu_tau_to_nu_mu_nu_tau(
     const ccomplex_t IT_0051 = cpow(s_13 + (-0.5)*IT_0014 + 0.5*m_N_4*(m_N_4 +
        (0 + _Complex_I*-1)*Gamma_o4) + (-0.5)*reg_prop, -1);
     const ccomplex_t IT_0052 = IT_0050*IT_0051;
-    const ccomplex_t IT_0053 = (-0.5)*IT_0016 + (-0.5)*IT_0028 + (-0.5)
-      *IT_0040 + (-0.5)*IT_0052;
+    const ccomplex_t IT_0053 = 0.5*IT_0016 + 0.5*IT_0028 + 0.5*IT_0040 + 0.5
+      *IT_0052;
     return create_ccomplex_return(2*s_34*IT_0053*conj(IT_0053));
 }
 

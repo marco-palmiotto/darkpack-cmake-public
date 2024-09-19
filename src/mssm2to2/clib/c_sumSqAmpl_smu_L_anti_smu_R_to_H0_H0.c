@@ -79,12 +79,12 @@ ccomplex_return_t c_sumSqAmpl_smu_L_anti_smu_R_to_H0_H0(
     const ccomplex_t IT_0035 = -IT_0034;
     const ccomplex_t IT_0036 = IT_0025*IT_0035;
     const ccomplex_t IT_0037 = pow(m_H0, 2);
-    const ccomplex_t IT_0038 = cpow((-2)*s_23 + IT_0020 + IT_0037 + -m_smu_L*
-      (m_smu_L + (0 + _Complex_I*-1)*Gamma_ml) + reg_prop, -1);
+    const ccomplex_t IT_0038 = cpow((-2)*s_13 + IT_0037 + (0 + _Complex_I*1)
+      *m_smu_L*Gamma_ml + reg_prop, -1);
     const ccomplex_t IT_0039 = IT_0036*IT_0038;
     const ccomplex_t IT_0040 = (0 + _Complex_I*1)*IT_0039;
-    const ccomplex_t IT_0041 = cpow((-2)*s_13 + IT_0037 + (0 + _Complex_I*1)
-      *m_smu_L*Gamma_ml + reg_prop, -1);
+    const ccomplex_t IT_0041 = cpow((-2)*s_23 + IT_0020 + IT_0037 + -m_smu_L*
+      (m_smu_L + (0 + _Complex_I*-1)*Gamma_ml) + reg_prop, -1);
     const ccomplex_t IT_0042 = IT_0036*IT_0041;
     const ccomplex_t IT_0043 = (0 + _Complex_I*1)*IT_0042;
     const ccomplex_t IT_0044 = (0 + _Complex_I*1)*e_em*(m_W*IT_0004*IT_0009*

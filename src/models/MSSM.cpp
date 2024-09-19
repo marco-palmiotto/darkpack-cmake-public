@@ -14,7 +14,7 @@
 #define DIMCHEPSTRING 30      // String dimension for calcHep names' output
 
 #define CORRESPONDANCE // Defining this variable the creation of correspondance.hpp is enabled
-// #define SQUAREDAMP     // Defining this variable squared amplitudes are calculated and added to the
+#define SQUAREDAMP     // Defining this variable squared amplitudes are calculated and added to the
 //                        library. Disabling this behaviour can be useful if the user just wants
 //                        to generate the auxiliary files for the library
 #define UPDATE_PART_DETAILS

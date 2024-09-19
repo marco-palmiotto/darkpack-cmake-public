@@ -154,8 +154,8 @@ ccomplex_return_t c_sumSqAmpl_C_1_anti_snu_tau_to_anti_tau_h(
     const ccomplex_t IT_0103 = IT_0019*IT_0062;
     const ccomplex_t IT_0104 = IT_0030*IT_0102*IT_0103;
     const ccomplex_t IT_0105 = m_tau*IT_0085;
-    const ccomplex_t IT_0106 = IT_0034*IT_0073;
-    const ccomplex_t IT_0107 = (0 + _Complex_I*1)*m_C_1;
+    const ccomplex_t IT_0106 = (0 + _Complex_I*1)*m_C_1;
+    const ccomplex_t IT_0107 = IT_0034*IT_0073;
     const ccomplex_t IT_0108 = IT_0044*IT_0106*IT_0107;
     const ccomplex_t IT_0109 = 0.5*IT_0101 + (-0.5)*IT_0104 + -IT_0105 + (-0.5
       )*IT_0108;
@@ -167,7 +167,7 @@ ccomplex_return_t c_sumSqAmpl_C_1_anti_snu_tau_to_anti_tau_h(
     const ccomplex_t IT_0115 = IT_0091*IT_0114;
     const ccomplex_t IT_0116 = (0 + _Complex_I*1)*IT_0115;
     const ccomplex_t IT_0117 = IT_0009*IT_0042;
-    const ccomplex_t IT_0118 = IT_0044*IT_0107*IT_0117;
+    const ccomplex_t IT_0118 = IT_0044*IT_0106*IT_0117;
     const ccomplex_t IT_0119 = m_tau*IT_0016;
     const ccomplex_t IT_0120 = 0.5*IT_0113 + (-0.5)*IT_0116 + 0.5*IT_0118 +
        IT_0119;

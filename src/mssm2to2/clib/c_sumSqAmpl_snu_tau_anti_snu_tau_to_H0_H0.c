@@ -60,7 +60,7 @@ ccomplex_return_t c_sumSqAmpl_snu_tau_anti_snu_tau_to_H0_H0(
     const ccomplex_t IT_0025 = IT_0022*IT_0024;
     const ccomplex_t IT_0026 = (0 + _Complex_I*1)*IT_0025;
     const ccomplex_t IT_0027 = pow(m_H0, 2);
-    const ccomplex_t IT_0028 = cpow((-2)*s_13 + IT_0027 + reg_prop + (0 +
+    const ccomplex_t IT_0028 = cpow((-2)*s_23 + IT_0027 + reg_prop + (0 +
        _Complex_I*1)*m_snu_tau*Gamma_nutaul, -1);
     const ccomplex_t IT_0029 = cpow(IT_0021, 2);
     const ccomplex_t IT_0030 = (0 + _Complex_I*1)*IT_0029;
@@ -77,7 +77,7 @@ ccomplex_return_t c_sumSqAmpl_snu_tau_anti_snu_tau_to_H0_H0(
       *Gamma_h) + (-2)*IT_0023 + -reg_prop, -1);
     const ccomplex_t IT_0038 = IT_0036*IT_0037;
     const ccomplex_t IT_0039 = (0 + _Complex_I*1)*IT_0038;
-    const ccomplex_t IT_0040 = cpow((-2)*s_23 + IT_0027 + reg_prop + (0 +
+    const ccomplex_t IT_0040 = cpow((-2)*s_13 + IT_0027 + reg_prop + (0 +
        _Complex_I*1)*m_snu_tau*Gamma_nutaul, -1);
     const ccomplex_t IT_0041 = IT_0030*IT_0040;
     const ccomplex_t IT_0042 = IT_0011 + -IT_0026 + IT_0031 + -IT_0039 +

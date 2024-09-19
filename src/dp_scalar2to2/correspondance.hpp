@@ -4,7 +4,6 @@
 #define __cplusplus
 #endif
 
-
 #include "scalar2to2.h"
 #include "clib_scalar2to2.h"
 #include <unordered_map>
@@ -242,4 +241,4 @@ inline double getMassFirst(const int p, const param_t &input)
     }
 }// End of getMassFirst
 }//End of namespace corr
-}//End of namespace mssm2to2
+}//End of namespace scalar2to2

@@ -1,7 +1,8 @@
+#include "config.hpp"
 #include "compare.hpp"
 #include "params_new.hpp"
 
-namespace scalar2to2
+namespace __SPEC_LIB_NAME__
 {
 
 bool compare_param_t(const param_t &p1, const param_t &p2)

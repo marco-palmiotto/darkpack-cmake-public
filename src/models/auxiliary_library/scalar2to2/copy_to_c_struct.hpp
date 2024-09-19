@@ -53,4 +53,4 @@ inline cparam_s update_c_kinematics(const Param_t &input, cparam_s output)
   output.s_34 = input.s_34;
   return output;
 }
-} // End of namespace __SPEC_LIB_NAME__
+} // End of namespace scalar2to2

@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.10)
 # setting the namespace for the specialised library
 set(__SPEC_LIB_NAME__ mssm2to2)
 
-set(__OUTPATH__ "${CMAKE_SOURCE_DIR}/out")
+set(__OUTPATH__ "${CMAKE_SOURCE_DIR}/out/")
 
 function(print)
     foreach(var ${ARGN})
@@ -72,11 +72,12 @@ print(CMAKE_BINARY_DIR SPEC_LIB_PATH TEMPLATED_LIB_PATH INVARIANT_LIB_HEADER_PAT
 # Automatically gather all .cpp files in all projects to be compiled at once
 file(GLOB LIB_CXX_SOURCES ${SPEC_LIB_PATH}/src/*.cpp 
                            ${TEMPLATED_LIB_PATH}/*.cpp 
-                           ${SOURCE_LIB_DIR}/*.cpp)
+                           ${PROJECT_SOURCE_DIR}/*.cpp)
 
 # Automatically gather all .c files in all projects to be compiled at once
 file(GLOB LIB_C_SOURCES ${SPEC_LIB_PATH}/clib/*.c
-                        ${TEMPLATED_LIB_PATH}/clib/*.c
+                        ${TEMPLATED_LIB_PATH}/*.c
+                        ${PROJECT_SOURCE_DIR}/*.c
                         )
 
 # Automatically gather all the CXX header files in all projects to be installed later on
@@ -89,7 +90,8 @@ file(GLOB LIB_CXX_HEADERS  ${SPEC_LIB_PATH}/include/*.h
 
 # Automatically gather all the C header files in all projects to be installed later on
 file(GLOB LIB_C_HEADERS ${SPEC_LIB_PATH}/clib/*.h
-                        ${TEMPLATED_LIB_PATH}/clib/*.h)
+                        ${TEMPLATED_LIB_PATH}/*.h
+                        ${PROJECT_SOURCE_DIR}/*.h)
 
 # print(LIB_CXX_SOURCES LIB_C_SOURCES LIB_CXX_HEADERS LIB_C_HEADERS)      
 
@@ -101,7 +103,7 @@ file(GLOB INVARIANT_LIB_HEADER_FILES ${INVARIANT_LIB_HEADER_PATH}/*.h
             
 # Defining all the targets:
     # Add the library and include all the .cpp files
-add_library(${PROJECT_NAME} ${LIB_CXX_SOURCES} ${LIB_C_SOURCES})
+add_library(${PROJECT_NAME} ${LIB_C_SOURCES} ${LIB_CXX_SOURCES} )
     # Add the executable
 add_executable(${EXEC_MAIN_NAME} script/main.cpp)
 

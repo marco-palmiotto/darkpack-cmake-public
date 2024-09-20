@@ -1,8 +1,5 @@
 #include "leshouches.h"
 
-#ifdef cplusplus__
-extern "C" {
-#endif
 
 int test_integer(char name[])
 /* tests if the string "name" is an integer, and return 1 if so, 0 otherwise */
@@ -4680,6 +4677,3 @@ int SUSY_Decays_Reader(char name[], struct parameters* param)
 	return 1;	
 }
 
-#ifdef cplusplus__
-}
-#endif

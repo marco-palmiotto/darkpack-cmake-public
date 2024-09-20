@@ -1,4 +1,4 @@
-#ifdef cplusplus__
+#ifdef __cplusplus
 extern "C" {
 #endif
 
@@ -322,6 +322,6 @@ int Les_Houches_Reader(char name[], struct parameters* param);
 int test_slha(char name[]);
 #endif
 
-#ifdef cplusplus__
+#ifdef __cplusplus
 } //Closing extern C
 #endif

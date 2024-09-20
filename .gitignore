@@ -3,7 +3,7 @@
 /**/build/
 */.directory
 *.directory
-
+/**/out/
 src/models/*2to2*/
 
 # Prerequisites

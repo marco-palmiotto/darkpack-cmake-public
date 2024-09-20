@@ -1,14 +1,14 @@
 #include "leshouches_patch.hpp"
 
-static inline double creal(Complex_C_t &z)
-{
-  return (static_cast<std::complex<double>>(z)).real();
-}
+// static inline double creal(Complex_C_t &z)
+// {
+//   return (static_cast<std::complex<double>>(z)).real();
+// }
 
-static inline double cimag(Complex_C_t &z)
-{
-  return (static_cast<std::complex<double>>(z)).imag();
-}
+// static inline double cimag(Complex_C_t &z)
+// {
+//   return (static_cast<std::complex<double>>(z)).imag();
+// }
 
 void print_parameters_siso(struct parameters *p, FILE *fptr) 
 {

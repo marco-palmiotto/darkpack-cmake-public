@@ -23,6 +23,7 @@ set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${RELEASE_FLAGS}")
 # Add subdirectories (add subprojects here, like your libraries and tests)
 add_subdirectory(src/DPMathLib)
 add_subdirectory(src/dp_scalar2to2)
+add_subdirectory(src/dp_mssm2to2)
 add_subdirectory(src/Test)
 
 # Set C++ standard globally

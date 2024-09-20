@@ -12,7 +12,7 @@ function(print)
 endfunction()
 
 project(dp_${__SPEC_LIB_NAME__} VERSION 1.0 LANGUAGES C CXX)
-set(EXEC_MAIN_NAME main_final.x)
+set(EXEC_MAIN_NAME main_final_${__SPEC_LIB_NAME__}.x)
 
 set(INVARIANT_LIB_NAME DPMathLib)
 

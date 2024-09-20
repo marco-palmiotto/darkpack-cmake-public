@@ -2,6 +2,7 @@
     "cmake.sourceDirectory": "/workspaces/darkpack-cmake",
     "files.associations": {
         "*.in": "c",
-        "complex": "cpp"
+        "complex": "cpp",
+        "random": "cpp"
     }
 }

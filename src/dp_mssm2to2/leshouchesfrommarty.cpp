@@ -115,7 +115,7 @@ namespace mssm2to2::readmodule
     // CKM matrix assignment
     real_t s12,s13,s23,c12,c13,c23;
     complex_t expid;
-    const complex_t I{0.0,1.0};
+    // const complex_t I{0.0, 1.0};
     complex_t CKM[4][4];
 
     s12=param.ckm_lambda;

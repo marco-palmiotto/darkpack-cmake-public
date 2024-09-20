@@ -88,25 +88,25 @@ namespace mssm2to2::input_manip
           do
           {
               //I recreate the matrix using the Wolfenstein parametrization 
-              const double lambda = 0.22650;
-              const double A = 0.790;
-              const double rhobar = 0.141;
-              const double etabar = 0.357;
-              const complex_t I{0.0,1.0};
+              constexpr const double lambda = 0.22650;
+              constexpr const double A = 0.790;
+              constexpr const double rhobar = 0.141;
+              constexpr const double etabar = 0.357;
+              constexpr const complex_t im_u{0.0,1.0};
               
               const double rho = rhobar/(1 - lambda*lambda/2);
               const double eta = etabar/(1 - lambda*lambda/2);
               
               input.V_ud = 1 - std::pow(lambda, 2)/2;
               input.V_us = lambda;
-              const complex_t Vub = std::abs(A*std::pow(lambda, 3)*(rho - I*eta));
+              const complex_t Vub = std::abs(A*std::pow(lambda, 3)*(rho - im_u*eta));
               input.V_ub_mod = std::abs(Vub);
           
               input.V_cd = -lambda;
               input.V_cs = -lambda*lambda/2;
               input.V_cb = A*lambda*lambda;
           
-              input.V_td = A*std::pow(lambda, 3)*(1 - rho -I*eta);
+              input.V_td = A*std::pow(lambda, 3)*(1 - rho -im_u*eta);
               input.V_ts = -A*lambda*lambda;
               input.V_tb = 1;
               

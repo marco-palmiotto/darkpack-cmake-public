@@ -1,15 +1,17 @@
 #ifndef MODEL_MSSM
 #define MODEL_MSSM
+#endif 
+
 #ifndef LESHOUCESFROMMARTY_INCLUDED
 #define LESHOUCESFROMMARTY_INCLUDED
 
 
-#include "congfig.hpp"
+#include "config.hpp"
 #include "process.hpp"
 #include "marty/lha/lha.h"
 
 #include "input_manip.hpp"
-#include "RunningSM.pp"
+#include "RunningSM.hpp"
 
 namespace mssm2to2::readmodule
 {

@@ -25,4 +25,3 @@ namespace mssm2to2::input_manip
 
   bool ImposeUnitarity(mssm2to2::param_t &input);
 }
-#endif

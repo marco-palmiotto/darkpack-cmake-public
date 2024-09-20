@@ -1,4 +1,4 @@
 #! /bin/sh
 
 cd build 
-make -j6
+make -j4

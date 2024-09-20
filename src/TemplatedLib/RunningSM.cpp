@@ -1,5 +1,5 @@
 #include "RunningSM.hpp"
-#define OUTPATH ""
+
 namespace __SPEC_LIB_NAME__
 {
 

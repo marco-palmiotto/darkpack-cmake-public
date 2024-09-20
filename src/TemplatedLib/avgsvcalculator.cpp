@@ -1,8 +1,6 @@
 #include "avgsvcalculator.hpp"
 #define DEFAULT_T_LIMIT (1.0e-5*input.getLightestBSMmass())
 
-#define OUTPATH "/home/palmiotto/Documents/MartyWorkspace/mssm-dev/RootWorkSpace/"
-
 template <typename T>
 static inline T SQUARE(const T x) {return x*x;}
 

@@ -3,6 +3,8 @@ cmake_minimum_required(VERSION 3.10)
 # setting the namespace for the specialised library
 set(__SPEC_LIB_NAME__ scalar2to2)
 
+set(__OUTPATH__ "${CMAKE_SOURCE_DIR}/out")
+
 function(print)
     foreach(var ${ARGN})
         message("${var} = ${${var}}")

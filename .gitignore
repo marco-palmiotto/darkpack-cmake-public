@@ -5,6 +5,7 @@
 *.directory
 /**/out/
 src/models/*2to2*/
+cmake-build-debug/
 
 # Prerequisites
 *.d

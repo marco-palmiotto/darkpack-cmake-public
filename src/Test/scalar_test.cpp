@@ -14,6 +14,8 @@
 using namespace scalar2to2;
 using namespace advmath;
 
+const std::string PATHPLOTS=std::string(OUTPATH)+"plots/" ; 
+
 scalar2to2::RunningSM run;
 
 inline double sq(const double x)
@@ -337,10 +339,10 @@ int main(int argc, char ** argv)
     std::cout << "\n Gamma_phi_up_pred = " << gamma_phi_pred(input);
     
     
-    std::ofstream fout{"Weff.out"};
+    std::ofstream fout{PATHPLOTS+"Weff.out"};
     if(!fout)
     {
-      std::cerr << "Impossible to open Weff.out\n";
+      std::cerr << "Impossible to open " << PATHPLOTS+"Weff.out" << std::endl;
       exit(1);      
     }
     
@@ -376,10 +378,10 @@ int main(int argc, char ** argv)
     
     fout.close();
     
-    fout.open("diffWeffTop.out");
+    fout.open(PATHPLOTS+"diffWeffTop.out");
     if(!fout)
     {
-      std::cerr << "Impossible to open diffWeffTop.out\n";
+      std::cerr << "Impossible to open " << PATHPLOTS << "diffWeffTop.out\n";
       exit(1);      
     }
     

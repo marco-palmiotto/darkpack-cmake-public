@@ -1,7 +1,7 @@
 #! /bin/bash
 
 # old option was -l1 -k2 works immediately, but very slow
-ninja -C build -l2 -j4
+ninja -C build -l1 
 exit_code=$?
 
 if [[ !$exit_code -ne 0 ]]

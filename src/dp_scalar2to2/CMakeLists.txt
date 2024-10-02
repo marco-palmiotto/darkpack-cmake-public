@@ -44,7 +44,7 @@ set(COMPILE_LINK_FLAGS
     -lmarty-lha
 )
 # Set global compilation flags (applied to all targets)
-set(GENERIC_FLAGS "-Wall -Wextra -Wpedantic -Wno-deprecated-declarations -fPIC")
+set(GENERIC_FLAGS "-Wall -Wextra -Wpedantic -Wno-deprecated-declarations -fPIC -fdiagnostics-color=always")
 set(MATH_OPTI_FLAGS "-fno-math-errno -ffinite-math-only -fno-rounding-math -fno-signaling-nans -fcx-limited-range -fexcess-precision=fast -fno-signed-zeros -fno-trapping-math -fassociative-math -freciprocal-math")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${GENERIC_FLAGS} ${MATH_OPTI_FLAGS}")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GENERIC_FLAGS} ${MATH_OPTI_FLAGS} -Wshadow")
@@ -93,6 +93,9 @@ file(GLOB LIB_C_HEADERS ${SPEC_LIB_PATH}/clib/*.h
                         ${TEMPLATED_LIB_PATH}/*.h
                         ${PROJECT_SOURCE_DIR}/*.h)
 
+# Automatically gather all the C++ source files for the executables
+file(GLOB SOURCE_FILES_LIST ${PROJECT_SOURCE_DIR}/script/*.cpp)
+
 # print(LIB_CXX_SOURCES LIB_C_SOURCES LIB_CXX_HEADERS LIB_C_HEADERS)      
 
 # For debugging: gathering all the header files of the invariant library
@@ -100,15 +103,27 @@ file(GLOB INVARIANT_LIB_HEADER_FILES ${INVARIANT_LIB_HEADER_PATH}/*.h
                                      ${INVARIANT_LIB_HEADER_PATH}/*.hpp)
 
 # print(INVARIANT_LIB_HEADER_FILES)
+
             
 # Defining all the targets:
     # Add the library and include all the .cpp files
 add_library(${PROJECT_NAME} ${LIB_C_SOURCES} ${LIB_CXX_SOURCES} )
-    # Add the executable
-add_executable(${EXEC_MAIN_NAME} script/main.cpp)
+    # For each executable, we must define a name for the .x output file
+    # and add it to the compilation list
+set(EXECUTABLES_LIST)
+foreach(source_file IN LISTS SOURCE_FILES_LIST)
+    # Get the filename without the path and the extension
+    get_filename_component(executable_name ${source_file} NAME_WE)
+    # Add the executable with .x extension
+    add_executable(${executable_name}.x ${source_file})
+    message("${executable_name}.x ${source_file}")
+    list(APPEND EXECUTABLES_LIST ${executable_name}.x )
+endforeach()
 
-# List of targets in pure C++
-set(TARGETS ${PROJECT_NAME} ${EXEC_MAIN_NAME})
+print(EXECUTABLES_LIST SOURCE_FILES_LIST)
+
+# List of all the targets in pure C++
+set(TARGETS ${PROJECT_NAME} ${EXECUTABLES_LIST})
 
 # For each CXX target: 
 #   - specify the include directoryu
@@ -147,11 +162,13 @@ install(FILES ${LIB_CXX_HEADERS} DESTINATION ${CMAKE_BINARY_DIR}/include/${PROJE
 install(FILES ${LIB_C_HEADERS} DESTINATION ${CMAKE_BINARY_DIR}/include/${PROJECT_NAME})
 
 # For the executables
-#    Manual link to the path of the libraries
-target_link_directories(${EXEC_MAIN_NAME}  PRIVATE ${CMAKE_BINARY_DIR}/lib/)
-#    Manual link of the library
-target_link_libraries(${EXEC_MAIN_NAME} PRIVATE
-    ${PROJECT_NAME} 
-    ${EXTERNAL_LIBS}
-    ${INVARIANT_LIB_NAME}
-)
+foreach(target IN LISTS EXECUTABLES_LIST)
+    #    Manual link to the path of the libraries
+    target_link_directories(${target}  PRIVATE ${CMAKE_BINARY_DIR}/lib/)
+    #    Manual link of the library
+    target_link_libraries(${target} PRIVATE
+        ${PROJECT_NAME} 
+        ${EXTERNAL_LIBS}
+        ${INVARIANT_LIB_NAME}
+    )
+endforeach()

@@ -7,7 +7,7 @@
 	},
 	"runArgs": [
     "--memory=8g",
-	"--memory-swap=8.1g",
+	"--memory-swap=10g",
     "--cpus=6"
   ],
 	"customizations": {

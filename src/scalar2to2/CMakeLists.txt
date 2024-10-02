@@ -20,7 +20,7 @@ set(COMPILE_LINK_FLAGS
     -lgslcblas
 )
 # Set global compilation flags (applied to all targets)
-set(GENERIC_FLAGS "-Wall -Wextra -Wpedantic -Wno-deprecated-declarations -fPIC")
+set(GENERIC_FLAGS "-Wall -Wextra -Wpedantic -Wno-deprecated-declarations -fPIC -fdiagnostics-color=always")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${GENERIC_FLAGS}")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GENERIC_FLAGS}")
 # Debug mode flags (applied when building with Debug configuration)

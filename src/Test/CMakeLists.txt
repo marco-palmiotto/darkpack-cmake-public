@@ -13,25 +13,25 @@ set(INVARIANT_LIB_NAME DPMathLib)
 
 file(GLOB SOURCE_FILES_LIST ${PROJECT_SOURCE_DIR}/*.cpp)
 
-# Define the list of external libraries
-set(EXTERNAL_LIBS
-    pthread 
-    ooptools 
-    gfortran 
-    gsl 
-    gslcblas
-)
-# Define the list of compile options (if needed)
-set(COMPILE_LINK_FLAGS
-    -lpthread
-    -looptools
-    -lgfortran
-    -lgsl
-    -lgslcblas
-)
-
 if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
     # Independent compilation
+
+    # Define the list of external libraries
+    set(EXTERNAL_LIBS
+                        pthread 
+                        ooptools 
+                        gfortran 
+                        gsl 
+                        gslcblas
+        )
+    # Define the list of compile options (if needed)
+    set(COMPILE_LINK_FLAGS
+                        -lpthread
+                        -looptools
+                        -lgfortran
+                        -lgsl
+                        -lgslcblas
+        )
     
     # Flags definition
 
@@ -82,17 +82,3 @@ foreach(source_file IN LISTS SOURCE_FILES_LIST)
     )
     target_link_libraries(${executable_name}.x ${INVARIANT_LIB_NAME} ${EXTERNAL_LIBS} ${MODELS_LIBS_NAMES})
 endforeach()
-
-# add_executable(${EXEC_NAME_0} main.cpp)
-
-# # for each executable, we perform some operations:
-# # 1. defining new header location
-# target_include_directories(${EXEC_NAME_0} PUBLIC
-#     ${INVARIANT_LIB_HEADER_PATH}
-#     ${CMAKE_BINARY_DIR}/include
-# )
-
-# # 2. manual link to the path of the libraries
-# target_link_directories(${EXEC_NAME_0} PRIVATE ${CMAKE_BINARY_DIR}/lib/)
-# # 3. manual link of the library
-# target_link_libraries(${EXEC_NAME_0} ${INVARIANT_LIB_NAME} ${EXTERNAL_LIBS} ${LIB_NAME_1}) 

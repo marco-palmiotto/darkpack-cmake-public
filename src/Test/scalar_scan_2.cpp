@@ -37,9 +37,8 @@ int main(int argc, char ** argv)
     std::cout << "\nDefining boltzfixed\n";
     BoltzmannSolver boltzfixed(input);
     std::cout << "Class constructed\n";
-    
-    
     const double benchmark_omega = boltzfixed.relic_density();
+    std::cout <<  boltzfixed.Tfo << '\n';
     std::cout << "Omega h^2 = " << benchmark_omega << '\n';
     
     
@@ -74,26 +73,26 @@ int main(int argc, char ** argv)
     const double step_gchi=2.e-3;
     const double step_mchi=2.0e+1;
     
-    input.g_u =std::sqrt(ref_gg);
+    input.g_u =std::sqrt(ref_gg);// g_u is fixed
       for( input.g_chi=0.4 ; input.g_chi > 0.2 ; input.g_chi=input.g_chi - step_gchi)
         for( input.m_chi=ref_mchi - halfrange_mchi ; input.m_chi < ref_mchi + halfrange_mchi ; input.m_chi=input.m_chi + step_mchi)
         {
           input.AssignMassesVector();
           
-//           unsigned int exit_code = boltzfixed.changeInput(input);
-//           if( exit_code != 0 ) 
-//           {
-//             std::cout << "Failed to change to:\n" 
-//                       << " - g_u = " << input.g_u << '\n'
-//                       << " - g_chi = " << input.g_chi << '\n'
-//                       << " - m_chi = " << input.m_chi << '\n';
-//             continue;
-//           }
+          unsigned int exit_code = boltzfixed.changeInput(input);
+          if( exit_code != 0 ) 
+          {
+            std::cout << "Failed to change to:\n" 
+                      << " - g_u = " << input.g_u << '\n'
+                      << " - g_chi = " << input.g_chi << '\n'
+                      << " - m_chi = " << input.m_chi << '\n';
+            continue;
+          }
           
           
           //======================================================
-          boltztemp.emplace_back(input, boltzfixed.getProcList());
-          const double relicdensity=boltztemp.back().relic_density(), Tfo = boltztemp.back().Tfo;
+          // boltztemp.emplace_back(input, boltzfixed.getProcList());
+          // const double relicdensity=boltztemp.back().relic_density(), Tfo = boltztemp.back().Tfo;
           //======================================================
           
           const double xfo = input.getLightestBSMmass()/Tfo;

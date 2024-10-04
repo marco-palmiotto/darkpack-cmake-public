@@ -1,3 +1,3 @@
 #! /bin/sh
 
-./build/src/Test/main_test.x
+./build/src/Test/scalar_test.x src/models/scalar.lha

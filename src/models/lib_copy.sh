@@ -19,6 +19,8 @@ else
     echo A library already exists in /src, skipping
 fi
 
+echo Generating CMakeLists.txt in $barebone_lib_destination_path
+sed "s/bsm2to2/$1/g" auxiliary_library/blank_files/CMakeLists.txt > ../$1/CMakeLists.txt
 
 darkpack_lib_destination_path=../dp_$1
 if [ ! -d $darkpack_lib_destination_path ]

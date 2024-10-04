@@ -1,7 +1,3 @@
-/* This is the first example file.
- * We start by including the standard files of the library
- * Then, we include all the new headers, in external_libs.h 
- */
 #include <iostream>
 #include <iomanip>
 #include "dp_scalar2to2/config.hpp"

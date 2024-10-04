@@ -44,7 +44,6 @@ The manual can be found in this repository and also [here](https://arxiv.org/abs
 # Setup of the library
 
 ## Generation of new models
-
 In order to generate a new model, you need to 
 1. place its source file in the folder `src/models`;
 2. compile it, by calling 
@@ -55,4 +54,16 @@ In order to generate a new model, you need to
 3. now the model is generated, you need to copy it into `src`. To do so, run the script
 
         ./lib_copy.sh <1>
-    where `<1>` is the same as before
+    where `<1>` is the same as before. This script will also genrate the `CMakeLists.txt` needed in the projects.
+
+## Compiling with the new-generated model
+
+4. you need to add your new model into the `CMakeLists.txt` in the root folder. Add the line:
+
+        add_subdirectory(src/dp_<1>)
+     where `<1>` is the same as before, after the other projects are added.
+5. you can compile all the models together by using `cmake`. Otherwise, you can use the scripts we provide
+
+        ./configure.sh
+        ./build.sh
+    which will, respectively, configure and build `DarkPACK` in release mode, and using `ninja` as build system.

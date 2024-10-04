@@ -4,7 +4,7 @@
         {
             "label": "configure",
             "type": "shell",
-            "command": "cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_BUILD_TYPE=Debug -S src -B build",
+            "command": "cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_BUILD_TYPE=Debug -G Ninja -S . -B ./build",
             "group": {
                 "kind": "build",
                 "isDefault": true
@@ -23,10 +23,10 @@
         {
             "label": "build",
             "type": "shell",
-            "command": "make -C build -j8", // Executes in the build folder
+            "command": "ninja -C build", // Executes in the build folder
             "dependsOn": "install-lib", // Ensures installation of the libraries happens before building
             "problemMatcher": ["$gcc"],
-            "detail": "Build the project using make"
+            "detail": "Build the project using the chosen build system"
         }
     ]
 }

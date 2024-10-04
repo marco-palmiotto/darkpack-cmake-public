@@ -27,6 +27,10 @@ then
     mkdir $darkpack_lib_destination_path
 fi
 
-cp -r auxiliary_library/$1/ $darkpack_lib_destination_path
-cp auxiliary_library/blank_files/leshouchesfrommarty.hpp $darkpack_lib_destination_path/leshouchesfrommarty.hpp
+dp_files=$(echo auxiliary_library/$1/*)
+for filename in ${dp_files[@]}
+do
+    echo Processing $filename
+    cp $filename $darkpack_lib_destination_path/
+done
 

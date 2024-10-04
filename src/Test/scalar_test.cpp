@@ -82,6 +82,9 @@ double sum_Squaredampl_pred( Param_t &input, const double Ecm, const int Ncolors
   return result;
 }
 
+// This function computes the contribution to dWeff/dcostheta
+// for a single process (i.e. a single SM fermion),
+// starting from the |M|^2 expression defined in DarkPACK 
 double dW_dcos_pred( Param_t &input, const double Ecm, const int Ncolors, const double gf, const double mf)
 {
   run.HandleParamRunning(input, Ecm);
@@ -100,6 +103,9 @@ double dW_dcos_pred( Param_t &input, const double Ecm, const int Ncolors, const 
   return result;
 }
 
+// This function computes the contribution to dWeff/dcostheta without the global coefficient, 
+// for a single process (i.e. a single SM fermion),
+// starting from the |M|^2 expression defined in DarkPACK 
 double dW_dcos_pred_nocoeff( Param_t &input, const double Ecm, const int Ncolors, const double gf, const double mf)
 {
   run.HandleParamRunning(input, Ecm);
@@ -113,7 +119,7 @@ double dW_dcos_pred_nocoeff( Param_t &input, const double Ecm, const int Ncolors
   return p12*p34*M2;
 }
 
-
+// This function computes the total Weff starting from the |M|^2 expression defined in DarkPACK 
 double Weff_pred_fromM2( Param_t &input, const double Ecm)
 {
   run.HandleParamRunning(input, Ecm);
@@ -154,6 +160,8 @@ double Weff_pred_fromM2( Param_t &input, const double Ecm)
   return 2*sum;
 }
 
+
+// This function computes Weff using the formula derived by hand
 double Weff_formula( Param_t &input, const double Ecm)
 {
   run.HandleParamRunning(input, Ecm);
@@ -173,17 +181,17 @@ double Weff_formula( Param_t &input, const double Ecm)
   double sum=0.;
   
     const std::array<int, 9> part({corr::u, corr::c, corr::t,corr::d, corr::s, corr::b,corr::e, corr::mu, corr::tau}),
-                        part_color({3,3,3,3,3,3,1,1,1});
+                             part_color({3,3,3,3,3,3,1,1,1});
     const std::array<double, 9> part_gf({input.g_u,input.g_u, input.g_u,input.g_d,input.g_d,input.g_d,input.g_l,input.g_l,input.g_l});
 //   std::cout << "calculating the sum over all fermions\n";
   for(auto i = 0 ; i <9; i++)
+  {
+    Process2to2 singleproc({corr::chi, corr::chi, part[i],part[i]},{false, true, false,true}); 
+    if(singleproc.checkExistance())
     {
-      Process2to2 singleproc({corr::chi, corr::chi, part[i],part[i]},{false, true, false,true}); 
-      if(singleproc.checkExistance())
-      {
-        sum+=sq(1.0*input.masses_vector[part[i]]*part_gf[i])*part_color[i]*std::pow(s-4.*sq(input.masses_vector[part[i]]), 3./2.);
-      }
+      sum+=sq(1.0*input.masses_vector[part[i]]*part_gf[i])*part_color[i]*std::pow(s-4.*sq(input.masses_vector[part[i]]), 3./2.);
     }
+  }
     
 //   std::cout << "Multiplying the sum\n";
   result*=sum;
@@ -213,11 +221,10 @@ int main(int argc, char ** argv)
     
     std::cout << "v = " << 2*(input.m_W*std::sin(input.theta_W)/input.e_em);
     
-    std::cout << "\nDefining setofproc\n";
+    std::cout << "\nDefining AvgSvCalculator\n";
     AvgSvCalculator allproc(input);
     allproc.setWeffcuts(false);
-//     allproc.enablerunning(false);
-    std::cout << "Class constructed\n";
+    std::cout << "AvgSvCalculator instantiated\n";
     allproc.print();
     
     allproc.print_procs(std::cout, true);
@@ -251,7 +258,7 @@ int main(int argc, char ** argv)
         double dweffdcoscontrib=singleproc.getDiffW12Contrib(input_m, sqrts, 0.5);
         double WeffContrib=singleproc.getTotalW12Contrib(input_m, sqrts);
         
-            // Print the header row
+        // Print the header row
         std::cout << std::setw(width_field) << ".getSumSquaredAmpl" << '\t' 
               << std::setw(width_field) << "sum_Squaredampl_pred" << '\t'
               << std::setw(width_field) << "1/2" << '\t'
@@ -338,7 +345,7 @@ int main(int argc, char ** argv)
     std::cout << " Gamma_phi_up_computed = " << gamma_phi_up_trial ;
     std::cout << "\n Gamma_phi_up_pred = " << gamma_phi_pred(input);
     
-    
+    // Creating plot files 
     std::ofstream fout{PATHPLOTS+"Weff.out"};
     if(!fout)
     {
@@ -346,7 +353,7 @@ int main(int argc, char ** argv)
       exit(1);      
     }
     
-    std::cout << "\n\nOpened Weff.out\n";
+    std::cout << "\n\nOpened " << PATHPLOTS << "Weff.out\n";
     
     fout.precision(17);
     
@@ -402,22 +409,16 @@ int main(int argc, char ** argv)
     
     
     fout.close();
-    double smallest_double = std::numeric_limits<double>::min();
-    double smallest_positive_double = std::numeric_limits<double>::min() * std::numeric_limits<double>::epsilon();
-
-    std::cout << "\nSmallest double: " << smallest_double << std::endl;
-    std::cout << "Absolute value of the smallest positive double: " << smallest_positive_double << std::endl;
     
-    
-    
-    fout.open("scalarsigmav.out");
+    // Creating output file for sigmav
+    fout.open(PATHPLOTS+"scalar_sigmav_all.out");
     if(!fout)
     {
-      std::cerr << "Impossible to open scalarsigmav.out\n";
+      std::cerr << "Impossible to open " << PATHPLOTS << "scalar_sigmav_all.out\n";
       exit(1);      
     }
     
-    std::cout << "\nOpened scalarsigmav.out\n";
+    std::cout << "\nOpened " << PATHPLOTS << "scalar_sigmav_all.out\n";
     
     
     for(T=1.0e-3 ; T<= 100.*input.getLightestBSMmass() ; T*=1.1)
@@ -429,18 +430,12 @@ int main(int argc, char ** argv)
            << '\t'
            << allproc.getAverageSigmav_coan_lowtemp(T) 
            << '\t';
-           
-//       sigmavpred = 0.;
-//       for( auto count_part : {corr::u, corr::c, corr::t, corr::d, corr::s, corr::b}) sigmavpred += sigmav_pred(T, 3, count_part, input);
-//       
-//       for( auto count_part : {corr::e, corr::mu, corr::tau} ) sigmavpred +=sigmav_pred(T, 1, count_part, input);
-//       
-        sigmavpred = 0.;
+      
+      sigmavpred = 0.;
         for( auto count_part : {corr::e, corr::mu, corr::tau} ) sigmavpred +=sigmav_pred(T, 1, count_part, input.g_l, input);
         for( auto count_part : {corr::d, corr::s, corr::b}) sigmavpred += sigmav_pred(T, 3, count_part,input.g_d, input);
         for( auto count_part : {corr::u, corr::c, corr::t}) sigmavpred += sigmav_pred(T, 3, count_part,input.g_u, input);
-        
-    
+      
       fout << sigmavpred
            << '\n';     
       
@@ -464,10 +459,10 @@ int main(int argc, char ** argv)
 
   
     
-    fout.open("YYeq.dat");
+    fout.open(PATHPLOTS+"YYeq.dat");
     if(!fout)
     {
-      std::cerr << "Impossible to open YYeq.dat\n";
+      std::cerr << "Impossible to open " << PATHPLOTS << "YYeq.dat\n";
       exit(1);      
     }
     

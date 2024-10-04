@@ -15,6 +15,27 @@ set(COMPILE_LINK_FLAGS
     -lgslcblas
 )
 
+# Controlla se questo è il progetto principale
+if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
+    # Compilazione indipendente: usa i flag specifici del sottoprogetto
+
+    # Set global compilation flags (applied to all targets)
+    set(GENERIC_FLAGS "-Wall -Wextra -Wpedantic -Wno-deprecated-declarations -fPIC -fdiagnostics-color=always")
+    set(MATH_OPTI_FLAGS "-fno-math-errno -ffinite-math-only -fno-rounding-math -fno-signaling-nans -fcx-limited-range -fexcess-precision=fast -fno-signed-zeros -fno-trapping-math -fassociative-math -freciprocal-math")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${GENERIC_FLAGS} ${MATH_OPTI_FLAGS}")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GENERIC_FLAGS} ${MATH_OPTI_FLAGS} -Wshadow")
+
+    # Debug mode flags (applied when building with Debug configuration)
+    set(DEBUG_FLAGS "-g -O0") # Enable debug symbols, disable optimization
+    set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} ${DEBUG_FLAGS}")
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${DEBUG_FLAGS}")
+
+    # Release mode flags (applied when building with Release configuration)
+    set(RELEASE_FLAGS "-O3 -DNDEBUG") # Optimize for performance, disable debugging features
+    set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} ${RELEASE_FLAGS}")
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${RELEASE_FLAGS}")
+endif()
+
 # Automatically gather all .cpp files in the src/ directory
 file(GLOB LIB_CXX_SOURCES ${PROJECT_SOURCE_DIR}/*.cpp)
 

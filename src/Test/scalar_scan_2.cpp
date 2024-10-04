@@ -38,8 +38,8 @@ int main(int argc, char ** argv)
     BoltzmannSolver boltzfixed(input);
     std::cout << "Class constructed\n";
     const double benchmark_omega = boltzfixed.relic_density();
-    std::cout <<  boltzfixed.Tfo << '\n';
-    std::cout << "Omega h^2 = " << benchmark_omega << '\n';
+    std::cout <<  "x_fo=" << input.getLightestBSMmass()/boltzfixed.Tfo ;
+    std::cout << "\nOmega h^2 = " << benchmark_omega << '\n';
     
     
     const std::string filename=OUTPATH+static_cast<std::string>("scans/3rd_scalar_scan_lin.dat");
@@ -89,7 +89,8 @@ int main(int argc, char ** argv)
             continue;
           }
           
-          
+          const double relicdensity=boltzfixed.relic_density();
+          const double Tfo = boltzfixed.Tfo;
           //======================================================
           // boltztemp.emplace_back(input, boltzfixed.getProcList());
           // const double relicdensity=boltztemp.back().relic_density(), Tfo = boltztemp.back().Tfo;

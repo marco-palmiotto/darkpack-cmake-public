@@ -6,9 +6,9 @@
                 "${default}",
                 "${workspaceFolder}/src/DPMathLib",
                 "${workspaceFolder}/src/TemplatedLib",
-                "${workspaceFolder}/src/mssm2to2/include",
-                "${workspaceFolder}/src/mssm2to2/clib",
-                "${workspaceFolder}/src/dp_mssm2to2",
+                "${workspaceFolder}/src/scalar2to2/include",
+                "${workspaceFolder}/src/scalar2to2/clib",
+                "${workspaceFolder}/src/dp_scalar2to2",
                 "${workspaceFolder}/build/include"
             ],
             "defines": [],

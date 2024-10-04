@@ -1,0 +1,11 @@
+sudo yum install gcc -y || exit 1
+sudo yum install gfortran -y || exit 1
+sudo yum install g++ -y || exit 1
+sudo yum install gsl -y || exit 1
+sudo yum install gsl-devel -y || exit 1
+sudo yum install texlive -y || exit 1
+sudo yum install ImageMagick -y || exit 1
+sudo yum install dvipng -y || exit 1
+sudo yum install coreutils -y || exit 1
+sudo yum install qtchooser -y || exit 1
+sudo yum install cmake -y || exit 1

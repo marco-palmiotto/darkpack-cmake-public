@@ -1,0 +1,11 @@
+# Dependencies in Ubuntu 20.04
+
+pkg-config git
+
+coreutils build-essential libgsl-dev libgslcblas0  qt5-default qtcreator dvipng
+
+# in Ubuntu 22.04
+
+pkg-config git
+
+coreutils build-essential libgsl-dev libgslcblas0  qtcreator dvipng qtbase5-dev

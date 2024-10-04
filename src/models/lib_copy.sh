@@ -20,7 +20,7 @@ else
 fi
 
 echo Generating CMakeLists.txt in $barebone_lib_destination_path
-sed "s/bsm2to2/$1/g" auxiliary_library/blank_files/CMakeLists.txt > ../$1/CMakeLists.txt
+sed "s/bsm2to2/$1/g" auxiliary_library/blank_files/CMakeLists.txt > $barebone_lib_destination_path/CMakeLists.txt
 
 darkpack_lib_destination_path=../dp_$1
 if [ ! -d $darkpack_lib_destination_path ]
@@ -36,3 +36,5 @@ do
     cp $filename $darkpack_lib_destination_path/
 done
 
+echo Generating CMakeLists.txt in $darkpack_lib_destination_path
+sed "s/bsm2to2/$1/g" auxiliary_library/blank_files/dp/CMakeLists.txt > $darkpack_lib_destination_path/CMakeLists.txt

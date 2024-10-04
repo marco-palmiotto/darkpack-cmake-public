@@ -1,5 +1,5 @@
 #include "leshouchesfrommarty.hpp"
-#define DEBUG
+// #define DEBUG
 
 namespace scalar2to2::readmodule
 {

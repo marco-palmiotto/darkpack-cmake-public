@@ -11,7 +11,7 @@ installpath=$sourcepath/build/.install
 echo Checking gcc version
 
 # Get the version of GCC
-gcc_version=$(gcc --version | grep -oP '\d+\.\d+\.\d+' | head -n1 | cut -f 1 =d '.')
+gcc_version=$(gcc --version | grep -oP '\d+\.\d+\.\d+' | head -n1 | cut -f 1 -d '.')
 
 echo You have installed $gcc_version
 
@@ -51,12 +51,8 @@ download_marty()
   fi
 }
 
-mkdir $sourcepath
-cp marty-public.tar.gz $sourcepath/marty-public.tar.gz
-cd $sourcepath
-tar -xf marty-public.tar.gz 
-rm marty-public.tar.gz 
-cd ..
+cd $work_dir
+download_marty 
 
 mkdir -p $installpath/bin 
 if [ $? -ne 0 ] ; then
@@ -72,19 +68,16 @@ if [ $? -ne 0 ] ; then
   echo "Error in creating $installpath/lib" ; exit 4
 fi
 
-cd $sourcepath/build 
-if [ $? -ne 0 ] ; then
- echo "Impossible to change directory in $sourcepath/build, aborting" ; exit 7
-fi
+cd $sourcepath
 
-cmake .. -DCMAKE_INSTALL_PREFIX=.install 
+cmake -DCMAKE_INSTALL_PREFIX=.install -S . -B build
 if [ $? -ne 0 ] ; then
  echo "Error in calling cmake (line 16), aborting" ; exit 8
 fi
 
 echo "Starting compilation of MARTY with $nthreads threads"
 
-make -j$nthreads 
+cd build && make -j$nthreads 
 if [ $? -ne 0 ] ; then
  echo "Error in calling make (line 17), aborting" ; exit 9
 fi

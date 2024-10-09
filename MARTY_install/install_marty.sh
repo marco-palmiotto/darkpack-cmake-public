@@ -15,21 +15,10 @@ gcc_version=$(gcc --version | grep -oP '\d+\.\d+\.\d+' | head -n1 | cut -f 1 -d 
 
 echo You have installed $gcc_version
 
-# Define the minimum required GCC version
-required_version="12"
-
-echo The required version is $required_version
-
-# Compare the versions
-if [ "$gcc_version" -le "$required_version" ]; then
-    # GCC version is greater than 12, export the variables
-    export CC=gcc-12
-    export CXX=g++-12
-    export FC=gfortran-12
-
-    echo Environmental variables have been updated
-else
-    echo Your system is good
+if [[ $gcc_version -le 9 || $gcc_version -ge 12 ]]
+then
+  echo "The required version must be between gcc-9 and gcc-12"
+  exit 1
 fi
 
 echo Cleaning possible past installations in marty-public

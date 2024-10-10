@@ -7,7 +7,7 @@
 #include "dp_scalar2to2/avgsvcalculator.hpp"
 #include "dp_scalar2to2/boltzmann.hpp"
 
-#define USE_BOLTZVECTOR
+// #define USE_BOLTZVECTOR
 
 using namespace scalar2to2;
 using namespace advmath;
@@ -50,7 +50,7 @@ int main(int argc, char ** argv)
     input.m_chi=input.m_chi+200;
     input.AssignMassesVector();// <=== the criminal line!
     boltzfixed.changeInput(input);
-    benchmark_omega = boltzfixed.relic/_density();
+    benchmark_omega = boltzfixed.relic_density();
     std::cout << input.m_chi;
     std::cout <<  "x_fo=" << input.getLightestBSMmass()/boltzfixed.Tfo ;
     std::cout << "\nOmega h^2 = " << benchmark_omega << '\n';
@@ -83,11 +83,11 @@ int main(int argc, char ** argv)
     
     const double halfrange_mchi=1.0e+3;
     
-    const double step_gchi=2.e-1;
+    const double step_gchi=1.0e-2;
     const double step_mchi=2.0e+1;
     
     input.g_u =std::sqrt(ref_gg);// g_u is fixed
-      for( input.g_chi=0.4 ; input.g_chi > 0.2 ; input.g_chi=input.g_chi - step_gchi)
+      for( input.g_chi=0.1 ; input.g_chi < 0.9 ; input.g_chi=input.g_chi + step_gchi)
         for( input.m_chi=ref_mchi - halfrange_mchi ; input.m_chi < ref_mchi + halfrange_mchi ; input.m_chi=input.m_chi + step_mchi)
         {
           input.AssignMassesVector();

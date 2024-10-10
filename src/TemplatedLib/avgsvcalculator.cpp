@@ -204,26 +204,20 @@ void AvgSvCalculator::changeInput(const Param_t &input_ext, const bool hasMassSp
   {
     sort_bsm_spectrum();
     
-    g2_Wefftab.clear();
     sqrtStab.clear();
     pefftab.clear();
-    
-    setLimitingValues();
-  }else
-  {
-    setLimitingValues();
-    
-    if( g2_Wefftab.size() != 0)
-    {
-      g2_Wefftab[0]=Weffderiv.at(0)*sq(input.getLightestBSMdof());
-      for(size_t i = 1 ; i < sqrtStab.size() ; i++)
-      {
-        g2_Wefftab[i]= get_g2_Weff(sqrtStab[i]);
-      }
-    }
-    
   }
   
+  
+  g2_Wefftab.clear();
+  setLimitingValues();
+  
+  g2_Wefftab[0]=Weffderiv.at(0)*sq(input.getLightestBSMdof());
+  for(size_t i = 1 ; i < sqrtStab.size() ; i++)
+  {
+    g2_Wefftab[i]= get_g2_Weff(sqrtStab[i]);
+  }
+
   setTaylorCoeffSVx_nosplitting();
 }
 

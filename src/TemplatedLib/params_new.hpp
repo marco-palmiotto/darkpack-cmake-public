@@ -514,15 +514,7 @@ public :
     
     // Procedure to automatically assign the elements in the 
     // "masses_vector" array, by calling corr::getMassFirst
-    inline void AssignMassesVector()
-    {
-      using namespace corr;
-      for(int i = 1 ; i <= TOTAL_PARTICLES ; i++)
-      {
-        masses_vector[i]= std::abs(getMassFirst(i, *this));
-      }
-      aremassesassigned=true;
-    };
+    void AssignMassesVector();
     
     // Procedure to determine the lightest BSM particle, and 
     // assign the relevant data member in the instance of this 

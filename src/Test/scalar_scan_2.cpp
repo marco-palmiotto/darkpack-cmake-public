@@ -7,6 +7,8 @@
 #include "dp_scalar2to2/avgsvcalculator.hpp"
 #include "dp_scalar2to2/boltzmann.hpp"
 
+#define USE_BOLTZVECTOR
+
 using namespace scalar2to2;
 using namespace advmath;
 
@@ -33,16 +35,27 @@ int main(int argc, char ** argv)
     struct Param_t input(argv[1]);
     
     input.Print(); // Printing out the input structure
+
+    AvgSvCalculator avg(input);
     
     std::cout << "\nDefining boltzfixed\n";
-    BoltzmannSolver boltzfixed(input);
+    BoltzmannSolver boltzfixed(input, avg.getProcList());
     std::cout << "Class constructed\n";
-    const double benchmark_omega = boltzfixed.relic_density();
+    double benchmark_omega = boltzfixed.relic_density();
+    std::cout <<  "x_fo=" << input.getLightestBSMmass()/boltzfixed.Tfo ;
+    std::cout << "\nOmega h^2 = " << benchmark_omega << '\n';
+
+    std::cout << "Re-calculating by increasing m_chi by 10%\n";
+    input.g_chi=0.4;
+    input.m_chi=input.m_chi+200;
+    input.AssignMassesVector();// <=== the criminal line!
+    boltzfixed.changeInput(input);
+    benchmark_omega = boltzfixed.relic/_density();
+    std::cout << input.m_chi;
     std::cout <<  "x_fo=" << input.getLightestBSMmass()/boltzfixed.Tfo ;
     std::cout << "\nOmega h^2 = " << benchmark_omega << '\n';
     
-    
-    const std::string filename=OUTPATH+static_cast<std::string>("scans/3rd_scalar_scan_lin.dat");
+    const std::string filename=OUTPATH+static_cast<std::string>("scans/4th_scalar_scan_lin.out");
     
     std::ofstream tempfile(filename.c_str());
         
@@ -55,12 +68,12 @@ int main(int argc, char ** argv)
     tempfile << std::setprecision(15) << std::scientific; 
     
     
-    //=======================================================
-    std::vector<BoltzmannSolver> boltztemp;
-    boltztemp.reserve(100000);
-    //=======================================================
-
-    std::cout << "\nSolving the Boltzmann equation using the same instance of the Boltzmann class\n"; 
+    #ifdef USE_BOLTZVECTOR
+      std::vector<BoltzmannSolver> boltztemp;
+      boltztemp.reserve(100000);
+    #else
+      std::cout << "\nSolving the Boltzmann equation using the same instance of the Boltzmann class\n"; 
+    #endif
     
 //     for( input.g_u=1. ; input.g_u > std::numerical_limits<double>::min() ; input.g_u*=0.9)
     
@@ -70,7 +83,7 @@ int main(int argc, char ** argv)
     
     const double halfrange_mchi=1.0e+3;
     
-    const double step_gchi=2.e-3;
+    const double step_gchi=2.e-1;
     const double step_mchi=2.0e+1;
     
     input.g_u =std::sqrt(ref_gg);// g_u is fixed
@@ -78,24 +91,24 @@ int main(int argc, char ** argv)
         for( input.m_chi=ref_mchi - halfrange_mchi ; input.m_chi < ref_mchi + halfrange_mchi ; input.m_chi=input.m_chi + step_mchi)
         {
           input.AssignMassesVector();
-          
-          unsigned int exit_code = boltzfixed.changeInput(input);
-          if( exit_code != 0 ) 
-          {
-            std::cout << "Failed to change to:\n" 
-                      << " - g_u = " << input.g_u << '\n'
-                      << " - g_chi = " << input.g_chi << '\n'
-                      << " - m_chi = " << input.m_chi << '\n';
-            continue;
-          }
-          
-          const double relicdensity=boltzfixed.relic_density();
-          const double Tfo = boltzfixed.Tfo;
-          //======================================================
-          // boltztemp.emplace_back(input, boltzfixed.getProcList());
-          // const double relicdensity=boltztemp.back().relic_density(), Tfo = boltztemp.back().Tfo;
-          //======================================================
-          
+      
+          #ifdef USE_BOLTZVECTOR
+            boltztemp.emplace_back(input);
+            const double relicdensity=boltztemp.back().relic_density(), Tfo = boltztemp.back().Tfo;
+          #else
+            unsigned int exit_code = boltzfixed.changeInput(input);
+            if( exit_code != 0 ) 
+            {
+              std::cout << "Failed to change to:\n" 
+                        << " - g_u = " << input.g_u << '\n'
+                        << " - g_chi = " << input.g_chi << '\n'
+                        << " - m_chi = " << input.m_chi << '\n';
+              continue;
+            }
+            
+            const double relicdensity=boltzfixed.relic_density();
+            const double Tfo = boltzfixed.Tfo;
+          #endif
           const double xfo = input.getLightestBSMmass()/Tfo;
           tempfile << static_cast<double>(input.g_chi) << '\t' 
                    << static_cast<double>(input.m_chi) << '\t' 

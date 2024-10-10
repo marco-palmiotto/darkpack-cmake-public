@@ -150,6 +150,17 @@ namespace __SPEC_LIB_NAME__
     }
     
   }
+
+  void Param_t::AssignMassesVector()
+  {
+    using namespace corr;
+    for(int i = 1 ; i <= TOTAL_PARTICLES ; i++)
+    {
+      masses_vector[i]= std::abs(getMassFirst(i, *this));
+    }
+    aremassesassigned=true;
+    setLightestBSMparticle();
+  };
   
   void darkpackparam_t::print(std::ostream& out) const 
   {

@@ -41,5 +41,11 @@ done
 echo Generating CMakeLists.txt in $darkpack_lib_destination_path
 sed "s/bsm2to2/$1/g" auxiliary_library/blank_files/dp/CMakeLists.txt > $darkpack_lib_destination_path/CMakeLists.txt
 
-echo Copying config.hpp.in in $darkpack_lib_destination_path
-cp auxiliary_library/blank_files/config.hpp.in $darkpack_lib_destination_path/config.hpp.in
+file_list=("config.hpp.in" "leshouchesfrommarty.hpp")
+
+for filename in ${file_list[@]}
+do
+    echo Copying $filename in $darkpack_lib_destination_path
+    cp auxiliary_library/blank_files/$filename $darkpack_lib_destination_path/$filename
+done
+

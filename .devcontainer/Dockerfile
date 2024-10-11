@@ -16,7 +16,7 @@ WORKDIR /home/${username}
 
 RUN git clone https://github.com/docbrown1955/marty-public.git && \
     cd marty-public && \
-    git checkout plugin/boltzmann_solver && \
+    git checkout master && \
     mkdir bin include lib build 
 
 RUN cd /home/${username}/marty-public/build && \

@@ -39,7 +39,7 @@ namespace corr{
        b
    };
 
-#include "smBsm.h"
+#include "smBsm.hpp"
 inline const std::array<std::string,TOTAL_PARTICLES+1> part_names={" ",
         "G",
         "V_3",

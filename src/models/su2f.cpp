@@ -595,7 +595,7 @@ int main()
   }
 
 
-  computeAndAddToLibFromList(su2f_model, lib, list_of_processes, "smBsm.h");
+  computeAndAddToLibFromList(su2f_model, lib, list_of_processes);
   
   
   // Computation of the widths at the three TreeLevel

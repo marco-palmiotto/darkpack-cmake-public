@@ -66,7 +66,7 @@ compile_MARTY_source()
 
 # Deleting the file with the calcHep-SuperIso correspondance
 # It will be opened in append mode next
-rm -f "data/processes_chep.txt"
+[[ $libname == "mssm2to2" ]] && rm -f "data/processes_chep.txt"
 
 # We need those folders to create files in them while $source_mty.x is run
 [ -d $libname/include ] || mkdir -p $libname/include

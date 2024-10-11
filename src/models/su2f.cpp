@@ -1,5 +1,6 @@
 #include <marty.h>
 #include <marty/models/sm.h>
+#include <marty/ufo/electriccharge.h>
 
 using namespace mty;
 using namespace mty::experimental;

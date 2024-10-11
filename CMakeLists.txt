@@ -53,6 +53,7 @@ add_subdirectory(src/DPMathLib)
     )
 
 add_subdirectory(src/dp_scalar2to2)
+add_subdirectory(src/dp_su2f2to2)
 # add_subdirectory(src/dp_mssm2to2)
 
 # Options to be applied only to the executables

@@ -2,7 +2,7 @@
 #include <marty/models/sm.h>
 
 using namespace mty;
-// using namespace mty::experimental;
+using namespace mty::experimental;
 using namespace mty::sm_input;
 using namespace csl;
 
@@ -27,7 +27,7 @@ public:
 
 private:
     int m_model;
-
+};
 
 SU2f_Model::SU2f_Model(int model) : SM_Model(false), m_model(model) {
     this->init();

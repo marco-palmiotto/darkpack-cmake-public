@@ -93,7 +93,7 @@ print_how()
 generate_param_t_comparison()
 {
 # This function has to be launched inside the $auxfolder_model
-  local libpath=../../../$libname/include/params.h
+  local libpath=../../$libname/include/params.h
 
   grep "csl::InitSanitizer<[[:alnum:]_]*> [[:alnum:]_]* { \"[[:alnum:]_]*\" };" $libpath | cut -f 2 -d '>' | cut -f 1 -d '{' | sed "s/^ \(.*\)$/if(!(p1.\1==p2.\1))return false;/g" > central_test.txt
   
@@ -108,7 +108,7 @@ generate_param_t_comparison()
 generate_copy_to_c_struct()
 {
 # This function has to be launched inside the $auxfolder_model
-  local inputfile=../../../$libname/include/params.h
+  local inputfile=../../$libname/include/params.h
   local outputfile=copy_to_c_struct.hpp
   
   echo Determining sij

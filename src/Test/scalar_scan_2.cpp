@@ -55,7 +55,7 @@ int main(int argc, char ** argv)
     std::cout <<  "x_fo=" << input.getLightestBSMmass()/boltzfixed.Tfo ;
     std::cout << "\nOmega h^2 = " << benchmark_omega << '\n';
     
-    const std::string filename=OUTPATH+static_cast<std::string>("scans/4th_scalar_scan_lin.out");
+    const std::string filename=OUTPATH+static_cast<std::string>("scans/5th_scalar_scan_lin_m_chi2TeVm_phi5TeV.out");
     
     std::ofstream tempfile(filename.c_str());
         
@@ -78,7 +78,7 @@ int main(int argc, char ** argv)
 //     for( input.g_u=1. ; input.g_u > std::numerical_limits<double>::min() ; input.g_u*=0.9)
     
     const double ref_mchi=2.e+3;
-    const double ref_mphi=4.4e+3;
+    const double ref_mphi=5.0e+3;
     const double ref_gg = 0.78*0.78;
     
     const double halfrange_mchi=1.0e+3;

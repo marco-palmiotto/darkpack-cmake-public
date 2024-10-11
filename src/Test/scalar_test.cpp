@@ -455,10 +455,10 @@ int main(int argc, char ** argv)
 
   
     
-    fout.open(PATHPLOTS+"YYeq.dat");
+    fout.open(PATHPLOTS+"YYeq.out");
     if(!fout)
     {
-      std::cerr << "Impossible to open " << PATHPLOTS << "YYeq.dat\n";
+      std::cerr << "Impossible to open " << PATHPLOTS << "YYeq.out\n";
       exit(1);      
     }
     

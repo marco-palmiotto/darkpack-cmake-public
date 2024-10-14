@@ -3,12 +3,15 @@ FROM mcr.microsoft.com/devcontainers/cpp:1-debian-12
 ARG username=vscode
 ARG nthreads=8
 
-# [Optional] Uncomment this section to install additional packages.
+# Installing packages for MARTY's dependencies
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     && apt-get -y install --no-install-recommends \
     libgsl-dev libgslcblas0 texlive texlive-luatex dvipng coreutils imagemagick \
     qtbase5-dev qtchooser qt5-qmake qtbase5-dev-tools \
-    make cmake g++ gcc gfortran git neofetch
+    make cmake g++ gcc gfortran git neofetch \
+    autoconf automake libtool libgoogle-glog-dev libgflags-dev libeigen3-dev
+# Installing packages for CMA-ES minimization algorithm's dependencies
+# RUN apt-get -y install autoconf automake libtool libgoogle-glog-dev libgflags-dev libeigen3-dev
 
 USER ${username}
 
@@ -44,5 +47,7 @@ ENV LD_LIBRARY_PATH=$INSTALLMARTYPATH/lib
 ENV LIBRARY_PATH=$INSTALLMARTYPATH/lib
 ENV C_INCLUDE_PATH=$INSTALLMARTYPATH/include
 ENV CPATH=$INSTALLMARTYPATH/include
+
+
 
 CMD ["sleep", "infinity"]

@@ -12,7 +12,7 @@
 using namespace scalar2to2;
 using namespace advmath;
 
-const std::string PATHPLOTS=std::string(OUTPATH)+"plots/" ;
+const std::string PATHPLOTS=std::string(OUTPATH) ;
 
 inline double sq(const double x)
 {
@@ -54,18 +54,8 @@ int main(int argc, char ** argv)
     std::cout << input.m_chi;
     std::cout <<  "x_fo=" << input.getLightestBSMmass()/boltzfixed.Tfo ;
     std::cout << "\nOmega h^2 = " << benchmark_omega << '\n';
-    
-    const std::string filename=OUTPATH+static_cast<std::string>("scans/5th_scalar_scan_lin_m_chi2TeVm_phi5TeV.out");
-    
-    std::ofstream tempfile(filename.c_str());
-        
-    if(!tempfile)
-    {
-      std::cout << "Impossible to open " << filename << '\n'; 
-      exit(1);
-    }
-    
-    tempfile << std::setprecision(15) << std::scientific; 
+
+
     
     
     #ifdef USE_BOLTZVECTOR
@@ -76,17 +66,50 @@ int main(int argc, char ** argv)
     #endif
     
 //     for( input.g_u=1. ; input.g_u > std::numerical_limits<double>::min() ; input.g_u*=0.9)
+    const std::string filename_base="scalar_scan_lin";
     
-    const double ref_mchi=2.e+3;
     const double ref_mphi=5.0e+3;
     const double ref_gg = 0.78*0.78;
-    
-    const double halfrange_mchi=1.0e+3;
-    
+
+    const double start_gchi=0.1;
+    const double end_gchi=0.9;
     const double step_gchi=1.0e-2;
+
+    const double ref_mchi=2.e+3;
+    const double halfrange_mchi=1.0e+3;
     const double step_mchi=2.0e+1;
     
-    input.g_u =std::sqrt(ref_gg);// g_u is fixed
+    input.g_u =1.;// g_u is fixed
+   
+
+    std::ofstream detail_file(PATHPLOTS+"scans/7th_"+filename_base+"_details.out");
+
+    if(!detail_file)
+    {
+      std::cout << "Impossible to open " << PATHPLOTS+"scans/7th_"+filename_base+"_details.out" << '\n'; 
+      exit(1);
+    }
+
+    detail_file << "g_u   = " << input.g_u.get();
+    detail_file << "\nm_phi = " << input.m_phi.get();
+    detail_file << "\nm_chi [" << ref_mphi -halfrange_mchi << " , " << ref_mchi + halfrange_mchi << "]";
+    detail_file << "\ng_chi [" << start_gchi << " , " << end_gchi << "]\n";
+
+    
+    const std::string filename=PATHPLOTS+static_cast<std::string>("scans/6th_scalar_scan_lin.out");
+    
+    std::ofstream tempfile(filename.c_str());
+        
+    if(!tempfile)
+    {
+      std::cout << "Impossible to open " << filename << '\n'; 
+      exit(1);
+    }
+    
+    tempfile << std::setprecision(15) << std::scientific; 
+
+
+
       for( input.g_chi=0.1 ; input.g_chi < 0.9 ; input.g_chi=input.g_chi + step_gchi)
         for( input.m_chi=ref_mchi - halfrange_mchi ; input.m_chi < ref_mchi + halfrange_mchi ; input.m_chi=input.m_chi + step_mchi)
         {

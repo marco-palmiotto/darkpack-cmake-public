@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.25.1)
 
 # setting the namespace for the specialised library
 set(__SPEC_LIB_NAME__ bsm2to2)

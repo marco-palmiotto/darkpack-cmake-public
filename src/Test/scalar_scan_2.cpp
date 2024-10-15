@@ -68,7 +68,7 @@ int main(int argc, char ** argv)
 //     for( input.g_u=1. ; input.g_u > std::numerical_limits<double>::min() ; input.g_u*=0.9)
     const std::string filename_base="scalar_scan_lin";
     
-    const double ref_mphi=5.0e+3;
+    // const double ref_mphi=5.0e+3;
     const double ref_gg = 0.78*0.78;
 
     const double start_gchi=0.1;
@@ -80,23 +80,24 @@ int main(int argc, char ** argv)
     const double step_mchi=2.0e+1;
     
     input.g_u =1.;// g_u is fixed
+    input.m_phi=1.e+4;
    
 
-    std::ofstream detail_file(PATHPLOTS+"scans/7th_"+filename_base+"_details.out");
+    std::ofstream detail_file(PATHPLOTS+"scans/8th_"+filename_base+"_details.out");
 
     if(!detail_file)
     {
-      std::cout << "Impossible to open " << PATHPLOTS+"scans/7th_"+filename_base+"_details.out" << '\n'; 
+      std::cout << "Impossible to open " << PATHPLOTS+"scans/8th_"+filename_base+"_details.out" << '\n'; 
       exit(1);
     }
 
     detail_file << "g_u   = " << input.g_u.get();
     detail_file << "\nm_phi = " << input.m_phi.get();
-    detail_file << "\nm_chi [" << ref_mphi -halfrange_mchi << " , " << ref_mchi + halfrange_mchi << "]";
+    detail_file << "\nm_chi [" << ref_mchi -halfrange_mchi << " , " << ref_mchi + halfrange_mchi << "]";
     detail_file << "\ng_chi [" << start_gchi << " , " << end_gchi << "]\n";
 
     
-    const std::string filename=PATHPLOTS+static_cast<std::string>("scans/6th_scalar_scan_lin.out");
+    const std::string filename=PATHPLOTS+static_cast<std::string>("scans/8th_scalar_scan_lin.out");
     
     std::ofstream tempfile(filename.c_str());
         

@@ -8,7 +8,7 @@ endfunction()
 
 project(main)
 
-
+set(CMA_ES_LIB_PATH ${PROJECT_SOURCE_DIR}/../../build/submodules/CMA-ES/src)
 
 file(GLOB MODEL_LIB_NAMES ${PROJECT_SOURCE_DIR}/../dp_* )
 set(INVARIANT_LIB_NAME DPMathLib)
@@ -25,6 +25,7 @@ if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
                         gfortran 
                         gsl 
                         gslcblas
+                        cmaes
         )
     # Define the list of compile options (if needed)
     set(COMPILE_LINK_FLAGS
@@ -64,7 +65,7 @@ if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
 endif()
 
 print(MODEL_LIB_NAMES MODELS_LIBS_NAMES SOURCE_FILES_LIST)
-
+print(CMA_ES_LIB_PATH)
 # 1. Generate an executable for each .cpp source file with a .x extension
 foreach(source_file IN LISTS SOURCE_FILES_LIST)
     # Get the filename without the path and the extension
@@ -75,8 +76,20 @@ foreach(source_file IN LISTS SOURCE_FILES_LIST)
     message("${executable_name}.x ${source_file}")
 
     # Include directories and link libraries for the executable
-    target_include_directories(${executable_name}.x PUBLIC
-        ${CMAKE_INSTALL_PREFIX}/include
+    target_include_directories(${executable_name}.x 
+        PUBLIC ${CMAKE_INSTALL_PREFIX}/include
+        PUBLIC ${CMAKE_PROJECT_DIR}/../../submodules/CMA-ES/include
     )
-    target_link_libraries(${executable_name}.x ${INVARIANT_LIB_NAME} ${EXTERNAL_LIBS} ${MODELS_LIBS_NAMES})
+
+    target_link_directories(${executable_name}.x 
+        PRIVATE ${CMA_ES_LIB_PATH}
+    )
+
+    add_dependencies(${executable_name}.x cmaes)
+
+    target_link_libraries(${executable_name}.x 
+        ${INVARIANT_LIB_NAME} 
+        ${EXTERNAL_LIBS} 
+        ${MODELS_LIBS_NAMES}
+    )
 endforeach()

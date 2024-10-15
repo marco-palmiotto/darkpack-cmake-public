@@ -51,8 +51,8 @@ add_library(${PROJECT_NAME} ${LIB_CXX_SOURCES} ${LIB_C_SOURCES})
 
 # Specify output folder for the libraries
 set_target_properties(${PROJECT_NAME} PROPERTIES
-    ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib
-    LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib
+    ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_INSTALL_PREFIX}/lib
+    LIBRARY_OUTPUT_DIRECTORY ${CMAKE_INSTALL_PREFIX}/lib
 )
 
 # Specify the include directory
@@ -65,4 +65,19 @@ target_link_libraries(${PROJECT_NAME} PRIVATE ${EXTERNAL_LIBS})
 target_compile_options(${PROJECT_NAME} PRIVATE ${COMPILE_LINK_FLAGS})
 
 # Installing header files
-install(FILES ${LIB_HEADERS} DESTINATION ${CMAKE_BINARY_DIR}/include/${PROJECT_NAME})
+install(FILES ${LIB_HEADERS} DESTINATION include/${PROJECT_NAME})
+# Installing the libary
+install(TARGETS ${PROJECT_NAME} DESTINATION lib)
+
+# Create a custom command to install headers
+set(HEADER_FILES ${LIB_HEADERS})
+add_custom_command(
+    OUTPUT ${CMAKE_BINARY_DIR}/install_headers_${PROJECT_NAME}
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_INSTALL_PREFIX}/include/${PROJECT_NAME}
+    COMMAND ${CMAKE_COMMAND} -E copy ${HEADER_FILES} ${CMAKE_INSTALL_PREFIX}/include//${PROJECT_NAME}//
+    DEPENDS ${HEADER_FILES}
+    COMMENT "Installing headers only for ${PROJECT_NAME}"
+)
+
+# Create a custom target for headers installation
+add_custom_target(install_headers_${PROJECT_NAME} ALL DEPENDS ${CMAKE_BINARY_DIR}/install_headers_${PROJECT_NAME})

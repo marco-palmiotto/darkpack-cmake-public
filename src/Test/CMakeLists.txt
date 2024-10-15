@@ -63,9 +63,6 @@ endif()
 
 print(MODEL_LIB_NAMES MODELS_LIBS_NAMES SOURCE_FILES_LIST)
 
-# Using the installed path for the invariant library's header
-set(INVARIANT_LIB_HEADER_PATH ${CMAKE_BINARY_DIR}/include/${INVARIANT_LIB_NAME})  
-
 # 1. Generate an executable for each .cpp source file with a .x extension
 foreach(source_file IN LISTS SOURCE_FILES_LIST)
     # Get the filename without the path and the extension
@@ -77,8 +74,7 @@ foreach(source_file IN LISTS SOURCE_FILES_LIST)
 
     # Include directories and link libraries for the executable
     target_include_directories(${executable_name}.x PUBLIC
-        ${INVARIANT_LIB_HEADER_PATH}
-        ${CMAKE_BINARY_DIR}/include
+        ${CMAKE_INSTALL_PREFIX}/include
     )
     target_link_libraries(${executable_name}.x ${INVARIANT_LIB_NAME} ${EXTERNAL_LIBS} ${MODELS_LIBS_NAMES})
 endforeach()

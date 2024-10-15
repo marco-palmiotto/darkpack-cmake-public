@@ -41,7 +41,7 @@ done
 echo Generating CMakeLists.txt in $darkpack_lib_destination_path
 sed "s/bsm2to2/$1/g" auxiliary_library/blank_files/dp/CMakeLists.txt > $darkpack_lib_destination_path/CMakeLists.txt
 
-file_list=("config.hpp.in" "leshouchesfrommarty.hpp")
+file_list=("config.hpp.in" ) #"leshouchesfrommarty.hpp")
 
 for filename in ${file_list[@]}
 do

@@ -9,7 +9,7 @@
                 "${workspaceFolder}/src/scalar2to2/include",
                 "${workspaceFolder}/src/scalar2to2/clib",
                 "${workspaceFolder}/src/dp_scalar2to2",
-                "${workspaceFolder}/build/include"
+                "${workspaceFolder}/build/.install/include"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/gcc",

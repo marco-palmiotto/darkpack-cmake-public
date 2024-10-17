@@ -15,7 +15,7 @@
         {
             "label": "install-headers",
             "type": "shell",
-            "command": "cmake --build . --target install_headers_all",
+            "command": "cmake --build ./build --target install_headers_all",
             "dependsOn": "configure", // Ensures the configure happens before installation
             "problemMatcher": [],
             "detail": "Install the headers of DarkPACK's libraries"

@@ -48,7 +48,7 @@ int main(int argc, char ** argv)
     std::cout << "Re-calculating by increasing m_chi by 10%\n";
     input.g_chi=0.4;
     input.m_chi=input.m_chi+200;
-    input.AssignMassesVector();// <=== the criminal line!
+    input.refresh();// <=== the criminal line!
     boltzfixed.changeInput(input);
     benchmark_omega = boltzfixed.relic_density();
     std::cout << input.m_chi;
@@ -114,7 +114,7 @@ int main(int argc, char ** argv)
       for( input.g_chi=0.1 ; input.g_chi < 0.9 ; input.g_chi=input.g_chi + step_gchi)
         for( input.m_chi=ref_mchi - halfrange_mchi ; input.m_chi < ref_mchi + halfrange_mchi ; input.m_chi=input.m_chi + step_mchi)
         {
-          input.AssignMassesVector();
+          input.refresh();
       
           #ifdef USE_BOLTZVECTOR
             boltztemp.emplace_back(input);

@@ -520,6 +520,9 @@ public :
     // assign the relevant data member in the instance of this 
     // structure
     void setLightestBSMparticle() ;
+
+    // Procedure to be called after an input change
+    void refresh();
     
     // Procedure to modify the content of a class instance with 
     // the one of another, by checking that the SM parameters 

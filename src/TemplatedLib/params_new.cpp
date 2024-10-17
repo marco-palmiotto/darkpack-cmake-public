@@ -159,8 +159,13 @@ namespace __SPEC_LIB_NAME__
       masses_vector[i]= std::abs(getMassFirst(i, *this));
     }
     aremassesassigned=true;
-    setLightestBSMparticle();
   };
+
+  void Param_t::refresh()
+  {
+    AssignMassesVector();
+    setLightestBSMparticle();
+  }
   
   void darkpackparam_t::print(std::ostream& out) const 
   {

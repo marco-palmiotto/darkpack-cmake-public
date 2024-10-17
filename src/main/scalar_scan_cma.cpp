@@ -28,7 +28,7 @@ static inline double sq(const double x)
 
 static inline double gaussian_shape(const double val, const double mean, const double stddev)
 {
-  return std::exp( - sq(val-mean)/2./sq(stddev) );
+  return -std::exp( - sq(val-mean)/2./sq(stddev) );
 }
 
 double function_to_minimize(const double *parameters, const int npar=3)
@@ -84,6 +84,8 @@ int main(int argc, char *argv[])
   std::vector<double> x0={0.1, 1.0e+3, 2.2e+3}; // Initial values
   double lbounds[npar]={1.e-4, 100. , 100. }, 
          ubounds[npar]={1.0  , 1.e+4, 1.e+4}; // arrays for lower and upper parameter bounds, respectively                
+
+  double trial = function_to_minimize(&x0[0], npar);
 
   GenoPheno<pwqBoundStrategy> gp(lbounds,ubounds,npar); // genotype / phenotype transform associated to bounds.  
   CMAParameters<GenoPheno<pwqBoundStrategy>> cmaparams(x0,sigma,-1,0,gp); // -1 for automatically \

@@ -208,15 +208,24 @@ void AvgSvCalculator::changeInput(const Param_t &input_ext, const bool hasMassSp
     pefftab.clear();
   }
   
-  
   g2_Wefftab.clear();
   setLimitingValues();
-  
-  g2_Wefftab[0]=Weffderiv.at(0)*sq(input.getLightestBSMdof());
-  for(size_t i = 1 ; i < sqrtStab.size() ; i++)
+
+  // Allocating g2_Wefftab if necessary
+  if(g2_Wefftab.size() == 0) 
   {
-    g2_Wefftab[i]= get_g2_Weff(sqrtStab[i]);
+    constexpr const real_t Tfreeze=25.;
+    constexpr const real_t Beps=1.e-6;
+    const real_t maxenergy=2.*getMassLBSM()-Tfreeze*std::log(Beps);
+    tabulateValues(std::max(10.*getMassLBSM(), maxenergy), 
+                   3000);
   }
+  
+  // g2_Wefftab[0]=Weffderiv[0]*sq(input.getLightestBSMdof());
+  // for(size_t i = 1 ; i < sqrtStab.size() ; i++)
+  // {
+  //   g2_Wefftab[i]= get_g2_Weff(sqrtStab[i]);
+  // }
 
   setTaylorCoeffSVx_nosplitting();
 }
@@ -627,6 +636,7 @@ void AvgSvCalculator::tabulateValues(const real_t &sqrtSmax, const size_t &Nmax)
   std::cout << "Sorting values\n";
 #endif
   std::sort(sqrtStab.begin(), sqrtStab.end());
+// Finished to allocate sqrtStab
   
 #ifdef DEBUG  
   std::cout << "Computing the relative peff and Weff for the default points\n";

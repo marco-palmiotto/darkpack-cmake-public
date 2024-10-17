@@ -4,7 +4,7 @@
         {
             "label": "configure",
             "type": "shell",
-            "command": "cmake -S . -B ./build  -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_BUILD_TYPE=Debug  -DCMAKE_INSTALL_PREFIX=./build/.install  -G Ninja",
+            "command": "cmake -S . -B ./build  -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_BUILD_TYPE=Debug  -DCMAKE_INSTALL_PREFIX=./build/.install  -G Ninja && cmake --build ./build --target install_headers_all",
             "group": {
                 "kind": "build",
                 "isDefault": true
@@ -24,7 +24,7 @@
             "label": "build",
             "type": "shell",
             "command": "ninja -C build",
-            "dependsOn": "install-headers",
+            "dependsOn": "configure",
             "problemMatcher": [
                 "$gcc"
             ],
@@ -34,7 +34,7 @@
             "type": "cppbuild",
             "label": "C/C++: g++ build active file",
             "command": "ninja -C build",
-            "dependsOn": "install-headers",
+            "dependsOn": "configure",
             "problemMatcher": [
                 "$gcc"
             ],

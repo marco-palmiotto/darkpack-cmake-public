@@ -16,17 +16,30 @@
             "label": "install-headers",
             "type": "shell",
             "command": "cmake --build ./build --target install_headers_all",
-            "dependsOn": "configure", // Ensures the configure happens before installation
+            "dependsOn": "configure",
             "problemMatcher": [],
             "detail": "Install the headers of DarkPACK's libraries"
         },
         {
             "label": "build",
             "type": "shell",
-            "command": "ninja -C build", // Executes in the build folder
-            "dependsOn": "install-headers", // Ensures installation of the libraries happens before building
-            "problemMatcher": ["$gcc"],
+            "command": "ninja -C build",
+            "dependsOn": "install-headers",
+            "problemMatcher": [
+                "$gcc"
+            ],
             "detail": "Build the project using the chosen build system"
+        },
+        {
+            "type": "cppbuild",
+            "label": "C/C++: g++ build active file",
+            "command": "ninja -C build",
+            "dependsOn": "install-headers",
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": "build",
+            "detail": "compiler: /usr/bin/g++"
         }
     ]
 }

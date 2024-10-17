@@ -64,6 +64,8 @@ double function_to_minimize(const double *parameters, const int npar=3)
 int main(int argc, char *argv[])
 {
 
+  std::cout << "Running " << argv[0] << std::endl;
+
   if(argc < 2)
   {
     std::cout << "This function requires 1 argument\n";

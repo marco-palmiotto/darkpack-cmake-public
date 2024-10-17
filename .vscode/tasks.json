@@ -4,7 +4,7 @@
         {
             "label": "configure",
             "type": "shell",
-            "command": "cmake -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_BUILD_TYPE=Debug -G Ninja -S . -B ./build",
+            "command": "cmake -S . -B ./build  -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_BUILD_TYPE=Debug  -DCMAKE_INSTALL_PREFIX=./build/.install  -G Ninja",
             "group": {
                 "kind": "build",
                 "isDefault": true
@@ -13,18 +13,18 @@
             "detail": "Run CMake to configure the project"
         },
         {
-            "label": "install-lib",
+            "label": "install-headers",
             "type": "shell",
-            "command": "cmake --install build",
+            "command": "cmake --build . --target install_headers_all",
             "dependsOn": "configure", // Ensures the configure happens before installation
             "problemMatcher": [],
-            "detail": "Install the libraries"
+            "detail": "Install the headers of DarkPACK's libraries"
         },
         {
             "label": "build",
             "type": "shell",
             "command": "ninja -C build", // Executes in the build folder
-            "dependsOn": "install-lib", // Ensures installation of the libraries happens before building
+            "dependsOn": "install-headers", // Ensures installation of the libraries happens before building
             "problemMatcher": ["$gcc"],
             "detail": "Build the project using the chosen build system"
         }

@@ -57,7 +57,7 @@ double function_to_minimize(const double *parameters, const int npar=3)
   input.refresh();
   boltz.changeInput(input);
   const double omega=boltz.relic_density();
-  return gaussian_shape(omega, omega_h2_target, omega_h2_err);
+  return std::abs(omega - omega_h2_target);
 }
 
 
@@ -81,11 +81,21 @@ int main(int argc, char *argv[])
   // input.g_chi = parameters[0];
   // input.m_chi = parameters[1];
   // input.m_phi = parameters[2];
-  std::vector<double> x0={0.1, 1.0e+3, 2.2e+3}; // Initial values
+  std::vector<double> x0={0.4, 4.0e+3, 8.1e+3}; // Initial values
   double lbounds[npar]={1.e-4, 100. , 100. }, 
          ubounds[npar]={1.0  , 1.e+4, 1.e+4}; // arrays for lower and upper parameter bounds, respectively                
 
-  double trial = function_to_minimize(&x0[0], npar);
+  constexpr const unsigned int nsols=4;
+  double sols[nsols][npar]={
+        {0.379524 , 999.867,  2200.91},
+        {0.849991 , 320.633 , 153.001},
+        {0.3772   , 1000.02 , 2199.99},
+        {0.327959 , 4000.05 , 8100.03}
+  }; 
+  for(unsigned i=0 ; i < nsols ; i++)
+  {
+    std::cout << function_to_minimize(sols[i], npar) << std::endl;
+  }
 
   GenoPheno<pwqBoundStrategy> gp(lbounds,ubounds,npar); // genotype / phenotype transform associated to bounds.  
   CMAParameters<GenoPheno<pwqBoundStrategy>> cmaparams(x0,sigma,-1,0,gp); // -1 for automatically \

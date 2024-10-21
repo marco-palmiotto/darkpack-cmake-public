@@ -74,7 +74,7 @@ set(HEADER_FILES ${LIB_HEADERS})
 add_custom_command(
     OUTPUT ${CMAKE_BINARY_DIR}/install_headers_${PROJECT_NAME}
     COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_INSTALL_PREFIX}/include/${PROJECT_NAME}
-    COMMAND ${CMAKE_COMMAND} -E copy ${HEADER_FILES} ${CMAKE_INSTALL_PREFIX}/include//${PROJECT_NAME}//
+    COMMAND ${CMAKE_COMMAND} -E copy ${HEADER_FILES} ${CMAKE_INSTALL_PREFIX}/include/${PROJECT_NAME}/
     DEPENDS ${HEADER_FILES}
     COMMENT "Installing headers only for ${PROJECT_NAME}"
 )

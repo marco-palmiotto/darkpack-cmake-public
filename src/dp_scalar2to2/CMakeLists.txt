@@ -184,12 +184,12 @@ endforeach()
 # Create a custom command to install headers
 set(HEADER_FILES ${LIB_CXX_HEADERS} ${LIB_C_HEADERS})
 add_custom_command(
-    OUTPUT ${CMAKE_BINARY_DIR}/install_headers
+    OUTPUT ${CMAKE_BINARY_DIR}/install_headers_${PROJECT_NAME}
     COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_INSTALL_PREFIX}/include/${PROJECT_NAME}
-    COMMAND ${CMAKE_COMMAND} -E copy ${HEADER_FILES} ${CMAKE_INSTALL_PREFIX}/include//${PROJECT_NAME}//
+    COMMAND ${CMAKE_COMMAND} -E copy ${HEADER_FILES} ${CMAKE_INSTALL_PREFIX}/include/${PROJECT_NAME}/
     DEPENDS ${HEADER_FILES}
     COMMENT "Installing headers only for ${PROJECT_NAME}"
 )
 
 # Create a custom target for headers installation
-add_custom_target(install_headers_${PROJECT_NAME} ALL DEPENDS ${CMAKE_BINARY_DIR}/install_headers)
+add_custom_target(install_headers_${PROJECT_NAME} ALL DEPENDS ${CMAKE_BINARY_DIR}/install_headers_${PROJECT_NAME})

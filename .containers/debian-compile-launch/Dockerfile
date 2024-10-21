@@ -41,6 +41,6 @@ RUN mkdir darkpack-cmake && \
       -DCMAKE_INSTALL_PREFIX=./build/.install \
       -G Ninja && \
     cmake --build ./build --target install_headers_all && \
-    ninja -C build 
+    ninja -C build -j2 -l2
 
 CMD ["sleep", "infinity"]

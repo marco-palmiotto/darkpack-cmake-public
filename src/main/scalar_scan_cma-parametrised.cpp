@@ -134,7 +134,7 @@ decided lambda, 0 is for random	seeding	of the internal generator.
   if(!outfile)
   {
     std::cerr << "Impossible to open " << argv[2] << " exiting\n";
-    return 3;
+    return 0;
   }
 
   outfile << "seed is\n";

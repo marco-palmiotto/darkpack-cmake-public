@@ -88,7 +88,7 @@ int main(int argc, char *argv[])
   filename=argv[1];
   
   std::cout << "The input file is " << filename << '\n';
-  double lbounds[npar]={1.e-4, 100. , 100. }, 
+  double lbounds[npar]={1.e-4, 1.   , 1. }, 
          ubounds[npar]={1.0  , 1.e+4, 1.e+5}; // arrays for lower and upper parameter bounds, respectively                
 
   std::vector<double> x0;

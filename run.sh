@@ -38,6 +38,6 @@ INTERVAL3_FAC_MAX=4.0
 
 random3=$(random_real_in_range_ref $INTERVAL3_FAC_MIN $INTERVAL3_FAC_MAX $random2)
 
-echo "./build/src/main/scalar_scan_cma-parametrised.x src/models/scalar.lha out/scan/result.out $random1 $random2 $random3"
+echo "./build/src/main/scalar_scan_cma-parametrised.x src/models/scalar.lha out/scans/result.out $random1 $random2 $random3"
 
-./build/src/main/scalar_scan_cma-parametrised.x src/models/scalar.lha out/scan/result.out $random1 $random2 $random3
+./build/src/main/scalar_scan_cma-parametrised.x src/models/scalar.lha out/scans/result.out $random1 $random2 $random3

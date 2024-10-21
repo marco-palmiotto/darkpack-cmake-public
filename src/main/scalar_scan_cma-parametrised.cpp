@@ -68,14 +68,16 @@ int main(int argc, char *argv[])
 
   constexpr const double sigma=omega_h2_err;
   constexpr const int npar=3;
+  constexpr const int n_required_args=npar+3;
+  constexpr const char *par_names[npar] = {"g_chi", "m_chi", "m_phi"};
   // parameters in input will be
   // input.g_chi = parameters[0];
   // input.m_chi = parameters[1];
   // input.m_phi = parameters[2];
 
-  if(argc < npar+1)
+  if(argc < n_required_args)
   {
-    std::cout << "This function requires " << npar+2 << " arguments:\n"
+    std::cout << "This function requires " << n_required_args << " arguments:\n"
               << " - The name of the input file\n"
               << " - The name of the output file\n"
               << " - The seed for the parameter g_chi\n"
@@ -104,18 +106,6 @@ int main(int argc, char *argv[])
     x0.emplace_back(value);
   }
 
-  constexpr const unsigned int nsols=4;
-  double sols[nsols][npar]={
-        {0.379524 , 999.867,  2200.91},
-        {0.849991 , 320.633 , 153.001},
-        {0.3772   , 1000.02 , 2199.99},
-        {0.327959 , 4000.05 , 8100.03}
-  }; 
-  for(unsigned i=0 ; i < nsols ; i++)
-  {
-    std::cout << function_to_minimize(sols[i], npar) << std::endl;
-  }
-
   GenoPheno<pwqBoundStrategy> gp(lbounds,ubounds,npar); // genotype / phenotype transform associated to bounds.  
   CMAParameters<GenoPheno<pwqBoundStrategy>> cmaparams(x0,sigma,-1,0,gp); // -1 for automatically \
 decided lambda, 0 is for random	seeding	of the internal generator.                                              
@@ -136,8 +126,8 @@ decided lambda, 0 is for random	seeding	of the internal generator.
     return 3;
   }
 
-  outfile << "seed is \n";
-  for(int i=0; i < npar ; i++) outfile << x0[i] << " ";
+  outfile << "seed is\n";
+  for(int i=0; i < npar ; i++) outfile << par_names[i] << " = " << x0[i] << '\n';
   outfile << "\nbest solution: ";
   cmasols.print(outfile,0,gp);
   outfile << std::endl;

@@ -64,7 +64,7 @@ double function_to_minimize(const double *parameters, const int npar=3)
 int main(int argc, char *argv[])
 {
 
-  std::cout << "Running " << argv[0] << std::endl;
+  std::cout << "Running " << argv[0] << '\n';
 
   constexpr const double sigma=omega_h2_err;
   constexpr const int npar=3;
@@ -87,11 +87,12 @@ int main(int argc, char *argv[])
   }
   filename=argv[1];
   
-  std::cout << "The input file is " << filename << std::endl;
+  std::cout << "The input file is " << filename << '\n';
   double lbounds[npar]={1.e-4, 100. , 100. }, 
-         ubounds[npar]={1.0  , 1.e+4, 1.e+4}; // arrays for lower and upper parameter bounds, respectively                
+         ubounds[npar]={1.0  , 1.e+4, 1.e+5}; // arrays for lower and upper parameter bounds, respectively                
 
-  std::vector<double> x0(npar);
+  std::vector<double> x0;
+  x0.reserve(npar);
   for(int i = 0 ; i < npar; i++)
   {
     const int index_arg=i+3;
@@ -99,12 +100,20 @@ int main(int argc, char *argv[])
     const double value=strtod(argv[index_arg],&end);
     if(value < lbounds[i] || value > ubounds[i])
     {
-      std::cerr << "Error: the parameter " << index_arg << " is out of the bound interval"
+      std::cerr << "Error in argument: " << index_arg << ", parameter " << i <<  ", " << par_names[i] << '\n'
+                << "value " << value << " is out of the bound interval"
                 << " [ " << lbounds[i] << ", " << ubounds[i] << " ].\n";
       return 2;
     }
+    std::cout << "x0.size()=" << x0.size() << ", emplacing back " << value << '\n';
     x0.emplace_back(value);
   }
+
+  if(x0.size() != npar)
+  {
+    std::cerr << "Initial parameters have wrong size: x0.size()=" << x0.size() << ", npar=" << npar << '\n';
+    return 2;
+  } 
 
   GenoPheno<pwqBoundStrategy> gp(lbounds,ubounds,npar); // genotype / phenotype transform associated to bounds.  
   CMAParameters<GenoPheno<pwqBoundStrategy>> cmaparams(x0,sigma,-1,0,gp); // -1 for automatically \
@@ -113,10 +122,12 @@ decided lambda, 0 is for random	seeding	of the internal generator.
   FitFunc f = &function_to_minimize;
   CMASolutions cmasols = cmaes<GenoPheno<pwqBoundStrategy>>(f, cmaparams);
 
-  std::cout << "best solution: ";
+  std::cout << "seed is\n";
+  for(int i=0; i < npar ; i++) std::cout << par_names[i] << " = " << x0[i] << '\n';
+  std::cout << "\nbest solution: ";
   cmasols.print(std::cout,0,gp);
-  std::cout << std::endl;
-  std::cout << "Expected Distance from Minimum: " << cmasols.edm() << std::endl;
+  std::cout << '\n';
+  std::cout << "Expected Distance from Minimum: " << cmasols.edm() << '\n';
   std::cout << "optimization took " << cmasols.elapsed_time() / 1000.0 << " seconds\n";
 
   std::ofstream outfile{argv[2]};
@@ -130,8 +141,8 @@ decided lambda, 0 is for random	seeding	of the internal generator.
   for(int i=0; i < npar ; i++) outfile << par_names[i] << " = " << x0[i] << '\n';
   outfile << "\nbest solution: ";
   cmasols.print(outfile,0,gp);
-  outfile << std::endl;
-  outfile << "Expected Distance from Minimum: " << cmasols.edm() << std::endl;
+  outfile << '\n';
+  outfile << "Expected Distance from Minimum: " << cmasols.edm() << '\n';
   outfile << "optimization took " << cmasols.elapsed_time() / 1000.0 << " seconds\n";
 
 

@@ -130,6 +130,14 @@ decided lambda, 0 is for random	seeding	of the internal generator.
   std::cout << "Expected Distance from Minimum: " << cmasols.edm() << '\n';
   std::cout << "optimization took " << cmasols.elapsed_time() / 1000.0 << " seconds\n";
 
+  Candidate bcand = cmasols.best_candidate();
+  double fmin = bcand.get_fvalue(); // min objective function value the optimizer converged to
+  std::vector<double> x_stdv = bcand.get_x(); // vector of objective function parameters at minimum.
+  const double* x_dptr = bcand.get_x_ptr(); // vector of objective function parameters at minimum, as C-style double array
+  Eigen::VectorXd x_ev = bcand.get_x_dvec(); // vector of objective function parameters at minimum, as Eigen vector
+  double edm = cmasols.edm(); // expected distance to the minimum.
+
+
   std::ofstream outfile{argv[2]};
   if(!outfile)
   {

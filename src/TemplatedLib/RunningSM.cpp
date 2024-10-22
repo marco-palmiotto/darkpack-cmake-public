@@ -1,5 +1,7 @@
 #include "RunningSM.hpp"
-
+// Needed for TestRunning masses
+#include <iomanip>
+#include <fstream> 
 namespace __SPEC_LIB_NAME__
 {
 

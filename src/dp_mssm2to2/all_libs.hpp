@@ -13,10 +13,9 @@
 #include "avgsvcalculator.hpp"
 #include "RunningSM.hpp"
 #include "boltzmann.hpp"
+#include "getSname.hpp"
 
-namespace mssm2to2{
-std::string getSname(const Process2to2 &proc);
-}
+
 
 
 

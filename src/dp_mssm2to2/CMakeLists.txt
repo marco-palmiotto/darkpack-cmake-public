@@ -22,7 +22,7 @@ set(TEMPLATED_LIB_PATH ${PROJECT_SOURCE_DIR}/../TemplatedLib)
 # The invariant is not compiled here, but as standalone
 # It needs to be linked for the executables
 set(INVARIANT_LIB_HEADER_PATH ${PROJECT_SOURCE_DIR}/../${INVARIANT_LIB_NAME})    
-set(INVARIANT_LIB_PATH ${INVARIANT_LIB_HEADER_PATH}/build/lib) 
+set(INVARIANT_LIB_PATH ${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_PREFIX}/lib) 
 
 if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
     # Compilazione indipendente: usa i flag specifici del sottoprogetto
@@ -153,8 +153,8 @@ endforeach()
 # for the library-targets
 #    Specify output folder 
 set_target_properties(${PROJECT_NAME} PROPERTIES
-    ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib
-    LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib
+    ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_INSTALL_PREFIX}/lib
+    LIBRARY_OUTPUT_DIRECTORY ${CMAKE_INSTALL_PREFIX}/lib
 )
 #    Linking external library
 target_link_libraries(${PROJECT_NAME} PRIVATE
@@ -163,14 +163,16 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 )
 
 # Copying the headers of the C++ library
-install(FILES ${LIB_CXX_HEADERS} DESTINATION ${CMAKE_BINARY_DIR}/include/${PROJECT_NAME})
+install(FILES ${LIB_CXX_HEADERS} DESTINATION include/${PROJECT_NAME})
 # Copying the headers of the C library
-install(FILES ${LIB_C_HEADERS} DESTINATION ${CMAKE_BINARY_DIR}/include/${PROJECT_NAME})
+install(FILES ${LIB_C_HEADERS} DESTINATION include/${PROJECT_NAME})
+# Installing the library
+install(TARGETS ${PROJECT_NAME} DESTINATION lib)
 
 # For the executables
 foreach(target IN LISTS EXECUTABLES_LIST)
     #    Manual link to the path of the libraries
-    target_link_directories(${target}  PRIVATE ${CMAKE_BINARY_DIR}/lib/)
+    target_link_directories(${target}  PRIVATE ${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_PREFIX}/lib/)
     #    Manual link of the library
     target_link_libraries(${target} PRIVATE
         ${PROJECT_NAME} 
@@ -178,3 +180,16 @@ foreach(target IN LISTS EXECUTABLES_LIST)
         ${INVARIANT_LIB_NAME}
     )
 endforeach()
+
+# Create a custom command to install headers
+set(HEADER_FILES ${LIB_CXX_HEADERS} ${LIB_C_HEADERS})
+add_custom_command(
+    OUTPUT ${CMAKE_BINARY_DIR}/install_headers_${PROJECT_NAME}
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_INSTALL_PREFIX}/include/${PROJECT_NAME}
+    COMMAND ${CMAKE_COMMAND} -E copy ${HEADER_FILES} ${CMAKE_INSTALL_PREFIX}/include/${PROJECT_NAME}/
+    DEPENDS ${HEADER_FILES}
+    COMMENT "Installing headers only for ${PROJECT_NAME}"
+)
+
+# Create a custom target for headers installation
+add_custom_target(install_headers_${PROJECT_NAME} ALL DEPENDS ${CMAKE_BINARY_DIR}/install_headers_${PROJECT_NAME})

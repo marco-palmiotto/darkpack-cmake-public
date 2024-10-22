@@ -38,8 +38,8 @@ BLOCK SU2LEPTONIC
      4  0.0 # theta_13_R 
      5  1.0E-1 # theta_23_L 
      6  1.0E-1 # theta_23_R 
-     7  1.0E-1 # g_f
-     8  200    # m_V
-     9  200    # m_phi  
-    10  400    # m_chi_dm_1
+     7  1.0E-1 # g_f         # to be varied in minimum
+     8  200    # m_V         # to be varied
+     9  200    # m_phi       # 2*m_v
+    10  400    # m_chi_dm_1  # same as below, fix ratio withh m_V, init =3,2.5,0.25
     11  400    # m_chi_dm_2

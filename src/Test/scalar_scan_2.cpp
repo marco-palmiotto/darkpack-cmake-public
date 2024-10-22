@@ -6,7 +6,7 @@
 #include "dp_scalar2to2/process.hpp"
 #include "dp_scalar2to2/avgsvcalculator.hpp"
 #include "dp_scalar2to2/boltzmann.hpp"
-
+#include <fstream>
 // #define USE_BOLTZVECTOR
 
 using namespace scalar2to2;

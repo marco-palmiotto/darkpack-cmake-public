@@ -11,6 +11,7 @@
 #include "process.hpp"
 #include "avgsvcalculator.hpp"
 #include "boltzmann.hpp"
+#include <fstream>
 
 using namespace scalar2to2;
 using namespace advmath;

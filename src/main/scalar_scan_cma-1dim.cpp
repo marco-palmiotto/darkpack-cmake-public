@@ -10,7 +10,7 @@
 #include <libcmaes/esoptimizer.h>
 #include <libcmaes/cmastrategy.h>
 #include <libcmaes/llogging.h>
-
+#include <fstream>
 using namespace scalar2to2;
 using namespace advmath;
 using namespace libcmaes;

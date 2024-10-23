@@ -54,10 +54,11 @@ compile_MARTY_source()
 {
   [ $# -ne 1 ] && echo "This function requires 1 argument : the name of the target file" && exit 1
   echo 'Generating C++ library via g++...'
-  $CXX -std=c++17 -g -c $1.cpp -o $1.o -I$INSTALLMARTYPATH/include || exit 2
+  echo "$CXX -std=c++17 -c $1.cpp -o $1.o -I$INSTALLMARTYPATH/include"
+  $CXX -std=c++17 -c $1.cpp -o $1.o -I$INSTALLMARTYPATH/include || exit 2
   [[ ! -f "$1.o" ]] && echo 'The file .o has not been generated. Compilation will stop now.' && exit 1
   echo 'Generating executable file linking with the libraries of MARTY...'
-  $CXX -std=c++17 -g -o $1.x $1.o -L$INSTALLMARTYPATH/lib -lmarty || exit 2
+  $CXX -std=c++17 -o $1.x $1.o -L$INSTALLMARTYPATH/lib -lmarty || exit 2
   [[ ! -f "$1.x" ]] && echo 'The file .x has not been generated. Compilation will stop now.' && exit 1
 }
 

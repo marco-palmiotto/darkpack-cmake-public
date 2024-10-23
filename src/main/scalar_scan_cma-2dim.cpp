@@ -38,34 +38,39 @@ int main(int argc, char *argv[])
 
   constexpr const double sigma=omega_h2_err;
   constexpr const int npar=2;
-  constexpr const int n_required_args=npar+3;
+  constexpr const int n_required_args=npar+4;
   constexpr const char *par_names[npar] = {"g_chi", "m_phi/m_chi"};
 
   constexpr const double init_seed_g_chi=0.3;
-  constexpr const double init_m_chi=1.0;
-  constexpr const double end_m_chi=1.e+5;
-  constexpr const int npoints=1000;
-  constexpr const double stepsize=std::pow(end_m_chi/init_m_chi, 1./npoints);
 
-  double lbounds[npar]={1.e-12, 0.3}, 
-         ubounds[npar]={1.0  , 3.0 }; // arrays for lower and upper parameter bounds, respectively  
+  double lbounds[npar]={1.e-12, 0.25}, 
+         ubounds[npar]={1.0  , 5.0 }; // arrays for lower and upper parameter bounds, respectively  
+
+    std::cout << "This function requires " << n_required_args << " arguments:\n"
+                << " - The name of the input file\n"
+                << " - The name of the output file\n"
+                << " - The seed for the parameter g_chi\n"
+                << " - The seed for the parameter m_phi/m_chi\n"
+                << " - The initial value for m_chi\n";
 
   if(argc < n_required_args)
   {
-    std::cout << "This function requires " << n_required_args << " arguments:\n"
-              << " - The name of the input file\n"
-              << " - The name of the output file\n"
-              << " - The seed for the parameter g_chi\n"
-              << " - The seed for the parameter m_phi/m_chi\n";
     return 1;
   }
   filename=argv[1];
   
-  std::cout << "The input file is " << filename << '\n';         
+  std::cout << "The input file is " << filename << '\n';    
+ 
+  char *end;
+  const double init_m_chi = std::strtod(argv[argc-1],&end);
+  constexpr const double end_m_chi=1.e+5;
+  constexpr const int npoints=1000;
+  const double stepsize=std::pow(end_m_chi/init_m_chi, 1./npoints);     
 
   Param_t input(filename.c_str());
   input.g_d=0.;
   input.g_u=1.;
+  input.m_chi=init_m_chi;
   input.refresh();
   BoltzmannSolver boltz(input);
 
@@ -85,7 +90,6 @@ int main(int argc, char *argv[])
   for(int i = 0 ; i < npar; i++)
   {
     const int index_arg=i+3;
-    char *end;
     const double value=strtod(argv[index_arg],&end);
     if(value < lbounds[i] || value > ubounds[i])
     {
@@ -105,6 +109,8 @@ int main(int argc, char *argv[])
   } 
 
   GenoPheno<pwqBoundStrategy> gp(lbounds,ubounds,npar); // genotype / phenotype transform associated to bounds.  
+  std::cout << "FIXED: " << input.m_chi
+            << "SEED: g_chi=" << x0[0] << " , m_phi/m_chi=" << x0[1] << '\n';
   CMAParameters<GenoPheno<pwqBoundStrategy>> cmaparams(x0,sigma,-1,0,gp); // -1 for automatically \
 decided lambda, 0 is for random	seeding	of the internal generator.                                              
   cmaparams.set_algo(aCMAES);

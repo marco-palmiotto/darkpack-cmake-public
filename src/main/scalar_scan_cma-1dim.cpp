@@ -78,7 +78,7 @@ int main(int argc, char *argv[])
   constexpr const double init_m_chi=1.0e+3;
   constexpr const double end_m_chi=1.e+5;
   constexpr const int npoints=1000;
-  constexpr const double stepsize=std::pow(end_m_chi/init_m_chi, 1./npoints);
+  const double stepsize=std::pow(end_m_chi/init_m_chi, 1./npoints);
 
   if(argc < n_required_args)
   {
@@ -159,7 +159,12 @@ int main(int argc, char *argv[])
   const double* x_dptr = bcand.get_x_ptr(); // vector of objective function parameters at minimum, as C-style double array
   Eigen::VectorXd x_ev = bcand.get_x_dvec(); // vector of objective function parameters at minimum, as Eigen vector
   double edm = cmasols.edm(); // expected distance to the minimum.
+  
+  Eigen::VectorXd bestparameters = gp.pheno(cmasols.get_best_seen_candidate().get_x_dvec());
+  // Applying pheno to the best candidate output
 
+  std::cout << gp.pheno(x_ev).transpose();
+  
   std::cout << "# m_chi   m_phi    g_chi   pull-Oh2\nRESULT=";
   std::cout << input.m_chi.get() << '\t' << input.m_phi.get() << '\t' << x_dptr[0] << '\t' << fmin << '\n';
   

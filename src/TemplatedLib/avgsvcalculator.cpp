@@ -197,6 +197,7 @@ void AvgSvCalculator::changeInput(const Param_t &input_ext, const bool hasMassSp
   std::cout << "Entering AvgSvCalculator::changeInput\n";
 #endif
   input = input_ext;
+  input.refresh();
   run.init(input);
   run.setHiggsLoopFactor(true);
   

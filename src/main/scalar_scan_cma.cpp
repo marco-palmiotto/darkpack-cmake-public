@@ -98,8 +98,10 @@ int main(int argc, char *argv[])
   }
 
   GenoPheno<pwqBoundStrategy> gp(lbounds,ubounds,npar); // genotype / phenotype transform associated to bounds.  
-  CMAParameters<GenoPheno<pwqBoundStrategy>> cmaparams(x0,sigma,-1,0,gp); // -1 for automatically \
-decided lambda, 0 is for random	seeding	of the internal generator.                                              
+
+  // -1 for automatically decided lambda, 0 is for random	seeding	of the internal generator. 
+  CMAParameters<GenoPheno<pwqBoundStrategy>> cmaparams(x0,sigma,-1,0,gp); 
+                                               
   cmaparams.set_algo(aCMAES);
   FitFunc f = &function_to_minimize;
   CMASolutions cmasols = cmaes<GenoPheno<pwqBoundStrategy>>(f, cmaparams);

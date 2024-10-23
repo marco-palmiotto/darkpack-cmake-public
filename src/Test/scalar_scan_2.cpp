@@ -69,7 +69,7 @@ int main(int argc, char ** argv)
     const std::string filename_base="scalar_scan_lin";
     
     // const double ref_mphi=5.0e+3;
-    const double ref_gg = 0.78*0.78;
+    // const double ref_gg = 0.78*0.78;
 
     const double start_gchi=0.1;
     const double end_gchi=0.9;

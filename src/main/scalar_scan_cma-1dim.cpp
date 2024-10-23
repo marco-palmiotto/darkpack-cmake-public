@@ -11,6 +11,7 @@
 #include <libcmaes/cmastrategy.h>
 #include <libcmaes/llogging.h>
 #include <fstream>
+#include <random>
 using namespace scalar2to2;
 using namespace advmath;
 using namespace libcmaes;
@@ -70,6 +71,14 @@ int main(int argc, char *argv[])
   constexpr const int n_required_args=2;
   constexpr const double factor=2.2;
   constexpr const int npar=1;
+  const double lbounds[1] ={1.0e-20},
+               ubounds[1] ={1.0};
+
+  constexpr const double init_seed_g_chi=0.3;
+  constexpr const double init_m_chi=1.0e+3;
+  constexpr const double end_m_chi=1.e+5;
+  constexpr const int npoints=1000;
+  constexpr const double stepsize=std::pow(end_m_chi/init_m_chi, 1./npoints);
 
   if(argc < n_required_args)
   {
@@ -81,13 +90,6 @@ int main(int argc, char *argv[])
   filename=argv[1];
   
   std::cout << "The input file is " << filename << '\n';
-
-  const double lbounds[1] ={1.e-12},
-               ubounds[1] ={1.0};
-
-  constexpr const double init_seed_g_chi=0.3;
-  constexpr const double init_m_chi=10.0;
-  constexpr const double end_m_chi=1.e+5;
 
   std::vector<double> x0;
   x0.reserve(npar);
@@ -126,9 +128,11 @@ int main(int argc, char *argv[])
     return std::abs(omega - omega_h2_target);
   };
 
-  GenoPheno<pwqBoundStrategy> gp(lbounds,ubounds,npar); // genotype / phenotype transform associated to bounds.  
-  CMAParameters<GenoPheno<pwqBoundStrategy>> cmaparams(x0,sigma,-1,0,gp); // -1 for automatically \
-decided lambda, 0 is for random	seeding	of the internal generator.                                              
+  GenoPheno<pwqBoundStrategy> gp(lbounds,ubounds,npar); // genotype / phenotype transform associated to bounds.
+
+  // -1 for automatically decided lambda, 0 is for random	seeding	of the internal generator.           
+  CMAParameters<GenoPheno<pwqBoundStrategy>> cmaparams(x0,sigma,-1,0,gp);     
+  
   cmaparams.set_algo(aCMAES);
   FitFunc f = function_to_minimize;
   CMASolutions cmasols = cmaes<GenoPheno<pwqBoundStrategy>>(f, cmaparams);
@@ -147,7 +151,7 @@ decided lambda, 0 is for random	seeding	of the internal generator.
   {
     std::cerr << "Impossible to open " << argv[2] << " exiting\n";
     return 0;
-  }
+  } 
 
   Candidate bcand = cmasols.best_candidate();
   double fmin = bcand.get_fvalue(); // min objective function value the optimizer converged to
@@ -156,8 +160,37 @@ decided lambda, 0 is for random	seeding	of the internal generator.
   Eigen::VectorXd x_ev = bcand.get_x_dvec(); // vector of objective function parameters at minimum, as Eigen vector
   double edm = cmasols.edm(); // expected distance to the minimum.
 
-  std::cout << "# m_chi   m_phi    g_chi   pull-Oh2\n";
+  std::cout << "# m_chi   m_phi    g_chi   pull-Oh2\nRESULT=";
   std::cout << input.m_chi.get() << '\t' << input.m_phi.get() << '\t' << x_dptr[0] << '\t' << fmin << '\n';
+  
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  std::uniform_real_distribution<> dis(std::log(lbounds[0]), std::log(ubounds[0]));
+
+  while(input.m_chi < end_m_chi)
+  {
+    if( x_dptr[0] > ubounds[0] ||  x_dptr[0] < lbounds[0]) 
+    {
+      std::cerr << "Error: result is out of bound\n";
+      return 1;
+    }
+    input.m_chi = input.m_chi*stepsize;
+    x0[0]=(fmin < 1.0e-3) ? x_dptr[0] : std::exp(dis(gen));
+
+    CMAParameters<GenoPheno<pwqBoundStrategy>> cmaparams1(x0,sigma,-1,0,gp); // -1 for automatically \
+  decided lambda, 0 is for random	seeding	of the internal generator.                                              
+    cmaparams1.set_algo(aCMAES);
+    cmasols = cmaes<GenoPheno<pwqBoundStrategy>>(f, cmaparams1);
+
+    bcand = cmasols.best_candidate();
+    fmin = bcand.get_fvalue(); // min objective function value the optimizer converged to
+    x_stdv = bcand.get_x(); // vector of objective function parameters at minimum.
+    x_dptr = bcand.get_x_ptr(); // vector of objective function parameters at minimum, as C-style double array
+    x_ev = bcand.get_x_dvec(); // vector of objective function parameters at minimum, as Eigen vector
+    edm = cmasols.edm(); // expected distance to the minimum.
+
+    std::cout << "RESULT=" <<input.m_chi.get() << '\t' << input.m_phi.get() << '\t' << x_dptr[0] << '\t' << fmin << '\n';
+  }
 
   return cmasols.run_status();
 }

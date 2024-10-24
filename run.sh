@@ -40,4 +40,8 @@
 
 # echo "./build/src/main/scalar_scan_cma-2dim.x src/models/scalar.lha out/scans/result.out $random1 $random2"
 
-./build/src/main/scalar_scan_cma-2dim.x src/models/scalar.lha out/scans/result.out 0.3 2.13  2.2e+3
+./build/src/main/scalar_scan_cma-2dim-loop.x \
+    src/models/scalar.lha \
+    out/scans/result.out \
+    0.3 2.13  \
+    2.3e+3 4.0e+3 10

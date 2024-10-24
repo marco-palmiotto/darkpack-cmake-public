@@ -68,3 +68,9 @@ MARTY_install/marty-public/
 .images
 
 MARTY_install/.martyconfig
+disable_permissions.sh
+enable_permissions.sh
+.containers/debian-compile-launch/apptainer_build.sh
+.containers/debian-compile-launch/apptainer_cgroups.conf
+.containers/debian-compile-launch/darkpack-launch.tar
+.containers/debian-compile-launch/apptainer_cgroups.conf

@@ -46,12 +46,12 @@ int main(int argc, char *argv[])
   double lbounds[npar]={1.e-12, 0.25}, 
          ubounds[npar]={1.0  , 5.0 }; // arrays for lower and upper parameter bounds, respectively  
 
-    std::cout << "This function requires " << n_required_args << " arguments:\n"
-                << " - The name of the input file\n"
-                << " - The name of the output file\n"
-                << " - The seed for the parameter g_chi\n"
-                << " - The seed for the parameter m_phi/m_chi\n"
-                << " - The initial value for m_chi\n";
+  std::cout << "This function requires " << n_required_args << " arguments:\n"
+              << " - The name of the input file\n"
+              << " - The name of the output file\n"
+              << " - The seed for the parameter g_chi\n"
+              << " - The seed for the parameter m_phi/m_chi\n"
+              << " - The initial value for m_chi\n";
 
   if(argc < n_required_args)
   {
@@ -60,6 +60,14 @@ int main(int argc, char *argv[])
   filename=argv[1];
   
   std::cout << "The input file is " << filename << '\n';    
+
+  std::ofstream outfile{argv[2]};
+
+  if(!outfile)
+  {
+    std::cerr << "Impossible to open " << argv[2] << '\n';
+    return 1;
+  }
  
   char *end;
   const double init_m_chi = std::strtod(argv[argc-1],&end);
@@ -132,9 +140,6 @@ decided lambda, 0 is for random	seeding	of the internal generator.
   // Eigen::VectorXd x_ev = bcand.get_x_dvec(); // vector of objective function parameters at minimum, as Eigen vector
   // double edm = cmasols.edm(); // expected distance to the minimum.
 
-
-  std::ofstream outfile{argv[2]};
-
   Candidate bcand = cmasols.best_candidate();
   double fmin = bcand.get_fvalue(); // min objective function value the optimizer converged to
   std::vector<double> x_stdv = bcand.get_x(); // vector of objective function parameters at minimum.
@@ -144,6 +149,12 @@ decided lambda, 0 is for random	seeding	of the internal generator.
 
   std::cout << "# m_chi   m_phi/m_chi    g_chi   pull-Oh2\nRESULT=";
   std::cout << input.m_chi.get() << '\t' << x_dptr[1] << '\t' << x_dptr[0] << '\t' << fmin << '\n';
+
+
+  outfile << "# m_chi   m_phi/m_chi    g_chi   pull-Oh2\n";
+  outfile << input.m_chi.get() << '\t' << x_dptr[1] << '\t' << x_dptr[0] << '\t' << fmin << '\n';
+
+  return 0;
 
   while(input.m_chi < end_m_chi)
   {
@@ -163,6 +174,9 @@ decided lambda, 0 is for random	seeding	of the internal generator.
     edm = cmasols.edm(); // expected distance to the minimum.
 
     std::cout << "RESULT=" <<input.m_chi.get() << '\t' << x_dptr[1] << '\t' << x_dptr[0] << '\t' << fmin << '\n';
+
+    outfile << input.m_chi.get() << '\t' << x_dptr[1] << '\t' << x_dptr[0] << '\t' << fmin << '\n';
+    
   }
 
 

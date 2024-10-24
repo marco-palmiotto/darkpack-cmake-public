@@ -1,5 +1,5 @@
 #!/bin/bash
 
-docker build -t darkpack-launch:latest . && \
-docker save -o darkpack-launch.tar darkpack-launch:latest 
+podman build -t darkpack-launch:latest .
+# podman save -o darkpack-launch.tar darkpack-launch:latest
 #&& sudo apptainer build darkpack-launch.sif docker-archive://darkpack-launch.tar

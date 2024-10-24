@@ -162,17 +162,18 @@ int main(int argc, char *argv[])
   const double* x_dptr = bcand.get_x_ptr(); // vector of objective function parameters at minimum, as C-style double array
   Eigen::VectorXd x_ev = bcand.get_x_dvec(); // vector of objective function parameters at minimum, as Eigen vector
   double edm = cmasols.edm(); // expected distance to the minimum.
-
-  std::cout << "# m_chi   m_phi/m_chi    g_chi   pull-Oh2   EDM\nRESULT=";
-  std::cout << input.m_chi.get() << '\t' << x_dptr[1] << '\t' << x_dptr[0] << '\t' << fmin << '\t' << edm << '\n';
-
-
-  outfile << "# m_chi   m_phi/m_chi    g_chi   pull-Oh2  EDM\n";
-  outfile << input.m_chi.get() << '\t' << x_dptr[1] << '\t' << x_dptr[0] << '\t' << fmin  << '\t' << edm << '\n';
-
   int return_val=cmasols.run_status();
+  
+  std::cout << "# m_chi   m_phi/m_chi    g_chi   pull-Oh2   EDM  exit_code  \nRESULT=";
+  std::cout << input.m_chi.get() << '\t' << x_dptr[1] << '\t' << x_dptr[0] << '\t' << fmin << '\t' << edm << '\t' << return_val << '\n';
 
-  while(input.m_chi < end_m_chi && return_val==0)
+
+  outfile << "# m_chi   m_phi/m_chi    g_chi   pull-Oh2  EDM  exit_code \n";
+  outfile << input.m_chi.get() << '\t' << x_dptr[1] << '\t' << x_dptr[0] << '\t' << fmin  << '\t' << edm << '\t' << return_val << '\n';
+
+
+
+  while(input.m_chi < end_m_chi)
   {
     input.m_chi = input.m_chi*stepsize;
     x0[0]=(fmin < 1.0e-3) ? x_dptr[0] : 0.3;
@@ -189,9 +190,9 @@ int main(int argc, char *argv[])
     x_ev = bcand.get_x_dvec(); // vector of objective function parameters at minimum, as Eigen vector
     edm = cmasols.edm(); // expected distance to the minimum.
 
-    std::cout << "RESULT=" <<input.m_chi.get() << '\t' << x_dptr[1] << '\t' << x_dptr[0] << '\t' << fmin  << '\t' << edm << '\n';
+    std::cout << "RESULT=" <<input.m_chi.get() << '\t' << x_dptr[1] << '\t' << x_dptr[0] << '\t' << fmin  << '\t' << edm << '\t' << return_val << '\n';
 
-    outfile << input.m_chi.get() << '\t' << x_dptr[1] << '\t' << x_dptr[0] << '\t' << fmin  << '\t' << edm << '\n';
+    outfile << input.m_chi.get() << '\t' << x_dptr[1] << '\t' << x_dptr[0] << '\t' << fmin  << '\t' << edm << '\t' << return_val << '\n';
     return_val=cmasols.run_status();
   }
 

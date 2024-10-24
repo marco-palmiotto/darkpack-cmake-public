@@ -1,0 +1,65 @@
+Bootstrap: docker
+From: mcr.microsoft.com/devcontainers/cpp:1-debian-12
+
+%labels
+    Maintainer marco.palmiotto@univ-lyon1.fr
+
+%post
+    # Definisci l'utente
+    export username=vscode
+
+    # Aggiorna e installa le dipendenze necessarie per MARTY e DarkPACK
+    apt-get update && export DEBIAN_FRONTEND=noninteractive && \
+    apt-get -y install --no-install-recommends \
+    libgsl-dev libgslcblas0 texlive texlive-luatex dvipng coreutils imagemagick \
+    qtbase5-dev qtchooser qt5-qmake qtbase5-dev-tools \
+    make cmake g++ gcc gfortran git neofetch \
+    autoconf automake libtool libgoogle-glog-dev libgflags-dev libeigen3-dev
+
+    # Creazione dell'utente specificato
+    chown -R ${username}:${username} /home/${username}
+
+    # Passa all'utente non-root per la compilazione di MARTY
+    su ${username} -c "
+    cd /home/${username} && \
+    git clone https://github.com/docbrown1955/marty-public.git && \
+    cd marty-public && \
+    git checkout master && \
+    mkdir bin include lib build && \
+    cd build && \
+    cmake .. -DCMAKE_INSTALL_PREFIX=.install -G Ninja && \
+    cmake --build . && \
+    cmake --install . && \
+    export INSTALLMARTYPATH=/home/vscode/marty-public/build/.install && \
+    export PATH=$INSTALLMARTYPATH/bin:$PATH && \
+    export LD_LIBRARY_PATH=$INSTALLMARTYPATH/lib && \
+    export LIBRARY_PATH=$INSTALLMARTYPATH/lib && \
+    export C_INCLUDE_PATH=$INSTALLMARTYPATH/include && \
+    export CPATH=$INSTALLMARTYPATH/include && \
+    cd /home/${username} && \
+    mkdir darkpack-cmake && \
+    tar -xf source.tar.gz -C darkpack-cmake && \
+    cd darkpack-cmake && \
+    cmake -S . -B ./build \
+      -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_BUILD_TYPE=Release \
+      -DCMAKE_INSTALL_PREFIX=./build/.install \
+      -G Ninja && \
+    cmake --build ./build --target install_headers_all && \
+    ninja -C build
+    "
+
+%files
+    source.tar.gz /home/vscode/
+
+%environment
+    # Imposta variabili d'ambiente persistenti
+    export INSTALLMARTYPATH=/home/vscode/marty-public/build/.install
+    export PATH=$INSTALLMARTYPATH/bin:$PATH
+    export LD_LIBRARY_PATH=$INSTALLMARTYPATH/lib
+    export LIBRARY_PATH=$INSTALLMARTYPATH/lib
+    export C_INCLUDE_PATH=$INSTALLMARTYPATH/include
+    export CPATH=$INSTALLMARTYPATH/include
+
+%runscript
+    # Esegui un comando predefinito quando viene eseguito il container
+    exec sleep infinity

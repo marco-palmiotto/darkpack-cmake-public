@@ -164,6 +164,7 @@ int main(int argc, char *argv[])
   // Applying pheno to the best candidate output
 
   std::cout << gp.pheno(x_ev).transpose();
+  std::cout << bestparameters.transpose();
   
   std::cout << "# m_chi   m_phi    g_chi   pull-Oh2\nRESULT=";
   std::cout << input.m_chi.get() << '\t' << input.m_phi.get() << '\t' << x_dptr[0] << '\t' << fmin << '\n';

@@ -1,17 +1,20 @@
 #include <iostream>
 #include <iomanip>
+#include "libcmaes/cmaes.h"
+#include <libcmaes/esoptimizer.h>
+#include <libcmaes/cmastrategy.h>
+#include <libcmaes/llogging.h>
+#include <fstream>
+
 #include "dp_scalar2to2/config.hpp"
 #include "dp_scalar2to2/correspondance.hpp" 
 #include "dp_scalar2to2/leshouchesfrommarty.hpp"
 #include "dp_scalar2to2/process.hpp"
 #include "dp_scalar2to2/avgsvcalculator.hpp"
 #include "dp_scalar2to2/boltzmann.hpp"
-#include "libcmaes/cmaes.h"
-#include <libcmaes/esoptimizer.h>
-#include <libcmaes/cmastrategy.h>
-#include <libcmaes/llogging.h>
-#include <fstream>
 using namespace scalar2to2;
+
+
 using namespace advmath;
 using namespace libcmaes;
 
@@ -147,22 +150,27 @@ int main(int argc, char *argv[])
   cmasols.print(std::cout,0,gp);
   std::cout << '\n';
   std::cout << "Expected Distance from Minimum: " << cmasols.edm() << '\n';
-  std::cout << "optimization took " << cmasols.elapsed_time() / 1000.0 << " seconds\n";
-
-  // Candidate bcand = cmasols.best_candidate();
-  // double fmin = bcand.get_fvalue(); // min objective function value the optimizer converged to
-  // std::vector<double> x_stdv = bcand.get_x(); // vector of objective function parameters at minimum.
-  // const double* x_dptr = bcand.get_x_ptr(); // vector of objective function parameters at minimum, as C-style double array
-  // Eigen::VectorXd x_ev = bcand.get_x_dvec(); // vector of objective function parameters at minimum, as Eigen vector
-  // double edm = cmasols.edm(); // expected distance to the minimum.
+  std::cout << "optimization took " << cmasols.elapsed_time() / 1000.0 << " seconds\n ";
 
   Candidate bcand = cmasols.best_candidate();
+
   double fmin = bcand.get_fvalue(); // min objective function value the optimizer converged to
   std::vector<double> x_stdv = bcand.get_x(); // vector of objective function parameters at minimum.
   const double* x_dptr = bcand.get_x_ptr(); // vector of objective function parameters at minimum, as C-style double array
   Eigen::VectorXd x_ev = bcand.get_x_dvec(); // vector of objective function parameters at minimum, as Eigen vector
   double edm = cmasols.edm(); // expected distance to the minimum.
   int return_val=cmasols.run_status();
+
+
+  Eigen::VectorXd bestparameters_dvec = gp.pheno(cmasols.get_best_seen_candidate().get_x_dvec());
+  // const double * bestparameters_ptr= gp.pheno(cmasols.get_best_seen_candidate().get_x_ptr());
+  // Applying pheno to the best candidate output
+
+  std::cout << gp.pheno(bestparameters_dvec).transpose();
+  for(auto i=0 ; i< npar; i++)
+  {
+    std::cout << "bestparameters_ptr["<< i << "]=" << bestparameters_dvec[i] << std::endl;
+  }
   
   std::cout << "# m_chi   m_phi/m_chi    g_chi   pull-Oh2   EDM  exit_code  \nRESULT=";
   std::cout << input.m_chi.get() << '\t' << x_dptr[1] << '\t' << x_dptr[0] << '\t' << fmin << '\t' << edm << '\t' << return_val << '\n';
@@ -171,7 +179,7 @@ int main(int argc, char *argv[])
   outfile << "# m_chi   m_phi/m_chi    g_chi   pull-Oh2  EDM  exit_code \n";
   outfile << input.m_chi.get() << '\t' << x_dptr[1] << '\t' << x_dptr[0] << '\t' << fmin  << '\t' << edm << '\t' << return_val << '\n';
 
-
+  return 0;
 
   while(input.m_chi < end_m_chi)
   {

@@ -8,3 +8,4 @@
 # ulimit -t 600
 
 sudo apptainer build darkpack-launch.sif docker-archive://darkpack-launch.tar
+scp darkpack-launch.sif mpalmiot@cca.in2p3.fr:/pbs/home/m/mpalmiot/code/

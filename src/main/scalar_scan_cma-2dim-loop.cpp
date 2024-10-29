@@ -155,37 +155,21 @@ int main(int argc, char *argv[])
   Candidate bcand = cmasols.best_candidate();
 
   double fmin = bcand.get_fvalue(); // min objective function value the optimizer converged to
-  std::vector<double> x_stdv = bcand.get_x(); // vector of objective function parameters at minimum.
-  const double* x_dptr = bcand.get_x_ptr(); // vector of objective function parameters at minimum, as C-style double array
-  Eigen::VectorXd x_ev = bcand.get_x_dvec(); // vector of objective function parameters at minimum, as Eigen vector
+  Eigen::VectorXd bestparameters_dvec = gp.pheno(cmasols.get_best_seen_candidate().get_x_dvec()); // Applying pheno to the best candidate output
   double edm = cmasols.edm(); // expected distance to the minimum.
   int return_val=cmasols.run_status();
-
-
-  Eigen::VectorXd bestparameters_dvec = gp.pheno(cmasols.get_best_seen_candidate().get_x_dvec());
-  // const double * bestparameters_ptr= gp.pheno(cmasols.get_best_seen_candidate().get_x_ptr());
-  // Applying pheno to the best candidate output
-
-  std::cout << gp.pheno(bestparameters_dvec).transpose();
-  for(auto i=0 ; i< npar; i++)
-  {
-    std::cout << "bestparameters_ptr["<< i << "]=" << bestparameters_dvec[i] << std::endl;
-  }
   
   std::cout << "# m_chi   m_phi/m_chi    g_chi   pull-Oh2   EDM  exit_code  \nRESULT=";
-  std::cout << input.m_chi.get() << '\t' << x_dptr[1] << '\t' << x_dptr[0] << '\t' << fmin << '\t' << edm << '\t' << return_val << '\n';
-
+  std::cout << input.m_chi.get() << '\t' << bestparameters_dvec[1] << '\t' << bestparameters_dvec[0] << '\t' << fmin << '\t' << edm << '\t' << return_val << '\n';
 
   outfile << "# m_chi   m_phi/m_chi    g_chi   pull-Oh2  EDM  exit_code \n";
-  outfile << input.m_chi.get() << '\t' << x_dptr[1] << '\t' << x_dptr[0] << '\t' << fmin  << '\t' << edm << '\t' << return_val << '\n';
-
-  return 0;
+  outfile << input.m_chi.get() << '\t' << bestparameters_dvec[1] << '\t' << bestparameters_dvec[0] << '\t' << fmin  << '\t' << edm << '\t' << return_val << '\n';
 
   while(input.m_chi < end_m_chi)
   {
     input.m_chi = input.m_chi*stepsize;
-    x0[0]=(fmin < 1.0e-3) ? x_dptr[0] : 0.3;
-    x0[1]=(fmin < 1.0e-3) ? x_dptr[1] : 2.2;
+    x0[0]=(fmin < 1.0e-3) ? bestparameters_dvec[0] : 0.3;
+    x0[1]=(fmin < 1.0e-3) ? bestparameters_dvec[1] : 2.2;
     CMAParameters<GenoPheno<pwqBoundStrategy>> cmaparams1(x0,sigma,-1,0,gp); // -1 for automatically \
   decided lambda, 0 is for random	seeding	of the internal generator.                                              
     cmaparams1.set_algo(aCMAES);
@@ -193,14 +177,12 @@ int main(int argc, char *argv[])
 
     bcand = cmasols.best_candidate();
     fmin = bcand.get_fvalue(); // min objective function value the optimizer converged to
-    x_stdv = bcand.get_x(); // vector of objective function parameters at minimum.
-    x_dptr = bcand.get_x_ptr(); // vector of objective function parameters at minimum, as C-style double array
-    x_ev = bcand.get_x_dvec(); // vector of objective function parameters at minimum, as Eigen vector
+    bestparameters_dvec = gp.pheno(cmasols.get_best_seen_candidate().get_x_dvec());
     edm = cmasols.edm(); // expected distance to the minimum.
 
-    std::cout << "RESULT=" <<input.m_chi.get() << '\t' << x_dptr[1] << '\t' << x_dptr[0] << '\t' << fmin  << '\t' << edm << '\t' << return_val << '\n';
+    std::cout << "RESULT=" <<input.m_chi.get() << '\t' << bestparameters_dvec[1] << '\t' << bestparameters_dvec[0] << '\t' << fmin  << '\t' << edm << '\t' << return_val << '\n';
 
-    outfile << input.m_chi.get() << '\t' << x_dptr[1] << '\t' << x_dptr[0] << '\t' << fmin  << '\t' << edm << '\t' << return_val << '\n';
+    outfile << input.m_chi.get() << '\t' << bestparameters_dvec[1] << '\t' << bestparameters_dvec[0] << '\t' << fmin  << '\t' << edm << '\t' << return_val << '\n';
     return_val=cmasols.run_status();
   }
 

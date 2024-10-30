@@ -1,9 +1,5 @@
 #!/bin/bash
 
-nthreads=1
-
-[ $# -eq 1 ] && nthreads=$1
-
 work_dir=$(pwd)
 sourcepath=$(pwd)/marty-public
 installpath=$sourcepath/build/.install 
@@ -15,15 +11,11 @@ gcc_version=$(gcc --version | grep -oP '\d+\.\d+\.\d+' | head -n1 | cut -f 1 -d 
 
 echo You have installed $gcc_version
 
-if [[ $gcc_version -le 9 || $gcc_version -ge 12 ]]
+if [[ $gcc_version -le 8 || $gcc_version -ge 13 ]]
 then
   echo "The required version must be between gcc-9 and gcc-12"
   exit 1
 fi
-
-echo Cleaning possible past installations in marty-public
-
-[ -d $sourcepath ] && rm -rf $sourcepath
 
 download_marty()
 {
@@ -33,50 +25,46 @@ download_marty()
     echo "Impossible to change directory in $sourcepath, aborting" ; exit 5
   fi
   git pull
-  git checkout plugin/boltzmann_solver
 
   if [ $? -ne 0 ] ; then
     echo "Error in downloading MARTY from the repository" ; cd .. ; exit 1
   fi
 }
 
+install_marty()
+{
+  cd $sourcepath
+
+  [ -d build ] || rm -rf build
+
+  cmake -DCMAKE_INSTALL_PREFIX=$installpath -S . -B build -G Ninja
+  if [ $? -ne 0 ] ; then
+  echo "Error in calling cmake (line 16), aborting" ; exit 8
+  fi
+
+  echo "Starting compilation of MARTY with ninja"
+
+  cd build && cmake --build .
+  if [ $? -ne 0 ] ; then
+  echo "Error in building, aborting" ; exit 9
+  fi
+
+  cmake --install .
+  if [ $? -ne 0 ] ; then
+  echo "Error in installing, aborting" ; exit 10
+  fi
+
+  echo 'Installation ended succesfully'
+}
+
+echo Cleaning possible past installations in marty-public
+[ -d $sourcepath ] && rm -rf $sourcepath
+
 cd $work_dir
-download_marty 
+download_marty
+#
+install_marty
 
-mkdir -p $installpath/bin 
-if [ $? -ne 0 ] ; then
-  echo "Error in creating $installpath/bin" ; exit 2
-fi
-
-mkdir -p $installpath/include 
-if [ $? -ne 0 ] ; then
-  echo "Error in creating $installpath/include" ; exit 3
-fi
-mkdir -p $installpath/lib 
-if [ $? -ne 0 ] ; then
-  echo "Error in creating $installpath/lib" ; exit 4
-fi
-
-cd $sourcepath
-
-cmake -DCMAKE_INSTALL_PREFIX=.install -S . -B build
-if [ $? -ne 0 ] ; then
- echo "Error in calling cmake (line 16), aborting" ; exit 8
-fi
-
-echo "Starting compilation of MARTY with $nthreads threads"
-
-cd build && make -j$nthreads 
-if [ $? -ne 0 ] ; then
- echo "Error in calling make (line 17), aborting" ; exit 9
-fi
-
-make install 
-if [ $? -ne 0 ] ; then
- echo "Error in calling make install (line 18), aborting" ; exit 10
-fi
-
-echo 'Installation ended succesfully'
 echo \n
 echo 'Generating configuration file'
 
@@ -105,6 +93,6 @@ else
   marty_script_path=""
 fi
 
-[ $marty_script_path -ne "" ] && sed "s|export INSTALLMARTYPATH=*|export INSTALLMARTYPATH=$installpath|g" -i compile_with_marty.sh && echo "Alternatively, you can try compiling your MARTY .cpp sources by using the script $marty_script_path, adding in your .bashrc only the path of the shared libraries, needed at runtime"
+[ $marty_script_path != "" ] && sed "s|export INSTALLMARTYPATH=*|export INSTALLMARTYPATH=$installpath|g" -i compile_with_marty.sh && echo "Alternatively, you can try compiling your MARTY .cpp sources by using the script $marty_script_path, adding in your .bashrc only the path of the shared libraries, needed at runtime"
 
 

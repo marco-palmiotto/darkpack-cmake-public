@@ -152,7 +152,7 @@ int main(int argc, char *argv[])
   std::cout << "Expected Distance from Minimum: " << cmasols.edm() << '\n';
   std::cout << "optimization took " << cmasols.elapsed_time() / 1000.0 << " seconds\n ";
 
-  Candidate bcand = cmasols.best_candidate();
+  Candidate bcand = cmasols.get_best_seen_candidate();
 
   double fmin = bcand.get_fvalue(); // min objective function value the optimizer converged to
   Eigen::VectorXd bestparameters_dvec = gp.pheno(cmasols.get_best_seen_candidate().get_x_dvec()); // Applying pheno to the best candidate output
@@ -175,9 +175,9 @@ int main(int argc, char *argv[])
     cmaparams1.set_algo(aCMAES);
     cmasols = cmaes<GenoPheno<pwqBoundStrategy>>(f, cmaparams1);
 
-    bcand = cmasols.best_candidate();
+    bcand = cmasols.get_best_seen_candidate();
     fmin = bcand.get_fvalue(); // min objective function value the optimizer converged to
-    bestparameters_dvec = gp.pheno(cmasols.get_best_seen_candidate().get_x_dvec());
+    bestparameters_dvec = gp.pheno(bcand.get_x_dvec());
     edm = cmasols.edm(); // expected distance to the minimum.
 
     std::cout << "RESULT=" <<input.m_chi.get() << '\t' << bestparameters_dvec[1] << '\t' << bestparameters_dvec[0] << '\t' << fmin  << '\t' << edm << '\t' << return_val << '\n';

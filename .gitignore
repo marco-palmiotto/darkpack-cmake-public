@@ -74,3 +74,4 @@ enable_permissions.sh
 .containers/debian-compile-launch/apptainer_cgroups.conf
 .containers/debian-compile-launch/darkpack-launch.tar
 .containers/debian-compile-launch/apptainer_cgroups.conf
+.containers/fedora-compile-launch/fedora36.tar

@@ -19,7 +19,21 @@ RUN yum update -y && \
         git \
         ninja-build \
         eigen3-devel \
+        tbb \
+        tbb-devel \
         -y 
+
+# Installs maquao (for profiling/development)
+RUN cd /usr/bin && wget https://maqao.org/maqao_archive/maqao.intel64.2.17.0.tar.xz &&	\
+    tar -xvf maqao.intel64.2.17.0.tar.xz && cp maqao.intel64.2.17.0/maqao.intel64 maqao && \
+    rm -rf maqao.intel64.2.17.0.tar.xz maqao.intel64.2.17.0/
+
+# Installs microbenchmark (for profiling/development)
+RUN git clone https://gitlab.in2p3.fr/CTA-LAPP/PHOENIX_LIBS/MicroBenchmark.git && \
+    cd MicroBenchmark && \
+    ./install.sh /usr/ && \
+    cd .. && \
+    rm -fr MicroBenchmark
 
 RUN useradd ${username}
 

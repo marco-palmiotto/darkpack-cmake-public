@@ -183,8 +183,7 @@ int main(int argc, char *argv[])
     input.m_chi = input.m_chi*stepsize;
     x0[0]=(fmin < 1.0e-3) ? x_dptr[0] : std::exp(dis(gen));
 
-    CMAParameters<GenoPheno<pwqBoundStrategy>> cmaparams1(x0,sigma,-1,0,gp); // -1 for automatically \
-  decided lambda, 0 is for random	seeding	of the internal generator.                                              
+    CMAParameters<GenoPheno<pwqBoundStrategy>> cmaparams1(x0,sigma,-1,0,gp); // -1 for automatically decided lambda, 0 is for random	seeding	of the internal generator.                                              
     cmaparams1.set_algo(aCMAES);
     cmasols = cmaes<GenoPheno<pwqBoundStrategy>>(f, cmaparams1);
 

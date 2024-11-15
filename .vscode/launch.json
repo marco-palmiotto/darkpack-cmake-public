@@ -8,8 +8,8 @@
             "name": "(gdb) Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/src/main/scalar_scan_cma.x", // Replace with the path to your executable
-            "args": ["${workspaceFolder}/src/models/scalar.lha"],
+            "program": "${workspaceFolder}/build/src/Test/scalar_computation.x",
+            "args": ["${workspaceFolder}/src/models/scalar.lha", "${workspaceFolder}/out/scans/input_to_test.dat", "${workspaceFolder}/out/scans/output_from_test.out"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],

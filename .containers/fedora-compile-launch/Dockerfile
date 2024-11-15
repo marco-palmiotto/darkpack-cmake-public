@@ -21,6 +21,7 @@ RUN yum update -y && \
         eigen3-devel \
         tbb \
         tbb-devel \
+        wget \
         -y 
 
 # Installs maquao (for profiling/development)

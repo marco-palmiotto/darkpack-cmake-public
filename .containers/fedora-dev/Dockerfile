@@ -18,9 +18,23 @@ RUN yum update -y && \
         cmake \
         git \
         ninja-build \
-        wget \
         eigen3-devel \
+        tbb \
+        tbb-devel \
+        wget \
         -y 
+
+# Installs maquao (for profiling/development)
+RUN cd /usr/bin && wget https://maqao.org/maqao_archive/maqao.intel64.2.17.0.tar.xz &&	\
+    tar -xvf maqao.intel64.2.17.0.tar.xz && cp maqao.intel64.2.17.0/maqao.intel64 maqao && \
+    rm -rf maqao.intel64.2.17.0.tar.xz maqao.intel64.2.17.0/
+
+# Installs microbenchmark (for profiling/development)
+RUN git clone https://gitlab.in2p3.fr/CTA-LAPP/PHOENIX_LIBS/MicroBenchmark.git && \
+    cd MicroBenchmark && \
+    ./install.sh /usr/ && \
+    cd .. && \
+    rm -fr MicroBenchmark
 
 RUN useradd ${username}
 
@@ -56,5 +70,12 @@ RUN mkdir darkpack-cmake && \
         -G Ninja && \
     cmake --build ./build --target install_headers_all && \
     ninja -C build
+
+# Installing vscode
+# RUN sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc && \
+#     echo -e "[code]\nname=Visual Studio Code\nbaseurl=https://packages.microsoft.com/yumrepos/vscode\nenabled=1\ngpgcheck=1\ngpgkey=https://packages.microsoft.com/keys/microsoft.asc" | sudo tee /etc/yum.repos.d/vscode.repo > /dev/null && \
+#     dnf check-update && \
+#     sudo dnf install code # or code-insiders
+
 
 CMD ["sleep", "infinity"]

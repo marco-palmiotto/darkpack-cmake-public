@@ -32,7 +32,7 @@ static inline double gaussian_shape(const double val, const double mean, const d
   return -std::exp( - sq(val-mean)/2./sq(stddev) );
 }
 
-double function_to_minimize(const double *parameters, const int npar=3)
+double function_to_minimize(const double *parameters, [[maybe_unused]] const int npar=3)
 {
   /* 
     BLOCK SCALARMODEL
@@ -118,7 +118,7 @@ int main(int argc, char *argv[])
   input.refresh();
   BoltzmannSolver boltz(input);
 
-  auto function_to_minimize = [&] (const double *parameters, const int npar=3)
+  auto function_to_minimize = [&] (const double *parameters, const int size_array=1)
   {
     // parameters in input will be
     input.g_chi = parameters[0];
@@ -158,7 +158,7 @@ int main(int argc, char *argv[])
   std::vector<double> x_stdv = bcand.get_x(); // vector of objective function parameters at minimum.
   const double* x_dptr = bcand.get_x_ptr(); // vector of objective function parameters at minimum, as C-style double array
   Eigen::VectorXd x_ev = bcand.get_x_dvec(); // vector of objective function parameters at minimum, as Eigen vector
-  double edm = cmasols.edm(); // expected distance to the minimum.
+  [[maybe_unused]] double edm = cmasols.edm(); // expected distance to the minimum.
   
   Eigen::VectorXd bestparameters = gp.pheno(cmasols.get_best_seen_candidate().get_x_dvec());
   // Applying pheno to the best candidate output

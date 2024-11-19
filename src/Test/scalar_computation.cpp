@@ -47,7 +47,7 @@ int main(int argc, char ** argv)
 
     std::vector<double> val_mchi, val_ratio, val_g;
     unsigned int nlines=0;
-    while(!filein.eof() && nlines <= 200)
+    while(!filein.eof())
     {
         double temp;
         std::cout << "\nReading line " << nlines ;

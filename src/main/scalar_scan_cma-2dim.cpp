@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
   constexpr const int n_required_args=npar+4;
   constexpr const char *par_names[npar] = {"g_chi", "m_phi/m_chi"};
 
-  constexpr const double init_seed_g_chi=0.3;
+  [[maybe_unused]] constexpr const double init_seed_g_chi=0.3;
 
   double lbounds[npar]={1.e-12, 0.25}, 
          ubounds[npar]={1.0  , 5.0 }; // arrays for lower and upper parameter bounds, respectively  
@@ -82,7 +82,7 @@ int main(int argc, char *argv[])
   input.refresh();
   BoltzmannSolver boltz(input);
 
-  auto function_to_minimize = [&] (const double *parameters, const int npar=2)
+  auto function_to_minimize = [&] (const double *parameters, [[maybe_unused]] const int size_array=2)
   {
     // parameters in input will be
     input.g_chi = parameters[0];
@@ -119,8 +119,7 @@ int main(int argc, char *argv[])
   GenoPheno<pwqBoundStrategy> gp(lbounds,ubounds,npar); // genotype / phenotype transform associated to bounds.  
   std::cout << "FIXED: " << input.m_chi
             << "SEED: g_chi=" << x0[0] << " , m_phi/m_chi=" << x0[1] << '\n';
-  CMAParameters<GenoPheno<pwqBoundStrategy>> cmaparams(x0,sigma,-1,0,gp); // -1 for automatically \
-decided lambda, 0 is for random	seeding	of the internal generator.                                              
+  CMAParameters<GenoPheno<pwqBoundStrategy>> cmaparams(x0,sigma,-1,0,gp); // -1 for automatically decided lambda, 0 is for random	seeding	of the internal generator.                                              
   cmaparams.set_algo(aCMAES);
   FitFunc f = function_to_minimize;
   CMASolutions cmasols = cmaes<GenoPheno<pwqBoundStrategy>>(f, cmaparams);
@@ -145,7 +144,7 @@ decided lambda, 0 is for random	seeding	of the internal generator.
   std::vector<double> x_stdv = bcand.get_x(); // vector of objective function parameters at minimum.
   const double* x_dptr = bcand.get_x_ptr(); // vector of objective function parameters at minimum, as C-style double array
   Eigen::VectorXd x_ev = bcand.get_x_dvec(); // vector of objective function parameters at minimum, as Eigen vector
-  double edm = cmasols.edm(); // expected distance to the minimum.
+  [[maybe_unused]] double edm = cmasols.edm(); // expected distance to the minimum.
 
   std::cout << "# m_chi   m_phi/m_chi    g_chi   pull-Oh2\nRESULT=";
   std::cout << input.m_chi.get() << '\t' << x_dptr[1] << '\t' << x_dptr[0] << '\t' << fmin << '\n';
@@ -161,8 +160,7 @@ decided lambda, 0 is for random	seeding	of the internal generator.
     input.m_chi = input.m_chi*stepsize;
     x0[0]=(fmin < 1.0e-3) ? x_dptr[0] : 0.3;
     x0[1]=(fmin < 1.0e-3) ? x_dptr[1] : 2.2;
-    CMAParameters<GenoPheno<pwqBoundStrategy>> cmaparams1(x0,sigma,-1,0,gp); // -1 for automatically \
-  decided lambda, 0 is for random	seeding	of the internal generator.                                              
+    CMAParameters<GenoPheno<pwqBoundStrategy>> cmaparams1(x0,sigma,-1,0,gp); // -1 for automaticallydecided lambda, 0 is for random	seeding	of the internal generator.                                              
     cmaparams1.set_algo(aCMAES);
     cmasols = cmaes<GenoPheno<pwqBoundStrategy>>(f, cmaparams1);
 

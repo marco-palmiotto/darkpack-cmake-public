@@ -31,7 +31,7 @@ static inline double gaussian_shape(const double val, const double mean, const d
   return -std::exp( - sq(val-mean)/2./sq(stddev) );
 }
 
-double function_to_minimize(const double *parameters, const int npar=3)
+double function_to_minimize(const double *parameters, [[maybe_unused]] const int npar=3)
 {
   /* 
     BLOCK SCALARMODEL
@@ -116,8 +116,7 @@ int main(int argc, char *argv[])
   } 
 
   GenoPheno<pwqBoundStrategy> gp(lbounds,ubounds,npar); // genotype / phenotype transform associated to bounds.  
-  CMAParameters<GenoPheno<pwqBoundStrategy>> cmaparams(x0,sigma,-1,0,gp); // -1 for automatically \
-decided lambda, 0 is for random	seeding	of the internal generator.                                              
+  CMAParameters<GenoPheno<pwqBoundStrategy>> cmaparams(x0,sigma,-1,0,gp); // -1 for automatically decided lambda, 0 is for random	seeding	of the internal generator.                                              
   cmaparams.set_algo(aCMAES);
   FitFunc f = &function_to_minimize;
   CMASolutions cmasols = cmaes<GenoPheno<pwqBoundStrategy>>(f, cmaparams);

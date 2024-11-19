@@ -11,6 +11,9 @@ cmake-build-debug/
 /*/config.hpp
 /**/config.hpp
 
+.containers/*/*.tar
+.containers/*.tar
+
 *.sif
 
 # Prerequisites
@@ -75,3 +78,6 @@ enable_permissions.sh
 .containers/debian-compile-launch/darkpack-launch.tar
 .containers/debian-compile-launch/apptainer_cgroups.conf
 .containers/fedora-compile-launch/fedora36.tar
+.containers/*/*.sif
+.containers/*.sif
+Yt.dat

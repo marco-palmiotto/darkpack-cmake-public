@@ -18,6 +18,7 @@ RUN yum update -y && \
         cmake \
         git \
         ninja-build \
+        gdb \
         eigen3-devel \
         tbb \
         tbb-devel \

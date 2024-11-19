@@ -1,8 +1,7 @@
-/* This file is empty on purpose
- * Please, fill it if you want the constructor with a filename
- * 
- * 
-#pragma once
+#ifndef LESHOUCESFROMMARTY_INCLUDED
+#define LESHOUCESFROMMARTY_INCLUDED
+// NOTE: DO NOT replace the include guard with pragma once!
+//       The constructor Param_t(std::string) needs the macro to be defined
 
 #ifndef __cplusplus
 #define __cplusplus
@@ -15,17 +14,21 @@
 #include "RunningSM.hpp"
 
 
-namespace __SPEC_LIB_NAME__::readmodule
+namespace su2f2to2::readmodule
 {
 
-  darkpackparam_t ReadLHA(const std::string name)
+  inline void computeThetaWandMw(const double alpha_em, const double Gf, const double Mz, double &thetaW, double &Mw)
   {
-    std::cerr << "Please, write the code for darkpackparam_t __SPEC_LIB_NAME__::readmoduleReadLHA(const std::string name)!\n"
-              << "Because such a function now just prints this message and returns nothing\n";
-              
-    darkpackparam_t empty;
-    return empty;
+      thetaW=0.5*std::asin(std::sqrt(4*M_PI*alpha_em/(std::sqrt(2)*Gf*Mz*Mz)));
+      Mw = Mz*std::cos(thetaW);
+      return;
   }
 
+  void AssignSMparams( Param_t &param, const std::string namefile);
+  void ReadBSMparams( Param_t &param, const std::string filename);
+  void AssignBSMparams( Param_t &param);
+
+  Param_t ReadLHA(const std::string name);
+
 }
-*/
+#endif

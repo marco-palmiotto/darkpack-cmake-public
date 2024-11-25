@@ -41,11 +41,21 @@ done
 echo Generating CMakeLists.txt in $darkpack_lib_destination_path
 sed "s/bsm2to2/$1/g" auxiliary_library/blank_files/dp/CMakeLists.txt > $darkpack_lib_destination_path/CMakeLists.txt
 
-file_list=("config.hpp.in" ) #"leshouchesfrommarty.hpp")
-
+# file list of the files to copy unconditionally
+file_list=("config.hpp.in" ) 
 for filename in ${file_list[@]}
 do
     echo Copying $filename in $darkpack_lib_destination_path
     cp auxiliary_library/blank_files/$filename $darkpack_lib_destination_path/$filename
 done
 
+# file to be copied only if not present already
+filename=leshouchesfrommarty.hpp
+echo Checking if $filename is already present in the library
+if [ -f $darkpack_lib_destination_path/$filename ]
+then
+    echo $darkpack_lib_destination_path/$filename already exists
+else
+    echo $darkpack_lib_destination_path/$filename does not exist, copying the template file
+    cp auxiliary_library/blank_files/$filename $darkpack_lib_destination_path/$filename
+fi

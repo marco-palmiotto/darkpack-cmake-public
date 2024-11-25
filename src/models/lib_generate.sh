@@ -21,7 +21,7 @@ required_version="12"
 echo The required version is $required_version
 
 # Compare the versions
-if [ "$gcc_version" -ge "$required_version" ]; then
+if [ "$gcc_version" -gt "$required_version" ]; then
     # GCC version is greater than 12, export the variables
     export CC=gcc-12
     export CXX=g++-12

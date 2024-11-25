@@ -118,7 +118,7 @@ int main(int argc, char *argv[])
   input.refresh();
   BoltzmannSolver boltz(input);
 
-  auto function_to_minimize = [&] (const double *parameters, const int size_array=1)
+  auto function_to_minimize = [&] (const double *parameters,[[maybe_unused]] const int size_array=1)
   {
     // parameters in input will be
     input.g_chi = parameters[0];

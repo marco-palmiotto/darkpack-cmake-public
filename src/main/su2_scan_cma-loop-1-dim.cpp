@@ -168,10 +168,10 @@ int main(int argc, char *argv[])
   double edm = cmasols.edm(); // expected distance to the minimum.
   int return_val=cmasols.run_status();
   
-  std::cout << "# m_phi/m_V  m_chi/m_V m_V    g_f   pull-Oh2   EDM  exit_code  \nRESULT=";
+  std::cout << "# m_phi/m_V  m_chi/m_V m_V   g_f   pull-Oh2   EDM  exit_code  \nRESULT=";
   std::cout << m_phi_over_mv << '\t' <<  mchi_over_mv << '\t' << input.m_V.get() << '\t' << bestparameters_dvec[0] << '\t' << fmin << '\t' << edm << '\t' << return_val << '\n';
 
-  outfile << "# m_phi/m_V  m_chi/m_V m_V   g_f   pull-Oh2   EDM  exit_code \n";
+  outfile << "# m_phi/m_V  m_chi/m_V m_V  g_f   pull-Oh2   EDM  exit_code \n";
   outfile << m_phi_over_mv << '\t' <<  mchi_over_mv << '\t' << input.m_V.get() << '\t' << bestparameters_dvec[0] << '\t' << fmin  << '\t' << edm << '\t' << return_val << '\n';
 
   for(int i = 1 ; i < npoints; i++)

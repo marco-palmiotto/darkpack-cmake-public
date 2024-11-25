@@ -33,6 +33,200 @@ complex_t m_chi_dm_2(
     return {res.real, res.imag};
 }
 
+complex_t sumSqAmpl_anti_chi_dm_1_chi_dm_1_to_anti_V_3_V_3(
+        param_t const &param
+        )
+{
+    cparam_t cparam;
+    cparam.g_f = param.g_f;
+    cparam.m_V = param.m_V;
+    cparam.s_12 = param.s_12;
+    cparam.s_13 = param.s_13;
+    cparam.s_14 = param.s_14;
+    cparam.s_23 = param.s_23;
+    cparam.s_24 = param.s_24;
+    cparam.s_34 = param.s_34;
+    cparam.reg_prop = param.reg_prop;
+    cparam.m_chi_dm_1 = param.m_chi_dm_1;
+    auto res = c_sumSqAmpl_anti_chi_dm_1_chi_dm_1_to_anti_V_3_V_3(&cparam);
+    return {res.real, res.imag};
+}
+
+complex_t sumSqAmpl_anti_chi_dm_1_chi_dm_1_to_anti_V_3_phi(
+        param_t const &param
+        )
+{
+    cparam_t cparam;
+    cparam.g_f = param.g_f;
+    cparam.m_V = param.m_V;
+    cparam.s_12 = param.s_12;
+    cparam.s_13 = param.s_13;
+    cparam.s_23 = param.s_23;
+    cparam.reg_prop = param.reg_prop;
+    cparam.Gamma_V_3 = param.Gamma_V_3;
+    cparam.m_chi_dm_1 = param.m_chi_dm_1;
+    auto res = c_sumSqAmpl_anti_chi_dm_1_chi_dm_1_to_anti_V_3_phi(&cparam);
+    return {res.real, res.imag};
+}
+
+complex_t sumSqAmpl_anti_chi_dm_1_chi_dm_1_to_anti_V_V(
+        param_t const &param
+        )
+{
+    cparam_t cparam;
+    cparam.g_f = param.g_f;
+    cparam.m_V = param.m_V;
+    cparam.s_12 = param.s_12;
+    cparam.s_13 = param.s_13;
+    cparam.s_14 = param.s_14;
+    cparam.s_23 = param.s_23;
+    cparam.s_24 = param.s_24;
+    cparam.s_34 = param.s_34;
+    cparam.reg_prop = param.reg_prop;
+    cparam.Gamma_V_3 = param.Gamma_V_3;
+    cparam.m_chi_dm_1 = param.m_chi_dm_1;
+    cparam.m_chi_dm_2 = param.m_chi_dm_2;
+    auto res = c_sumSqAmpl_anti_chi_dm_1_chi_dm_1_to_anti_V_V(&cparam);
+    return {res.real, res.imag};
+}
+
+complex_t sumSqAmpl_anti_chi_dm_1_chi_dm_1_to_anti_nu_e_nu_e(
+        param_t const &param
+        )
+{
+    cparam_t cparam;
+    cparam.g_f = param.g_f;
+    cparam.m_V = param.m_V;
+    cparam.s_12 = param.s_12;
+    cparam.s_13 = param.s_13;
+    cparam.s_14 = param.s_14;
+    cparam.s_23 = param.s_23;
+    cparam.s_24 = param.s_24;
+    cparam.s_34 = param.s_34;
+    cparam.reg_prop = param.reg_prop;
+    cparam.Gamma_V_3 = param.Gamma_V_3;
+    cparam.m_chi_dm_1 = param.m_chi_dm_1;
+    cparam.theta_12_L = param.theta_12_L;
+    cparam.theta_13_L = param.theta_13_L;
+    cparam.theta_23_L = param.theta_23_L;
+    auto res = c_sumSqAmpl_anti_chi_dm_1_chi_dm_1_to_anti_nu_e_nu_e(&cparam);
+    return {res.real, res.imag};
+}
+
+complex_t sumSqAmpl_anti_chi_dm_1_chi_dm_1_to_anti_nu_e_nu_mu(
+        param_t const &param
+        )
+{
+    cparam_t cparam;
+    cparam.g_f = param.g_f;
+    cparam.m_V = param.m_V;
+    cparam.s_12 = param.s_12;
+    cparam.s_13 = param.s_13;
+    cparam.s_14 = param.s_14;
+    cparam.s_23 = param.s_23;
+    cparam.s_24 = param.s_24;
+    cparam.s_34 = param.s_34;
+    cparam.reg_prop = param.reg_prop;
+    cparam.Gamma_V_3 = param.Gamma_V_3;
+    cparam.m_chi_dm_1 = param.m_chi_dm_1;
+    cparam.theta_12_L = param.theta_12_L;
+    cparam.theta_13_L = param.theta_13_L;
+    cparam.theta_23_L = param.theta_23_L;
+    auto res = c_sumSqAmpl_anti_chi_dm_1_chi_dm_1_to_anti_nu_e_nu_mu(&cparam);
+    return {res.real, res.imag};
+}
+
+complex_t sumSqAmpl_anti_chi_dm_1_chi_dm_1_to_anti_nu_e_nu_tau(
+        param_t const &param
+        )
+{
+    cparam_t cparam;
+    cparam.g_f = param.g_f;
+    cparam.m_V = param.m_V;
+    cparam.s_12 = param.s_12;
+    cparam.s_13 = param.s_13;
+    cparam.s_14 = param.s_14;
+    cparam.s_23 = param.s_23;
+    cparam.s_24 = param.s_24;
+    cparam.s_34 = param.s_34;
+    cparam.reg_prop = param.reg_prop;
+    cparam.Gamma_V_3 = param.Gamma_V_3;
+    cparam.m_chi_dm_1 = param.m_chi_dm_1;
+    cparam.theta_12_L = param.theta_12_L;
+    cparam.theta_13_L = param.theta_13_L;
+    cparam.theta_23_L = param.theta_23_L;
+    auto res = c_sumSqAmpl_anti_chi_dm_1_chi_dm_1_to_anti_nu_e_nu_tau(&cparam);
+    return {res.real, res.imag};
+}
+
+complex_t sumSqAmpl_anti_chi_dm_1_chi_dm_1_to_anti_nu_mu_nu_mu(
+        param_t const &param
+        )
+{
+    cparam_t cparam;
+    cparam.g_f = param.g_f;
+    cparam.m_V = param.m_V;
+    cparam.s_12 = param.s_12;
+    cparam.s_13 = param.s_13;
+    cparam.s_14 = param.s_14;
+    cparam.s_23 = param.s_23;
+    cparam.s_24 = param.s_24;
+    cparam.s_34 = param.s_34;
+    cparam.reg_prop = param.reg_prop;
+    cparam.Gamma_V_3 = param.Gamma_V_3;
+    cparam.m_chi_dm_1 = param.m_chi_dm_1;
+    cparam.theta_12_L = param.theta_12_L;
+    cparam.theta_23_L = param.theta_23_L;
+    auto res = c_sumSqAmpl_anti_chi_dm_1_chi_dm_1_to_anti_nu_mu_nu_mu(&cparam);
+    return {res.real, res.imag};
+}
+
+complex_t sumSqAmpl_anti_chi_dm_1_chi_dm_1_to_anti_nu_mu_nu_tau(
+        param_t const &param
+        )
+{
+    cparam_t cparam;
+    cparam.g_f = param.g_f;
+    cparam.m_V = param.m_V;
+    cparam.s_12 = param.s_12;
+    cparam.s_13 = param.s_13;
+    cparam.s_14 = param.s_14;
+    cparam.s_23 = param.s_23;
+    cparam.s_24 = param.s_24;
+    cparam.s_34 = param.s_34;
+    cparam.reg_prop = param.reg_prop;
+    cparam.Gamma_V_3 = param.Gamma_V_3;
+    cparam.m_chi_dm_1 = param.m_chi_dm_1;
+    cparam.theta_12_L = param.theta_12_L;
+    cparam.theta_13_L = param.theta_13_L;
+    cparam.theta_23_L = param.theta_23_L;
+    auto res = c_sumSqAmpl_anti_chi_dm_1_chi_dm_1_to_anti_nu_mu_nu_tau(&cparam);
+    return {res.real, res.imag};
+}
+
+complex_t sumSqAmpl_anti_chi_dm_1_chi_dm_1_to_anti_nu_tau_nu_tau(
+        param_t const &param
+        )
+{
+    cparam_t cparam;
+    cparam.g_f = param.g_f;
+    cparam.m_V = param.m_V;
+    cparam.s_12 = param.s_12;
+    cparam.s_13 = param.s_13;
+    cparam.s_14 = param.s_14;
+    cparam.s_23 = param.s_23;
+    cparam.s_24 = param.s_24;
+    cparam.s_34 = param.s_34;
+    cparam.reg_prop = param.reg_prop;
+    cparam.Gamma_V_3 = param.Gamma_V_3;
+    cparam.m_chi_dm_1 = param.m_chi_dm_1;
+    cparam.theta_12_L = param.theta_12_L;
+    cparam.theta_13_L = param.theta_13_L;
+    cparam.theta_23_L = param.theta_23_L;
+    auto res = c_sumSqAmpl_anti_chi_dm_1_chi_dm_1_to_anti_nu_tau_nu_tau(&cparam);
+    return {res.real, res.imag};
+}
+
 complex_t sumSqAmpl_anti_chi_dm_1_chi_dm_1_to_anti_e_e(
         param_t const &param
         )
@@ -196,7 +390,7 @@ complex_t sumSqAmpl_anti_chi_dm_1_chi_dm_1_to_anti_tau_tau(
     return {res.real, res.imag};
 }
 
-complex_t sumSqAmpl_anti_chi_dm_1_chi_dm_1_to_anti_nu_e_nu_e(
+complex_t sumSqAmpl_anti_chi_dm_1_chi_dm_2_to_anti_V_phi(
         param_t const &param
         )
 {
@@ -205,21 +399,16 @@ complex_t sumSqAmpl_anti_chi_dm_1_chi_dm_1_to_anti_nu_e_nu_e(
     cparam.m_V = param.m_V;
     cparam.s_12 = param.s_12;
     cparam.s_13 = param.s_13;
-    cparam.s_14 = param.s_14;
     cparam.s_23 = param.s_23;
-    cparam.s_24 = param.s_24;
-    cparam.s_34 = param.s_34;
+    cparam.Gamma_V = param.Gamma_V;
     cparam.reg_prop = param.reg_prop;
-    cparam.Gamma_V_3 = param.Gamma_V_3;
     cparam.m_chi_dm_1 = param.m_chi_dm_1;
-    cparam.theta_12_L = param.theta_12_L;
-    cparam.theta_13_L = param.theta_13_L;
-    cparam.theta_23_L = param.theta_23_L;
-    auto res = c_sumSqAmpl_anti_chi_dm_1_chi_dm_1_to_anti_nu_e_nu_e(&cparam);
+    cparam.m_chi_dm_2 = param.m_chi_dm_2;
+    auto res = c_sumSqAmpl_anti_chi_dm_1_chi_dm_2_to_anti_V_phi(&cparam);
     return {res.real, res.imag};
 }
 
-complex_t sumSqAmpl_anti_chi_dm_1_chi_dm_1_to_anti_nu_e_nu_mu(
+complex_t sumSqAmpl_anti_chi_dm_1_chi_dm_2_to_anti_nu_e_nu_e(
         param_t const &param
         )
 {
@@ -232,17 +421,18 @@ complex_t sumSqAmpl_anti_chi_dm_1_chi_dm_1_to_anti_nu_e_nu_mu(
     cparam.s_23 = param.s_23;
     cparam.s_24 = param.s_24;
     cparam.s_34 = param.s_34;
+    cparam.Gamma_V = param.Gamma_V;
     cparam.reg_prop = param.reg_prop;
-    cparam.Gamma_V_3 = param.Gamma_V_3;
     cparam.m_chi_dm_1 = param.m_chi_dm_1;
+    cparam.m_chi_dm_2 = param.m_chi_dm_2;
     cparam.theta_12_L = param.theta_12_L;
     cparam.theta_13_L = param.theta_13_L;
     cparam.theta_23_L = param.theta_23_L;
-    auto res = c_sumSqAmpl_anti_chi_dm_1_chi_dm_1_to_anti_nu_e_nu_mu(&cparam);
+    auto res = c_sumSqAmpl_anti_chi_dm_1_chi_dm_2_to_anti_nu_e_nu_e(&cparam);
     return {res.real, res.imag};
 }
 
-complex_t sumSqAmpl_anti_chi_dm_1_chi_dm_1_to_anti_nu_e_nu_tau(
+complex_t sumSqAmpl_anti_chi_dm_1_chi_dm_2_to_anti_nu_e_nu_mu(
         param_t const &param
         )
 {
@@ -255,17 +445,18 @@ complex_t sumSqAmpl_anti_chi_dm_1_chi_dm_1_to_anti_nu_e_nu_tau(
     cparam.s_23 = param.s_23;
     cparam.s_24 = param.s_24;
     cparam.s_34 = param.s_34;
+    cparam.Gamma_V = param.Gamma_V;
     cparam.reg_prop = param.reg_prop;
-    cparam.Gamma_V_3 = param.Gamma_V_3;
     cparam.m_chi_dm_1 = param.m_chi_dm_1;
+    cparam.m_chi_dm_2 = param.m_chi_dm_2;
     cparam.theta_12_L = param.theta_12_L;
     cparam.theta_13_L = param.theta_13_L;
     cparam.theta_23_L = param.theta_23_L;
-    auto res = c_sumSqAmpl_anti_chi_dm_1_chi_dm_1_to_anti_nu_e_nu_tau(&cparam);
+    auto res = c_sumSqAmpl_anti_chi_dm_1_chi_dm_2_to_anti_nu_e_nu_mu(&cparam);
     return {res.real, res.imag};
 }
 
-complex_t sumSqAmpl_anti_chi_dm_1_chi_dm_1_to_anti_nu_mu_nu_mu(
+complex_t sumSqAmpl_anti_chi_dm_1_chi_dm_2_to_anti_nu_e_nu_tau(
         param_t const &param
         )
 {
@@ -278,39 +469,18 @@ complex_t sumSqAmpl_anti_chi_dm_1_chi_dm_1_to_anti_nu_mu_nu_mu(
     cparam.s_23 = param.s_23;
     cparam.s_24 = param.s_24;
     cparam.s_34 = param.s_34;
+    cparam.Gamma_V = param.Gamma_V;
     cparam.reg_prop = param.reg_prop;
-    cparam.Gamma_V_3 = param.Gamma_V_3;
     cparam.m_chi_dm_1 = param.m_chi_dm_1;
-    cparam.theta_12_L = param.theta_12_L;
-    cparam.theta_23_L = param.theta_23_L;
-    auto res = c_sumSqAmpl_anti_chi_dm_1_chi_dm_1_to_anti_nu_mu_nu_mu(&cparam);
-    return {res.real, res.imag};
-}
-
-complex_t sumSqAmpl_anti_chi_dm_1_chi_dm_1_to_anti_nu_mu_nu_tau(
-        param_t const &param
-        )
-{
-    cparam_t cparam;
-    cparam.g_f = param.g_f;
-    cparam.m_V = param.m_V;
-    cparam.s_12 = param.s_12;
-    cparam.s_13 = param.s_13;
-    cparam.s_14 = param.s_14;
-    cparam.s_23 = param.s_23;
-    cparam.s_24 = param.s_24;
-    cparam.s_34 = param.s_34;
-    cparam.reg_prop = param.reg_prop;
-    cparam.Gamma_V_3 = param.Gamma_V_3;
-    cparam.m_chi_dm_1 = param.m_chi_dm_1;
+    cparam.m_chi_dm_2 = param.m_chi_dm_2;
     cparam.theta_12_L = param.theta_12_L;
     cparam.theta_13_L = param.theta_13_L;
     cparam.theta_23_L = param.theta_23_L;
-    auto res = c_sumSqAmpl_anti_chi_dm_1_chi_dm_1_to_anti_nu_mu_nu_tau(&cparam);
+    auto res = c_sumSqAmpl_anti_chi_dm_1_chi_dm_2_to_anti_nu_e_nu_tau(&cparam);
     return {res.real, res.imag};
 }
 
-complex_t sumSqAmpl_anti_chi_dm_1_chi_dm_1_to_anti_nu_tau_nu_tau(
+complex_t sumSqAmpl_anti_chi_dm_1_chi_dm_2_to_anti_nu_mu_nu_mu(
         param_t const &param
         )
 {
@@ -323,13 +493,61 @@ complex_t sumSqAmpl_anti_chi_dm_1_chi_dm_1_to_anti_nu_tau_nu_tau(
     cparam.s_23 = param.s_23;
     cparam.s_24 = param.s_24;
     cparam.s_34 = param.s_34;
+    cparam.Gamma_V = param.Gamma_V;
     cparam.reg_prop = param.reg_prop;
-    cparam.Gamma_V_3 = param.Gamma_V_3;
     cparam.m_chi_dm_1 = param.m_chi_dm_1;
+    cparam.m_chi_dm_2 = param.m_chi_dm_2;
+    cparam.theta_12_L = param.theta_12_L;
+    cparam.theta_23_L = param.theta_23_L;
+    auto res = c_sumSqAmpl_anti_chi_dm_1_chi_dm_2_to_anti_nu_mu_nu_mu(&cparam);
+    return {res.real, res.imag};
+}
+
+complex_t sumSqAmpl_anti_chi_dm_1_chi_dm_2_to_anti_nu_mu_nu_tau(
+        param_t const &param
+        )
+{
+    cparam_t cparam;
+    cparam.g_f = param.g_f;
+    cparam.m_V = param.m_V;
+    cparam.s_12 = param.s_12;
+    cparam.s_13 = param.s_13;
+    cparam.s_14 = param.s_14;
+    cparam.s_23 = param.s_23;
+    cparam.s_24 = param.s_24;
+    cparam.s_34 = param.s_34;
+    cparam.Gamma_V = param.Gamma_V;
+    cparam.reg_prop = param.reg_prop;
+    cparam.m_chi_dm_1 = param.m_chi_dm_1;
+    cparam.m_chi_dm_2 = param.m_chi_dm_2;
     cparam.theta_12_L = param.theta_12_L;
     cparam.theta_13_L = param.theta_13_L;
     cparam.theta_23_L = param.theta_23_L;
-    auto res = c_sumSqAmpl_anti_chi_dm_1_chi_dm_1_to_anti_nu_tau_nu_tau(&cparam);
+    auto res = c_sumSqAmpl_anti_chi_dm_1_chi_dm_2_to_anti_nu_mu_nu_tau(&cparam);
+    return {res.real, res.imag};
+}
+
+complex_t sumSqAmpl_anti_chi_dm_1_chi_dm_2_to_anti_nu_tau_nu_tau(
+        param_t const &param
+        )
+{
+    cparam_t cparam;
+    cparam.g_f = param.g_f;
+    cparam.m_V = param.m_V;
+    cparam.s_12 = param.s_12;
+    cparam.s_13 = param.s_13;
+    cparam.s_14 = param.s_14;
+    cparam.s_23 = param.s_23;
+    cparam.s_24 = param.s_24;
+    cparam.s_34 = param.s_34;
+    cparam.Gamma_V = param.Gamma_V;
+    cparam.reg_prop = param.reg_prop;
+    cparam.m_chi_dm_1 = param.m_chi_dm_1;
+    cparam.m_chi_dm_2 = param.m_chi_dm_2;
+    cparam.theta_12_L = param.theta_12_L;
+    cparam.theta_13_L = param.theta_13_L;
+    cparam.theta_23_L = param.theta_23_L;
+    auto res = c_sumSqAmpl_anti_chi_dm_1_chi_dm_2_to_anti_nu_tau_nu_tau(&cparam);
     return {res.real, res.imag};
 }
 
@@ -502,7 +720,7 @@ complex_t sumSqAmpl_anti_chi_dm_1_chi_dm_2_to_anti_tau_tau(
     return {res.real, res.imag};
 }
 
-complex_t sumSqAmpl_anti_chi_dm_1_chi_dm_2_to_anti_nu_e_nu_e(
+complex_t sumSqAmpl_anti_chi_dm_2_chi_dm_2_to_anti_V_3_V_3(
         param_t const &param
         )
 {
@@ -515,18 +733,74 @@ complex_t sumSqAmpl_anti_chi_dm_1_chi_dm_2_to_anti_nu_e_nu_e(
     cparam.s_23 = param.s_23;
     cparam.s_24 = param.s_24;
     cparam.s_34 = param.s_34;
-    cparam.Gamma_V = param.Gamma_V;
     cparam.reg_prop = param.reg_prop;
+    cparam.m_chi_dm_2 = param.m_chi_dm_2;
+    auto res = c_sumSqAmpl_anti_chi_dm_2_chi_dm_2_to_anti_V_3_V_3(&cparam);
+    return {res.real, res.imag};
+}
+
+complex_t sumSqAmpl_anti_chi_dm_2_chi_dm_2_to_anti_V_3_phi(
+        param_t const &param
+        )
+{
+    cparam_t cparam;
+    cparam.g_f = param.g_f;
+    cparam.m_V = param.m_V;
+    cparam.s_12 = param.s_12;
+    cparam.s_13 = param.s_13;
+    cparam.s_23 = param.s_23;
+    cparam.reg_prop = param.reg_prop;
+    cparam.Gamma_V_3 = param.Gamma_V_3;
+    cparam.m_chi_dm_2 = param.m_chi_dm_2;
+    auto res = c_sumSqAmpl_anti_chi_dm_2_chi_dm_2_to_anti_V_3_phi(&cparam);
+    return {res.real, res.imag};
+}
+
+complex_t sumSqAmpl_anti_chi_dm_2_chi_dm_2_to_anti_V_V(
+        param_t const &param
+        )
+{
+    cparam_t cparam;
+    cparam.g_f = param.g_f;
+    cparam.m_V = param.m_V;
+    cparam.s_12 = param.s_12;
+    cparam.s_13 = param.s_13;
+    cparam.s_14 = param.s_14;
+    cparam.s_23 = param.s_23;
+    cparam.s_24 = param.s_24;
+    cparam.s_34 = param.s_34;
+    cparam.reg_prop = param.reg_prop;
+    cparam.Gamma_V_3 = param.Gamma_V_3;
     cparam.m_chi_dm_1 = param.m_chi_dm_1;
+    cparam.m_chi_dm_2 = param.m_chi_dm_2;
+    auto res = c_sumSqAmpl_anti_chi_dm_2_chi_dm_2_to_anti_V_V(&cparam);
+    return {res.real, res.imag};
+}
+
+complex_t sumSqAmpl_anti_chi_dm_2_chi_dm_2_to_anti_nu_e_nu_e(
+        param_t const &param
+        )
+{
+    cparam_t cparam;
+    cparam.g_f = param.g_f;
+    cparam.m_V = param.m_V;
+    cparam.s_12 = param.s_12;
+    cparam.s_13 = param.s_13;
+    cparam.s_14 = param.s_14;
+    cparam.s_23 = param.s_23;
+    cparam.s_24 = param.s_24;
+    cparam.s_34 = param.s_34;
+    cparam.reg_prop = param.reg_prop;
+    cparam.Gamma_V_3 = param.Gamma_V_3;
     cparam.m_chi_dm_2 = param.m_chi_dm_2;
     cparam.theta_12_L = param.theta_12_L;
     cparam.theta_13_L = param.theta_13_L;
     cparam.theta_23_L = param.theta_23_L;
-    auto res = c_sumSqAmpl_anti_chi_dm_1_chi_dm_2_to_anti_nu_e_nu_e(&cparam);
+    auto res = c_sumSqAmpl_anti_chi_dm_2_chi_dm_2_to_anti_nu_e_nu_e(&cparam);
     return {res.real, res.imag};
 }
 
-complex_t sumSqAmpl_anti_chi_dm_1_chi_dm_2_to_anti_nu_e_nu_mu(
+complex_t sumSqAmpl_anti_chi_dm_2_chi_dm_2_to_anti_nu_e_nu_mu(
         param_t const &param
         )
 {
@@ -539,18 +813,17 @@ complex_t sumSqAmpl_anti_chi_dm_1_chi_dm_2_to_anti_nu_e_nu_mu(
     cparam.s_23 = param.s_23;
     cparam.s_24 = param.s_24;
     cparam.s_34 = param.s_34;
-    cparam.Gamma_V = param.Gamma_V;
     cparam.reg_prop = param.reg_prop;
-    cparam.m_chi_dm_1 = param.m_chi_dm_1;
+    cparam.Gamma_V_3 = param.Gamma_V_3;
     cparam.m_chi_dm_2 = param.m_chi_dm_2;
     cparam.theta_12_L = param.theta_12_L;
     cparam.theta_13_L = param.theta_13_L;
     cparam.theta_23_L = param.theta_23_L;
-    auto res = c_sumSqAmpl_anti_chi_dm_1_chi_dm_2_to_anti_nu_e_nu_mu(&cparam);
+    auto res = c_sumSqAmpl_anti_chi_dm_2_chi_dm_2_to_anti_nu_e_nu_mu(&cparam);
     return {res.real, res.imag};
 }
 
-complex_t sumSqAmpl_anti_chi_dm_1_chi_dm_2_to_anti_nu_e_nu_tau(
+complex_t sumSqAmpl_anti_chi_dm_2_chi_dm_2_to_anti_nu_e_nu_tau(
         param_t const &param
         )
 {
@@ -563,18 +836,17 @@ complex_t sumSqAmpl_anti_chi_dm_1_chi_dm_2_to_anti_nu_e_nu_tau(
     cparam.s_23 = param.s_23;
     cparam.s_24 = param.s_24;
     cparam.s_34 = param.s_34;
-    cparam.Gamma_V = param.Gamma_V;
     cparam.reg_prop = param.reg_prop;
-    cparam.m_chi_dm_1 = param.m_chi_dm_1;
+    cparam.Gamma_V_3 = param.Gamma_V_3;
     cparam.m_chi_dm_2 = param.m_chi_dm_2;
     cparam.theta_12_L = param.theta_12_L;
     cparam.theta_13_L = param.theta_13_L;
     cparam.theta_23_L = param.theta_23_L;
-    auto res = c_sumSqAmpl_anti_chi_dm_1_chi_dm_2_to_anti_nu_e_nu_tau(&cparam);
+    auto res = c_sumSqAmpl_anti_chi_dm_2_chi_dm_2_to_anti_nu_e_nu_tau(&cparam);
     return {res.real, res.imag};
 }
 
-complex_t sumSqAmpl_anti_chi_dm_1_chi_dm_2_to_anti_nu_mu_nu_mu(
+complex_t sumSqAmpl_anti_chi_dm_2_chi_dm_2_to_anti_nu_mu_nu_mu(
         param_t const &param
         )
 {
@@ -587,17 +859,16 @@ complex_t sumSqAmpl_anti_chi_dm_1_chi_dm_2_to_anti_nu_mu_nu_mu(
     cparam.s_23 = param.s_23;
     cparam.s_24 = param.s_24;
     cparam.s_34 = param.s_34;
-    cparam.Gamma_V = param.Gamma_V;
     cparam.reg_prop = param.reg_prop;
-    cparam.m_chi_dm_1 = param.m_chi_dm_1;
+    cparam.Gamma_V_3 = param.Gamma_V_3;
     cparam.m_chi_dm_2 = param.m_chi_dm_2;
     cparam.theta_12_L = param.theta_12_L;
     cparam.theta_23_L = param.theta_23_L;
-    auto res = c_sumSqAmpl_anti_chi_dm_1_chi_dm_2_to_anti_nu_mu_nu_mu(&cparam);
+    auto res = c_sumSqAmpl_anti_chi_dm_2_chi_dm_2_to_anti_nu_mu_nu_mu(&cparam);
     return {res.real, res.imag};
 }
 
-complex_t sumSqAmpl_anti_chi_dm_1_chi_dm_2_to_anti_nu_mu_nu_tau(
+complex_t sumSqAmpl_anti_chi_dm_2_chi_dm_2_to_anti_nu_mu_nu_tau(
         param_t const &param
         )
 {
@@ -610,38 +881,36 @@ complex_t sumSqAmpl_anti_chi_dm_1_chi_dm_2_to_anti_nu_mu_nu_tau(
     cparam.s_23 = param.s_23;
     cparam.s_24 = param.s_24;
     cparam.s_34 = param.s_34;
-    cparam.Gamma_V = param.Gamma_V;
     cparam.reg_prop = param.reg_prop;
-    cparam.m_chi_dm_1 = param.m_chi_dm_1;
-    cparam.m_chi_dm_2 = param.m_chi_dm_2;
-    cparam.theta_12_L = param.theta_12_L;
-    cparam.theta_13_L = param.theta_13_L;
-    cparam.theta_23_L = param.theta_23_L;
-    auto res = c_sumSqAmpl_anti_chi_dm_1_chi_dm_2_to_anti_nu_mu_nu_tau(&cparam);
-    return {res.real, res.imag};
-}
-
-complex_t sumSqAmpl_anti_chi_dm_1_chi_dm_2_to_anti_nu_tau_nu_tau(
-        param_t const &param
-        )
-{
-    cparam_t cparam;
-    cparam.g_f = param.g_f;
-    cparam.m_V = param.m_V;
-    cparam.s_12 = param.s_12;
-    cparam.s_13 = param.s_13;
-    cparam.s_14 = param.s_14;
-    cparam.s_23 = param.s_23;
-    cparam.s_24 = param.s_24;
-    cparam.s_34 = param.s_34;
-    cparam.Gamma_V = param.Gamma_V;
-    cparam.reg_prop = param.reg_prop;
-    cparam.m_chi_dm_1 = param.m_chi_dm_1;
+    cparam.Gamma_V_3 = param.Gamma_V_3;
     cparam.m_chi_dm_2 = param.m_chi_dm_2;
     cparam.theta_12_L = param.theta_12_L;
     cparam.theta_13_L = param.theta_13_L;
     cparam.theta_23_L = param.theta_23_L;
-    auto res = c_sumSqAmpl_anti_chi_dm_1_chi_dm_2_to_anti_nu_tau_nu_tau(&cparam);
+    auto res = c_sumSqAmpl_anti_chi_dm_2_chi_dm_2_to_anti_nu_mu_nu_tau(&cparam);
+    return {res.real, res.imag};
+}
+
+complex_t sumSqAmpl_anti_chi_dm_2_chi_dm_2_to_anti_nu_tau_nu_tau(
+        param_t const &param
+        )
+{
+    cparam_t cparam;
+    cparam.g_f = param.g_f;
+    cparam.m_V = param.m_V;
+    cparam.s_12 = param.s_12;
+    cparam.s_13 = param.s_13;
+    cparam.s_14 = param.s_14;
+    cparam.s_23 = param.s_23;
+    cparam.s_24 = param.s_24;
+    cparam.s_34 = param.s_34;
+    cparam.reg_prop = param.reg_prop;
+    cparam.Gamma_V_3 = param.Gamma_V_3;
+    cparam.m_chi_dm_2 = param.m_chi_dm_2;
+    cparam.theta_12_L = param.theta_12_L;
+    cparam.theta_13_L = param.theta_13_L;
+    cparam.theta_23_L = param.theta_23_L;
+    auto res = c_sumSqAmpl_anti_chi_dm_2_chi_dm_2_to_anti_nu_tau_nu_tau(&cparam);
     return {res.real, res.imag};
 }
 
@@ -805,143 +1074,6 @@ complex_t sumSqAmpl_anti_chi_dm_2_chi_dm_2_to_anti_tau_tau(
     cparam.theta_23_L = param.theta_23_L;
     cparam.theta_23_R = param.theta_23_R;
     auto res = c_sumSqAmpl_anti_chi_dm_2_chi_dm_2_to_anti_tau_tau(&cparam);
-    return {res.real, res.imag};
-}
-
-complex_t sumSqAmpl_anti_chi_dm_2_chi_dm_2_to_anti_nu_e_nu_e(
-        param_t const &param
-        )
-{
-    cparam_t cparam;
-    cparam.g_f = param.g_f;
-    cparam.m_V = param.m_V;
-    cparam.s_12 = param.s_12;
-    cparam.s_13 = param.s_13;
-    cparam.s_14 = param.s_14;
-    cparam.s_23 = param.s_23;
-    cparam.s_24 = param.s_24;
-    cparam.s_34 = param.s_34;
-    cparam.reg_prop = param.reg_prop;
-    cparam.Gamma_V_3 = param.Gamma_V_3;
-    cparam.m_chi_dm_2 = param.m_chi_dm_2;
-    cparam.theta_12_L = param.theta_12_L;
-    cparam.theta_13_L = param.theta_13_L;
-    cparam.theta_23_L = param.theta_23_L;
-    auto res = c_sumSqAmpl_anti_chi_dm_2_chi_dm_2_to_anti_nu_e_nu_e(&cparam);
-    return {res.real, res.imag};
-}
-
-complex_t sumSqAmpl_anti_chi_dm_2_chi_dm_2_to_anti_nu_e_nu_mu(
-        param_t const &param
-        )
-{
-    cparam_t cparam;
-    cparam.g_f = param.g_f;
-    cparam.m_V = param.m_V;
-    cparam.s_12 = param.s_12;
-    cparam.s_13 = param.s_13;
-    cparam.s_14 = param.s_14;
-    cparam.s_23 = param.s_23;
-    cparam.s_24 = param.s_24;
-    cparam.s_34 = param.s_34;
-    cparam.reg_prop = param.reg_prop;
-    cparam.Gamma_V_3 = param.Gamma_V_3;
-    cparam.m_chi_dm_2 = param.m_chi_dm_2;
-    cparam.theta_12_L = param.theta_12_L;
-    cparam.theta_13_L = param.theta_13_L;
-    cparam.theta_23_L = param.theta_23_L;
-    auto res = c_sumSqAmpl_anti_chi_dm_2_chi_dm_2_to_anti_nu_e_nu_mu(&cparam);
-    return {res.real, res.imag};
-}
-
-complex_t sumSqAmpl_anti_chi_dm_2_chi_dm_2_to_anti_nu_e_nu_tau(
-        param_t const &param
-        )
-{
-    cparam_t cparam;
-    cparam.g_f = param.g_f;
-    cparam.m_V = param.m_V;
-    cparam.s_12 = param.s_12;
-    cparam.s_13 = param.s_13;
-    cparam.s_14 = param.s_14;
-    cparam.s_23 = param.s_23;
-    cparam.s_24 = param.s_24;
-    cparam.s_34 = param.s_34;
-    cparam.reg_prop = param.reg_prop;
-    cparam.Gamma_V_3 = param.Gamma_V_3;
-    cparam.m_chi_dm_2 = param.m_chi_dm_2;
-    cparam.theta_12_L = param.theta_12_L;
-    cparam.theta_13_L = param.theta_13_L;
-    cparam.theta_23_L = param.theta_23_L;
-    auto res = c_sumSqAmpl_anti_chi_dm_2_chi_dm_2_to_anti_nu_e_nu_tau(&cparam);
-    return {res.real, res.imag};
-}
-
-complex_t sumSqAmpl_anti_chi_dm_2_chi_dm_2_to_anti_nu_mu_nu_mu(
-        param_t const &param
-        )
-{
-    cparam_t cparam;
-    cparam.g_f = param.g_f;
-    cparam.m_V = param.m_V;
-    cparam.s_12 = param.s_12;
-    cparam.s_13 = param.s_13;
-    cparam.s_14 = param.s_14;
-    cparam.s_23 = param.s_23;
-    cparam.s_24 = param.s_24;
-    cparam.s_34 = param.s_34;
-    cparam.reg_prop = param.reg_prop;
-    cparam.Gamma_V_3 = param.Gamma_V_3;
-    cparam.m_chi_dm_2 = param.m_chi_dm_2;
-    cparam.theta_12_L = param.theta_12_L;
-    cparam.theta_23_L = param.theta_23_L;
-    auto res = c_sumSqAmpl_anti_chi_dm_2_chi_dm_2_to_anti_nu_mu_nu_mu(&cparam);
-    return {res.real, res.imag};
-}
-
-complex_t sumSqAmpl_anti_chi_dm_2_chi_dm_2_to_anti_nu_mu_nu_tau(
-        param_t const &param
-        )
-{
-    cparam_t cparam;
-    cparam.g_f = param.g_f;
-    cparam.m_V = param.m_V;
-    cparam.s_12 = param.s_12;
-    cparam.s_13 = param.s_13;
-    cparam.s_14 = param.s_14;
-    cparam.s_23 = param.s_23;
-    cparam.s_24 = param.s_24;
-    cparam.s_34 = param.s_34;
-    cparam.reg_prop = param.reg_prop;
-    cparam.Gamma_V_3 = param.Gamma_V_3;
-    cparam.m_chi_dm_2 = param.m_chi_dm_2;
-    cparam.theta_12_L = param.theta_12_L;
-    cparam.theta_13_L = param.theta_13_L;
-    cparam.theta_23_L = param.theta_23_L;
-    auto res = c_sumSqAmpl_anti_chi_dm_2_chi_dm_2_to_anti_nu_mu_nu_tau(&cparam);
-    return {res.real, res.imag};
-}
-
-complex_t sumSqAmpl_anti_chi_dm_2_chi_dm_2_to_anti_nu_tau_nu_tau(
-        param_t const &param
-        )
-{
-    cparam_t cparam;
-    cparam.g_f = param.g_f;
-    cparam.m_V = param.m_V;
-    cparam.s_12 = param.s_12;
-    cparam.s_13 = param.s_13;
-    cparam.s_14 = param.s_14;
-    cparam.s_23 = param.s_23;
-    cparam.s_24 = param.s_24;
-    cparam.s_34 = param.s_34;
-    cparam.reg_prop = param.reg_prop;
-    cparam.Gamma_V_3 = param.Gamma_V_3;
-    cparam.m_chi_dm_2 = param.m_chi_dm_2;
-    cparam.theta_12_L = param.theta_12_L;
-    cparam.theta_13_L = param.theta_13_L;
-    cparam.theta_23_L = param.theta_23_L;
-    auto res = c_sumSqAmpl_anti_chi_dm_2_chi_dm_2_to_anti_nu_tau_nu_tau(&cparam);
     return {res.real, res.imag};
 }
 

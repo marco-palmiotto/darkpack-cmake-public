@@ -19,37 +19,19 @@ complex_t m_chi_dm_2(
 
 struct param_t;
 
-complex_t sumSqAmpl_anti_chi_dm_1_chi_dm_1_to_anti_e_e(
+complex_t sumSqAmpl_anti_chi_dm_1_chi_dm_1_to_anti_V_3_V_3(
         param_t const &param
         );
 
 struct param_t;
 
-complex_t sumSqAmpl_anti_chi_dm_1_chi_dm_1_to_anti_e_mu(
+complex_t sumSqAmpl_anti_chi_dm_1_chi_dm_1_to_anti_V_3_phi(
         param_t const &param
         );
 
 struct param_t;
 
-complex_t sumSqAmpl_anti_chi_dm_1_chi_dm_1_to_anti_e_tau(
-        param_t const &param
-        );
-
-struct param_t;
-
-complex_t sumSqAmpl_anti_chi_dm_1_chi_dm_1_to_anti_mu_mu(
-        param_t const &param
-        );
-
-struct param_t;
-
-complex_t sumSqAmpl_anti_chi_dm_1_chi_dm_1_to_anti_mu_tau(
-        param_t const &param
-        );
-
-struct param_t;
-
-complex_t sumSqAmpl_anti_chi_dm_1_chi_dm_1_to_anti_tau_tau(
+complex_t sumSqAmpl_anti_chi_dm_1_chi_dm_1_to_anti_V_V(
         param_t const &param
         );
 
@@ -91,37 +73,43 @@ complex_t sumSqAmpl_anti_chi_dm_1_chi_dm_1_to_anti_nu_tau_nu_tau(
 
 struct param_t;
 
-complex_t sumSqAmpl_anti_chi_dm_1_chi_dm_2_to_anti_e_e(
+complex_t sumSqAmpl_anti_chi_dm_1_chi_dm_1_to_anti_e_e(
         param_t const &param
         );
 
 struct param_t;
 
-complex_t sumSqAmpl_anti_chi_dm_1_chi_dm_2_to_anti_e_mu(
+complex_t sumSqAmpl_anti_chi_dm_1_chi_dm_1_to_anti_e_mu(
         param_t const &param
         );
 
 struct param_t;
 
-complex_t sumSqAmpl_anti_chi_dm_1_chi_dm_2_to_anti_e_tau(
+complex_t sumSqAmpl_anti_chi_dm_1_chi_dm_1_to_anti_e_tau(
         param_t const &param
         );
 
 struct param_t;
 
-complex_t sumSqAmpl_anti_chi_dm_1_chi_dm_2_to_anti_mu_mu(
+complex_t sumSqAmpl_anti_chi_dm_1_chi_dm_1_to_anti_mu_mu(
         param_t const &param
         );
 
 struct param_t;
 
-complex_t sumSqAmpl_anti_chi_dm_1_chi_dm_2_to_anti_mu_tau(
+complex_t sumSqAmpl_anti_chi_dm_1_chi_dm_1_to_anti_mu_tau(
         param_t const &param
         );
 
 struct param_t;
 
-complex_t sumSqAmpl_anti_chi_dm_1_chi_dm_2_to_anti_tau_tau(
+complex_t sumSqAmpl_anti_chi_dm_1_chi_dm_1_to_anti_tau_tau(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t sumSqAmpl_anti_chi_dm_1_chi_dm_2_to_anti_V_phi(
         param_t const &param
         );
 
@@ -163,37 +151,55 @@ complex_t sumSqAmpl_anti_chi_dm_1_chi_dm_2_to_anti_nu_tau_nu_tau(
 
 struct param_t;
 
-complex_t sumSqAmpl_anti_chi_dm_2_chi_dm_2_to_anti_e_e(
+complex_t sumSqAmpl_anti_chi_dm_1_chi_dm_2_to_anti_e_e(
         param_t const &param
         );
 
 struct param_t;
 
-complex_t sumSqAmpl_anti_chi_dm_2_chi_dm_2_to_anti_e_mu(
+complex_t sumSqAmpl_anti_chi_dm_1_chi_dm_2_to_anti_e_mu(
         param_t const &param
         );
 
 struct param_t;
 
-complex_t sumSqAmpl_anti_chi_dm_2_chi_dm_2_to_anti_e_tau(
+complex_t sumSqAmpl_anti_chi_dm_1_chi_dm_2_to_anti_e_tau(
         param_t const &param
         );
 
 struct param_t;
 
-complex_t sumSqAmpl_anti_chi_dm_2_chi_dm_2_to_anti_mu_mu(
+complex_t sumSqAmpl_anti_chi_dm_1_chi_dm_2_to_anti_mu_mu(
         param_t const &param
         );
 
 struct param_t;
 
-complex_t sumSqAmpl_anti_chi_dm_2_chi_dm_2_to_anti_mu_tau(
+complex_t sumSqAmpl_anti_chi_dm_1_chi_dm_2_to_anti_mu_tau(
         param_t const &param
         );
 
 struct param_t;
 
-complex_t sumSqAmpl_anti_chi_dm_2_chi_dm_2_to_anti_tau_tau(
+complex_t sumSqAmpl_anti_chi_dm_1_chi_dm_2_to_anti_tau_tau(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t sumSqAmpl_anti_chi_dm_2_chi_dm_2_to_anti_V_3_V_3(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t sumSqAmpl_anti_chi_dm_2_chi_dm_2_to_anti_V_3_phi(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t sumSqAmpl_anti_chi_dm_2_chi_dm_2_to_anti_V_V(
         param_t const &param
         );
 
@@ -230,6 +236,42 @@ complex_t sumSqAmpl_anti_chi_dm_2_chi_dm_2_to_anti_nu_mu_nu_tau(
 struct param_t;
 
 complex_t sumSqAmpl_anti_chi_dm_2_chi_dm_2_to_anti_nu_tau_nu_tau(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t sumSqAmpl_anti_chi_dm_2_chi_dm_2_to_anti_e_e(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t sumSqAmpl_anti_chi_dm_2_chi_dm_2_to_anti_e_mu(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t sumSqAmpl_anti_chi_dm_2_chi_dm_2_to_anti_e_tau(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t sumSqAmpl_anti_chi_dm_2_chi_dm_2_to_anti_mu_mu(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t sumSqAmpl_anti_chi_dm_2_chi_dm_2_to_anti_mu_tau(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t sumSqAmpl_anti_chi_dm_2_chi_dm_2_to_anti_tau_tau(
         param_t const &param
         );
 

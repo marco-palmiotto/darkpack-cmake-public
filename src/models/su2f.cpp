@@ -490,9 +490,6 @@ int main()
       su2f_model.getParticle("chi_dm_1"),
       su2f_model.getParticle("chi_dm_2")
      });
-  
-
-  
   for ( size_t i = 0 ; i != part.size() ; i++ )
   {
      bool istoadd=true;
@@ -557,15 +554,6 @@ int main()
   
   std::cout << "Building the list of SM leptons\n";
   
-  std::array<Particle,6> smfermions({
-                                     su2f_model.getParticle("e"  ), 
-                                     su2f_model.getParticle("mu" ), 
-                                     su2f_model.getParticle("tau"), 
-                                     su2f_model.getParticle("nu_e"), 
-                                     su2f_model.getParticle("nu_mu"), 
-                                     su2f_model.getParticle("nu_tau")
-                                    });
-  
   std::array<Particle,2> bsm_fields({
     su2f_model.getParticle("chi_dm_1"),
     su2f_model.getParticle("chi_dm_2")});
@@ -574,16 +562,16 @@ int main()
   {
     for( size_t i2 = i1 ; i2 < bsm_fields.size() ; i2++) 
     {
-      for( size_t j1 = 0 ; j1 < smfermions.size() ; j1++) 
+      for( size_t j1 = 0 ; j1 < psm.size() ; j1++) 
       {
-        for( size_t j2 = j1 ; j2 < smfermions.size() ; j2++) 
+        for( size_t j2 = j1 ; j2 < psm.size() ; j2++) 
         {
             Process2to2ToCompute proc_c;
             
             proc_c.process={Incoming(AntiPart(bsm_fields[i1])), 
                             Incoming(bsm_fields[i2]), 
-                            Outgoing(AntiPart(smfermions[j1])),
-                            Outgoing(smfermions[j2]) };
+                            Outgoing(AntiPart(psm[j1])),
+                            Outgoing(psm[j2]) };
             proc_c.order=mty::Order::TreeLevel;
             proc_c.leading_order=false;
             proc_c.Wgauge=mty::gauge::Type::Feynman;

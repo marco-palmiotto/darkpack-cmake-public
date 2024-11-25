@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.25.1)
+cmake_minimum_required(VERSION 3.10)
 
 # setting the namespace for the specialised library
 set(__SPEC_LIB_NAME__ su2f2to2)

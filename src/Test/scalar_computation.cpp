@@ -1,14 +1,19 @@
 #include <iostream>
 #include <iomanip>
+#include <string>
+#include <fstream>
+
 #include "dp_scalar2to2/config.hpp"
 #include "dp_scalar2to2/correspondance.hpp" 
 #include "dp_scalar2to2/leshouchesfrommarty.hpp"
 #include "dp_scalar2to2/process.hpp"
 #include "dp_scalar2to2/avgsvcalculator.hpp"
 #include "dp_scalar2to2/boltzmann.hpp"
-#include <fstream>
+
 using namespace scalar2to2;
 using namespace advmath;
+
+std::string thisfolder="/mnt/Data/projects/darkpack-cmake";
 
 int main(int argc, char ** argv)
 {
@@ -27,7 +32,7 @@ int main(int argc, char ** argv)
     
     struct Param_t input(argv[1]);
     BoltzmannSolver boltz(input);
-    boltz.solver=2;
+    // boltz.solver=2;
 
     std::ifstream filein{argv[2]};
     if(!filein)
@@ -63,11 +68,20 @@ int main(int argc, char ** argv)
         std::cout << "\nm_chi=" << val_mchi[i] << " ratio="<< val_ratio[i] << " g="<< val_g[i];
     }
 
-    fileout << "#\tm_chi\tm_phi/m_chi\tg_chi\tOh2\txfo\n";
+    fileout << "#\tm_chi\tm_phi/m_chi\tg_chi\tOh2\txfo\t<sv>filename\n";
     for(size_t i=0; i < val_mchi.size(); i++)
     {
         std::cout << "\nComputing point " << i << '/' << nlines;
         std::cout << "\nm_chi=" << val_mchi[i] << " ratio="<< val_ratio[i] << " g="<< val_g[i];
+
+        std::string filename=thisfolder+"/out/scans/sigmav/scalar_sv_"+std::to_string(i+1)+".out";
+        std::ofstream sigmavfile(filename.c_str());
+        if(!sigmavfile)
+        {
+            std::cerr << "Impossible to open " << filename << std::endl;
+            return 1;
+        }
+
         input.m_chi=val_mchi[i];
         input.m_phi=input.m_chi*val_ratio[i];
         input.g_chi=0.3;
@@ -78,11 +92,21 @@ int main(int argc, char ** argv)
         const real_t relicd=boltz.relic_density(),
                      xfo=input.getLightestBSMmass()/boltz.Tfo;
         // Printing <sv> on file
-        
+        const real_t xmin=1.0e-4;
+        const real_t xmax=1.0e+3;
+        const int npoints_sv=500;
+        const real_t factor_sv=std::pow(xmax/xmin, 1./npoints_sv);
+        for(int j=0; j<=npoints_sv; j++)
+        {
+        const real_t x=xmin*std::pow(factor_sv, j);
+            sigmavfile << std::setprecision(5) << x << '\t';
+            const real_t sigmav=boltz.getAverageSigmav_coan(input.getLightestBSMmass()/x);
+            sigmavfile << sigmav << '\n';
+        }
         std::cout << val_mchi[i] << '\t' << val_ratio[i] << '\t' << val_g[i] << '\t' <<
                    relicd << '\t' << xfo << '\n';
         fileout << val_mchi[i] << '\t' << val_ratio[i] << '\t' << val_g[i] << '\t' <<
-                    relicd << '\t' << xfo << '\n';
+                    relicd << '\t' << xfo << '\t' << filename << '\n';
     }
     
     

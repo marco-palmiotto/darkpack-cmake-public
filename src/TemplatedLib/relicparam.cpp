@@ -139,7 +139,7 @@ void Relicparam_t::init(const real_t &mrelic, const int x)
   failsafe=1;         // 0=fast, 1=precise (default), ... See stand_cosmo.c
   err=0;
   Tinit=27.;          // Starting at T = 27 x 10^9 K as default
-  Tnudec=27.;           // Neutrino decoupling T = 27 x 10^9 K as default
+  Tnudec=27.;         // Neutrino decoupling T = 27 x 10^9 K as default
   eta0=6.10e-10;      // Baryon-to-photon ratio (Planck 2015 results XIII)
   Nnu=3.046;          // Number of SM neutrinos, e+- reheating included
   dNnu=0.;            // Number of extra neutrino species (e.g. sterile neutrinos)
@@ -293,6 +293,7 @@ void Relicparam_t::print_relicparam(std::ostream &out) const
 
 real_t Relicparam_t::getheff(const real_t &T)
 {
+  // NOTE: dataT is ordered from high to low temperatures
   if(T >= dataT.front().T) 
   {
 #ifdef VERBOSE
@@ -309,10 +310,12 @@ real_t Relicparam_t::getheff(const real_t &T)
       return dataT.back().heff;
   }
   
+  // Finding the index corresponding at the temperature T[ie] < T
   int ie = 1;
-  
   while( T < dataT[ie].T ) ie++;
   
+  // Computing the result with a logarithmic interpolation
+  // The same algoroithm is used in SuperIso Relic v4 (see cosmodel.c)
   const real_t logT=std::log(T);
   
   const real_t heff1=dataT[ie].heff;
@@ -370,9 +373,18 @@ real_t Relicparam_t::getgeff(const real_t &T)
 #endif
 
 
-void Relicparam_t::Init_cosmomodel_param(const real_t &eta, const real_t &Nnu_local, const real_t &dNnu_local, const real_t &life_neutron_local, const real_t &life_neutron_error_local, const real_t &xinu1_local, const real_t &xinu2_local, const real_t &xinu3_local)
-/* modifies the values of the baryon-to-photon ratio eta, the number of SM neutrinos Nnu_local, extra neutrino species dNnu_local
- *  and the neutron lifetime life_neutron_local */
+void Relicparam_t::Init_cosmomodel_param(
+      const real_t &eta, 
+      const real_t &Nnu_local, 
+      const real_t &dNnu_local, 
+      const real_t &life_neutron_local, 
+      const real_t &life_neutron_error_local, 
+      const real_t &xinu1_local, const real_t &xinu2_local, const real_t &xinu3_local)
+/* modifies 
+    - the values of the baryon-to-photon ratio eta, 
+    - the number of SM neutrinos Nnu_local, 
+    - extra neutrino species dNnu_local
+    - the neutron lifetime life_neutron_local */
 {
     this->eta0=eta;
     this->Nnu=Nnu_local;

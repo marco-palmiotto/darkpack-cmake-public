@@ -28,6 +28,7 @@ USER ${username}
 
 WORKDIR /home/${username}
 
+# Installing MARTY
 RUN git clone https://github.com/docbrown1955/marty-public.git && \
     cd marty-public && \
     git checkout master && \
@@ -44,6 +45,21 @@ ENV LD_LIBRARY_PATH=$INSTALLMARTYPATH/lib
 ENV LIBRARY_PATH=$INSTALLMARTYPATH/lib
 ENV C_INCLUDE_PATH=$INSTALLMARTYPATH/include
 ENV CPATH=$INSTALLMARTYPATH/include
+
+# Installing CMA-ES
+# RUN git clone https://github.com/CMA-ES/libcmaes.git && \
+#     cd libcmaes && \
+#     cmake -S . -B build -DCMAKE_INSTALL_PREFIX=.install -G Ninja && \
+#     cd build && \
+#     cmake --build . && \
+#     cmake --install .
+
+# ENV INSTALLCMAPATH="/home/${username}/libcmaes/build/.install"
+# ENV PATH=$INSTALLCMAPATH/bin:$PATH
+# ENV LD_LIBRARY_PATH=$INSTALLCMAPATH/lib
+# ENV LIBRARY_PATH=$INSTALLCMAPATH/lib
+# ENV C_INCLUDE_PATH=$INSTALLCMAPATH/include
+# ENV CPATH=$INSTALLCMAPATH/include
 
 # Installing DarkPACK with default options
 COPY source.tar.gz /home/${username}/

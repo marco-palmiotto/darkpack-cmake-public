@@ -1,5 +1,6 @@
 #include "relicparam.hpp"
 #include "macros.hpp"
+#include <cassert>
 
 // #define DEBUG
 template <typename T>
@@ -256,7 +257,7 @@ void Relicparam_t::print_relicparam(std::ostream &out) const
   out << (full_comput);
   out << (use_table_rhoPD);
   out << (size_table_rhoPD);
-  for (int i = 0; i < size_table_rhoPD; ++i) 
+  for (size_t i = 0; i < size_table_rhoPD; ++i) 
   {
       out << (table_rhoPD[0][i]);
       out << (table_rhoPD[1][i]);
@@ -380,11 +381,17 @@ void Relicparam_t::Init_cosmomodel_param(
       const real_t &life_neutron_local, 
       const real_t &life_neutron_error_local, 
       const real_t &xinu1_local, const real_t &xinu2_local, const real_t &xinu3_local)
-/* modifies 
+/* Arguments: 
     - the values of the baryon-to-photon ratio eta, 
     - the number of SM neutrinos Nnu_local, 
     - extra neutrino species dNnu_local
-    - the neutron lifetime life_neutron_local */
+    - the neutron lifetime life_neutron_local 
+    - xinu1 is the degeneracy parameter for e- and neutrino_e
+    - xinu2 is the degeneracy parameter for muon and neutrino_mu
+    - xinu3 is the degeneracy parameter for tau and neutrino_tau
+  This procedure defines the cosmological model based on which the relic density is
+  computed. It has to be called FIRST while instantiating a Relicparam_t structure
+  */
 {
     this->eta0=eta;
     this->Nnu=Nnu_local;
@@ -400,7 +407,7 @@ void Relicparam_t::Init_cosmomodel_param(
 
 /*--------------------------------------------------------------*/
 
-void Relicparam_t::Init_wimp(const real_t &mass_wimp, int EM_coupled_local, int neut_coupled_local, int neuteq_coupled_local, int fermion_local, int selfConjugate_local, const real_t &g_chi_local)
+void Relicparam_t::Init_wimp(const real_t &mass_wimp, const int EM_coupled_local, const int neut_coupled_local, const int neuteq_coupled_local, const int fermion_local, const int selfConjugate_local, const real_t &g_chi_local)
 /* modifies the parameters of an included light WIMP */
 {
     this->m_chi=mass_wimp;
@@ -418,6 +425,18 @@ void Relicparam_t::Init_wimp(const real_t &mass_wimp, int EM_coupled_local, int 
 
 void Relicparam_t::Init_dark_density(const real_t &dd0_local, const real_t &ndd_local, const real_t &T_end)
 {
+  /*
+  This procedure defines the cosmological model based on which the relic density is
+  computed.
+  If it is not called, no additional density will be added, and the calculation will be performed in
+  the standard cosmological model.
+  It adds a dark energy density as in Eq. (33) of [Manual SuperIso Relic 3.1]:                
+      \rho_D = \kappa_\rho * \rho_rad(T_BBN) * ( T / T_BBN )^n_\rho
+  with 
+   - dd0= \kappa_\rho = \rho_D / \rho_rad at T_BBN
+   - ndd= n_\rho : the decreasing exponent
+   - T_end = reheating temperature
+  */
   if(phi_model.get() != 0)
   {
     this->energy_model=0;
@@ -440,6 +459,18 @@ void Relicparam_t::Init_dark_density(const real_t &dd0_local, const real_t &ndd_
 
 void Relicparam_t::Init_dark_density2(const real_t &ndd_local, const real_t &Tddeq_local, const real_t &T_end)
 {
+  /*
+    This procedure defines the cosmological model based on which the relic density is
+    computed.
+    If it is not called, no additional density will be added, and the calculation will be performed in
+    the standard cosmological model.
+    It adds a dark energy density computed as:                
+        rho_D(T) = rhorad(T) * geff(Tddeq)/geff(T) * (heff(T)/heff(Tddeq))^(ndd/3) * (T/Tddeq)^ndd
+    with 
+    - ndd : the decreasing exponent
+    - Tddeq : the temperaure at which rho_D = rho_rad
+    - T_end = reheating temperature
+  */
   if(phi_model.get() != 0)
   {
     this->energy_model=0;
@@ -460,10 +491,9 @@ void Relicparam_t::Init_dark_density2(const real_t &ndd_local, const real_t &Tdd
 
 /*--------------------------------------------------------------*/
 
-void Relicparam_t::Init_dark_coupling(int coupD)
+void Relicparam_t::Init_dark_coupling(const int coupD)
 {
   this->coupd=coupD;
-
   return;
 }
 
@@ -471,6 +501,14 @@ void Relicparam_t::Init_dark_coupling(int coupD)
 
 void Relicparam_t::Init_quintessence(const real_t &T12, const real_t &n2, const real_t &T23, const real_t &n3, const real_t &T34, const real_t &n4)
 {
+  /*
+    This procedure defines the cosmological model based on which the relic density is
+    computed.
+    If it is not called, no additional density will be added, and the calculation will be performed in
+    the standard cosmological model.
+    It adds the quitessence to the standard cosmological scenario.
+    The explanation of the parameters can be found at paragraph 5.3.2 of [G. Robbin's PhD thesis]
+  */
   if(phi_model.get() != 0)
   {
     this->energy_model=0;
@@ -479,7 +517,8 @@ void Relicparam_t::Init_quintessence(const real_t &T12, const real_t &n2, const 
 
   this->energy_model=3;
   this->dd0=0.;
-  this->use_table_rhoPD=this->size_table_rhoPD=0;
+  this->use_table_rhoPD=false;
+  this->size_table_rhoPD=0;
   
   this->quintn2=n2;
   this->quintn3=n3;
@@ -494,6 +533,18 @@ void Relicparam_t::Init_quintessence(const real_t &T12, const real_t &n2, const 
 /*--------------------------------------------------------------*/
 
 void Relicparam_t::Init_dark_entropy(const real_t &sd0_local, const real_t &nsd_local, const real_t &T_end)
+  /*
+  This procedure defines the cosmological model based on which the relic density is
+  computed.
+  If it is not called, no additional density will be added, and the calculation will be performed in
+  the standard cosmological model.
+  It adds a dark energy entropy as in Eq. (34) of [Manual SuperIso Relic 3.1]:                
+      s_D = \kappa_s * s_rad(T_BBN) * ( T / T_BBN )^n_s
+  with 
+   - sd0= \kappa_s = s_D / s_rad at T_BBN
+   - nsd= n_s : the decreasing exponent
+   - T_end = reheating temperature
+  */
 {
   if(phi_model.get() != 0) return;
 
@@ -502,7 +553,6 @@ void Relicparam_t::Init_dark_entropy(const real_t &sd0_local, const real_t &nsd_
   this->Tsend=T_end;
 
   this->use_table_rhoPD=this->size_table_rhoPD=0;
-  
   return;
 }
 
@@ -510,6 +560,18 @@ void Relicparam_t::Init_dark_entropy(const real_t &sd0_local, const real_t &nsd_
 
 void Relicparam_t::Init_dark_entropySigmaD(const real_t &Sigmad0_local, const real_t &nSigmad_local, const real_t &T_end)
 {
+  /*
+    This procedure defines the cosmological model based on which the relic density is
+    computed.
+    If it is not called, no additional density will be added, and the calculation will be performed in
+    the standard cosmological model. 
+    It adds a dark energy entropy as in Eq. (35) of [Manual SuperIso Relic 3.1]:                
+        \Sigma_D = \kappa_\Sigma * \Sigma_rad(T_BBN) * ( T / T_BBN )^n_\Sigma
+    with 
+    - Sigmad0= \kappa_\Sigma = \Sigma_D / \Sigma_rad at T_BBN
+    - nsd= n_\Sigma : the decreasing exponent
+    - T_end = reheating temperature
+  */
   if(phi_model.get() != 0) return;
   
   this->Sigmad0=Sigmad0_local;
@@ -525,6 +587,27 @@ void Relicparam_t::Init_dark_entropySigmaD(const real_t &Sigmad0_local, const re
 
 void Relicparam_t::Init_entropySigmarad(const real_t &Sigmarad0_local, const real_t &nSigmarad_local, const real_t &T_end)
 {
+/*Reference is [Manual SuperIso Relic 4].
+  This procedure defines the cosmological model based on which the relic density is
+  computed.
+  If it is not called, no additional entropy will be added, and the calculation will be performed in
+  the standard cosmological model.
+
+  This procedure sets the parameters for computing \Sigma_rad(T), a quantity that, if different from
+     \Sigma_rad(T) = 0 for each T
+  modifies the radiation entropy density s_rad, following equation (A10)
+     \dot s_rad  = -3 H s_rad + \Sigma_rad(T)
+  If \Sigma_rad(T), then s_rad is the same of the standard cosmological model
+     s_rad(T) = h_eff(T) 2 \pi^2 / 45 T^3
+
+  \Sigma_rad(T) is parametrised as equation (A11):                
+      \Sigma_rad = \kappa_\Sigma_rad * \Sigma_rad^eff(T_BBN) * ( T / T_BBN )^n_\Sigma_rad
+
+  Therefore, the input parameters are:
+   - Sigmarad0= \kappa_\Sigma_rad = \Sigma_rad / \Sigma_rad^eff at T_BBN
+   - nSigmaradd= n_\Sigma_rad : the decreasing exponent
+   - T_end = reheating temperature
+*/
   if(phi_model.get() != 0) return;
 
   this->Sigmarad0=Sigmarad0_local;
@@ -590,8 +673,14 @@ void Relicparam_t::Init_scalarfield(const real_t &rhotilde_phi_Tmax, const real_
 
 /*--------------------------------------------------------------*/
 
-void Relicparam_t::Init_dark_density_table(real_t table[2][NTABMAX], int nlines)
+void Relicparam_t::Init_dark_density_table(real_t table[2][NTABMAX], const size_t nlines)
 {
+  /* 
+    Resets all the parameters to be the ones of the standard cosmological model,
+    and copies the table in input as of pairs (Temperature, rho_D)
+    in the table_rhoPD data member.
+  */
+  assert(nlines<NTABMAX);
   Init_dark_density(0.,0.,0.);
   Init_dark_density2(0.,0.,0.);
   Init_dark_entropy(0.,0.,0.);
@@ -601,10 +690,13 @@ void Relicparam_t::Init_dark_density_table(real_t table[2][NTABMAX], int nlines)
   
   this->use_table_rhoPD=1;
   
-  int ie,je;
-  
   this->size_table_rhoPD=nlines;
-  for(ie=0;ie<=1;ie++) for(je=0;je<nlines;je++) this->table_rhoPD[ie][je]=table[ie][je];
+
+  for(size_t je=0;je<nlines;je++) 
+  { // Here can be modified with std::transform or a std::move?
+    this->table_rhoPD[0][je]=table[0][je];
+    this->table_rhoPD[1][je]=table[1][je];
+  }
     
   return;
 }
@@ -635,11 +727,16 @@ void Relicparam_t::Init_neutron_decay(const real_t &tau, const real_t &tau_err, 
 
 real_t Relicparam_t::dark_density(const real_t &T)
 {
+  /* 
+    This function computes the dark density in a modified cosmological scenario.
+    If the scenario is the standard cosmological model, this function returns 0.
+  */
   if(phi_model.get() != 0) return 0.;
   
+  // If the table is defined, we interpolate from the table and we return that value
   if(this->size_table_rhoPD>1&&this->use_table_rhoPD)
   {
-    int ie=1;
+    size_t ie=1;
   
     if(T<this->table_rhoPD[0][this->size_table_rhoPD-1])
     {
@@ -650,78 +747,94 @@ real_t Relicparam_t::dark_density(const real_t &T)
       while(T<this->table_rhoPD[0][ie]&&ie<this->size_table_rhoPD) ie++;
     }
 
-    real_t logrhoD1,logrhoD2,rhoD,logT1,logT2,logT;
-    logT=std::log(T);
-    logrhoD1=std::log(this->table_rhoPD[1][ie]);
-    logrhoD2=std::log(this->table_rhoPD[1][ie-1]);
-    logT1=std::log(this->table_rhoPD[0][ie]);
-    logT2=std::log(this->table_rhoPD[0][ie-1]);
+    const real_t logT=std::log(T);
+    const real_t logrhoD1=std::log(this->table_rhoPD[1][ie]);
+    const real_t logrhoD2=std::log(this->table_rhoPD[1][ie-1]);
+    const real_t logT1=std::log(this->table_rhoPD[0][ie]);
+    const real_t logT2=std::log(this->table_rhoPD[0][ie-1]);
     
-    rhoD=exp((logrhoD2-logrhoD1)/(logT2-logT1)*(logT-logT1)+logrhoD1);
+    const real_t rhoD=exp((logrhoD2-logrhoD1)/(logT2-logT1)*(logT-logT1)+logrhoD1);
     
     return rhoD;
   }
   
+  // If the input temperature is less than the "dark density" cutoff temperature, return 0.
   if(T<this->Tdend) return 0.;
-  
-  
-  if(this->energy_model==3)
+
+  // How to compute the energy density depends on the assumed model.
+  // If no model is defined, this function will return 0.
+  switch (this->energy_model)
   {
-    const real_t H0=67.8/3.0856e19; /* Hubble constant in second */  
-    const real_t rho_Lambda=0.7*H0*H0/(8.*pi*Gn)/2.322e17; 
-    
-    if(T<=this->quintT12) return rho_Lambda;
-    
-    const real_t rho02=rho_Lambda;
-    if(T<=this->quintT23) return rho02*std::pow(T/this->quintT12,this->quintn2);
-    
-    const real_t rho03=rho02*std::pow(this->quintT23/this->quintT12,this->quintn2);
-    if(T<=this->quintT34) return rho03*std::pow(T/this->quintT23,this->quintn3);
-    
-    const real_t rho04=rho03*std::pow(this->quintT34/this->quintT23,this->quintn3);
-    return rho04*std::pow(T/this->quintT34,this->quintn4);
-  }
-  
-  if(this->energy_model==2)
-  {
-    if(this->Tddeq==0.) return 0.;
-    
-    const real_t geffT=getgeff(T);
-    const real_t rhorad=pi*pi/30.*geffT*std::pow(T,4.);
-    
-    return rhorad*(getgeff(this->Tddeq)/geffT)*std::pow(getheff(T)/heff(this->Tddeq),this->ndd/3.)*std::pow(T/this->Tddeq,this->ndd);
-  }
-  
-  if(this->energy_model==1)
-  {
-    if(this->dd0==0.) return 0.;
-    
-    const real_t rho_photon_1MeV=pi*pi/15.*1.e-12;
+    case 3: /* Energy model corresponding to quintessence
+               This condition is realised if Init_quintessence is the last Init that has been 
+               called for the dark energy density.
+               The explanation of this way of computing the energy density can be found at
+               paragraph 5.3.2 of [G. Robbin's PhD thesis]
+            */
+      {
+        const real_t H0=67.8/3.0856e19; /* Hubble constant in second */  
+        const real_t rho_Lambda=0.7*H0*H0/(8.*pi*Gn)/2.322e17; 
         
-    return this->dd0*rho_photon_1MeV*std::pow(T/1.e-3,this->ndd);
+        if(T<=this->quintT12) return rho_Lambda;
+        
+        const real_t rho02=rho_Lambda;
+        if(T<=this->quintT23) return rho02*std::pow(T/this->quintT12,this->quintn2);
+        
+        const real_t rho03=rho02*std::pow(this->quintT23/this->quintT12,this->quintn2);
+        if(T<=this->quintT34) return rho03*std::pow(T/this->quintT23,this->quintn3);
+        
+        const real_t rho04=rho03*std::pow(this->quintT34/this->quintT23,this->quintn3);
+        return rho04*std::pow(T/this->quintT34,this->quintn4);
+      }
+    case 2: /* In this model, the temperature Tddeq has to be defined, 
+               such that rho_D(Tddeq) = rho_rad(Tddeq).
+               Then, rho_D(T) is computed knowing how it scales.
+               This condition is realised if Init_dark_density2 is the last Init that has been called for the dark energy density
+            */
+      {
+        if(this->Tddeq==0.) return 0.;
+        
+        const real_t geffT=getgeff(T);
+        const real_t rhorad=pi*pi/30.*geffT*std::pow(T,4.);
+        
+        return rhorad*( getgeff(this->Tddeq)/geffT)*
+                       std::pow(getheff(T)/heff(this->Tddeq),this->ndd/3.)*
+                       std::pow(T/this->Tddeq,this->ndd);
+      }
+    case 1: // This energy model is the one defined in equation (A6) of [Manual SuperIso Relic v4]
+            // This condition is realised if Init_dark_density is the last Init that has been called for the dark energy density
+      {
+        if(this->dd0==0.) return 0.;
+        const real_t rho_photon_1MeV=pi*pi/15.*1.e-12;
+        return this->dd0*rho_photon_1MeV*std::pow(T/1.e-3,this->ndd);
+      }
   }
-  
   return 0.;
 }
 
 
 real_t Relicparam_t::dark_density_pressure(const real_t &T)
 {
-  if(phi_model.get() != 0) return 0.;
+  // If any of the phi_model(s) is enabled (pressureless scalar field), retirns 0
+  if(phi_model.get() != 0) return 0.; 
     
+  // If T is lower than the "dark density" cutoff, returns 0.
   if(T<this->Tdend) return 0.;
   
   if(this->energy_model==1) if(this->dd0==0.) return 0.;
   
+  // If the model 2 is enabled and there's no definition of the equivalence temperature, returns 0.
   if(this->energy_model==2) if(this->Tddeq==0.) return 0.;
   
+  // Derivative of the dark density at tempertature T
   const real_t ddark_density_dT=(dark_density(T*1.001)-dark_density(T*0.999))/0.002/T;
   
+  // Total entropy density (radiation + dark) at temperatire T
+  const real_t entropy=2.*pi*pi/45.*getheff(T)*std::pow(T,3.)+dark_entropy(T);
+
+  // Derivative of the total entropy density (radiation + dark) at temperatire T
   const real_t dentropy_dT=2.*pi*pi/45.*(getheff(T*1.001)*std::pow(T*1.001,3.)-heff(T*0.999)*std::pow(T*0.999,3.))/0.002/T+dark_entropy_derivative(T);
   
-  const real_t entropy=2.*pi*pi/45.*getheff(T)*std::pow(T,3.)+dark_entropy(T);
-  
-  //return (this->ndd/3.-1.)*dark_density(T); /* outdated */
   return (ddark_density_dT-dentropy_dT/entropy*dark_density(T))*entropy/dentropy_dT;
 }
 

@@ -55,16 +55,17 @@ struct Relicparam_t
     csl::InitSanitizer<int> entropy_model { "entropy_model" };     // Entropy model switch
     csl::InitSanitizer<int> energy_model { "energy_model" };       // Energy model switch
 
-    csl::InitSanitizer<real_t> dd0 { "dd0" };             // Dark matter density
-    csl::InitSanitizer<real_t> ndd { "ndd" };             // Dark matter density slope
-    csl::InitSanitizer<real_t> Tdend { "Tdend" };         // Dark matter density cutoff temperature
-    csl::InitSanitizer<real_t> Tddeq { "Tddeq" };         // Dark matter density equality temperature
+                                                          // Ref. is Eq. (33) of [Manual SuperIso Relic 3.1]
+    csl::InitSanitizer<real_t> dd0 { "dd0" };             // Dark energy density (rho_D) at BBN
+    csl::InitSanitizer<real_t> ndd { "ndd" };             // Dark energy density decreasing exponent
+    csl::InitSanitizer<real_t> Tdend { "Tdend" };         // Dark energy density cutoff temperature
+    csl::InitSanitizer<real_t> Tddeq { "Tddeq" };         // Temperature at which rho_D = rho_rad (radiation energy density)
 
-    csl::InitSanitizer<real_t> sd0 { "sd0" };            // Dark entropy density
-    csl::InitSanitizer<real_t> nsd { "nsd" };            // Dark entropy density slope
+    csl::InitSanitizer<real_t> sd0 { "sd0" };            // Dark entropy density at BBN
+    csl::InitSanitizer<real_t> nsd { "nsd" };            // Dark entropy density decreasing exponent
     csl::InitSanitizer<real_t> Tsend { "Tsend" };        // Dark entropy density cutoff temperature
 
-    csl::InitSanitizer<real_t> Sigmad0 { "Sigmad0" };        // Dark entropy injection amplitude
+    csl::InitSanitizer<real_t> Sigmad0 { "Sigmad0" };        // Dark entropy injection at BBN
     csl::InitSanitizer<real_t> nSigmad { "nSigmad" };        // Dark entropy injection slope
     csl::InitSanitizer<real_t> TSigmadend { "TSigmadend" };  // Dark entropy injection cutoff temperature
 
@@ -113,8 +114,8 @@ struct Relicparam_t
     csl::InitSanitizer<int> full_comput { "full_comput" };      // Switch to deactivate the fast freeze-out temperature determination
 
     csl::InitSanitizer<int> use_table_rhoPD { "use_table_rhoPD" };                     // Switch for using the table of rho * PD
-    csl::InitSanitizer<real_t> table_rhoPD[2][NTABMAX];  // Table of rho * PD
-    csl::InitSanitizer<int> size_table_rhoPD { "size_table_rhoPD" };                   // Size of the table of rho * PD
+    csl::InitSanitizer<real_t> table_rhoPD[2][NTABMAX];  // Table of rho_PD
+    csl::InitSanitizer<size_t> size_table_rhoPD { "size_table_rhoPD" };                   // Size of the table of rho * PD
 
     /*---------------------*/
     /* AlterBBN parameters */
@@ -168,10 +169,10 @@ struct Relicparam_t
     // Their purpose is to initialise this class with modified cosmological model
     // according to the same convention of SuperIso Relic v4
     void Init_cosmomodel_param(const real_t &eta, const real_t &Nnu_local, const real_t &dNnu_local, const real_t &life_neutron_local, const real_t &life_neutron_error_local, const real_t &xinu1_local, const real_t &xinu2_local, const real_t &xinu3_local);
-    void Init_wimp(const real_t &mass_wimp, int EM_coupled_local, int neut_coupled_local, int neuteq_coupled_local, int fermion_local, int selfConjugate_local, const real_t &g_chi_local);
+    void Init_wimp(const real_t &mass_wimp, const int EM_coupled_local, const int neut_coupled_local, const int neuteq_coupled_local, const int fermion_local, const int selfConjugate_local, const real_t &g_chi_local);
     void Init_dark_density(const real_t &dd0, const real_t &ndd, const real_t &T_end);
     void Init_dark_density2(const real_t &ndd, const real_t &Tddeq, const real_t &T_end);
-    void Init_dark_coupling(int coupD);
+    void Init_dark_coupling(const int coupD);
     void Init_quintessence(const real_t &T12, const real_t &n2, const real_t &T23, const real_t &n3, const real_t &T34, const real_t &n4);
     void Init_dark_entropy(const real_t &sd0, const real_t &nsd, const real_t &T_end);
     void Init_dark_entropySigmaD(const real_t &Sigmad0, const real_t &nSigmad, const real_t &T_end);
@@ -179,7 +180,7 @@ struct Relicparam_t
     void Init_nonthermal(const real_t &nt0, const real_t &nnt, const real_t &T_end);
     void Init_gravitino(const real_t &mgravitino);
     void Init_scalarfield(const real_t &rhotilde_phi_Tmax, const real_t &Tmax, const real_t &T_RH, const real_t &eta_phi, const real_t &n_phi);
-    void Init_dark_density_table(real_t table[2][NTABMAX], int nlines);
+    void Init_dark_density_table(real_t table[2][NTABMAX], const size_t nlines);
     void Init_neutron_decay(const real_t &tau, const real_t &tau_err, const real_t &fierz, const real_t &m_chi, const real_t &B_chi);
 
 

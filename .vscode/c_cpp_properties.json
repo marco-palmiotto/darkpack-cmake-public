@@ -8,10 +8,11 @@
                 "${workspaceFolder}/build/.install/include",
                 "${workspaceFolder}/src/DPMathLib",
                 "${workspaceFolder}/src/TemplatedLib",
-                "${workspaceFolder}/src/scalar2to2/include",
-                "${workspaceFolder}/src/scalar2to2/clib",
-                "${workspaceFolder}/src/dp_scalar2to2",
-                "${workspaceFolder}/build/.install/include"
+                "${workspaceFolder}/src/su2f2to2/include",
+                "${workspaceFolder}/src/su2f2to2/clib",
+                "${workspaceFolder}/src/dp_su2f2to2",
+                "${workspaceFolder}/build/.install/include",
+                "${workspaceFolder}/submodules/libcmaes/.install/include"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/gcc",

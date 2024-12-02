@@ -48,5 +48,5 @@
 
 ./build/src/Test/scalar_computation.x \
     src/models/scalar.lha \
-    out/scans/input_to_test.dat \
-    out/scans/output_from_test.out
+    out/scans/input_to_test_all.dat \
+    out/scans/output_from_test_all.out

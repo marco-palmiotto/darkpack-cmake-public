@@ -560,25 +560,37 @@ int main()
   
   for( size_t i1 = 0 ; i1 < bsm_fields.size() ; i1++) 
   {
-    for( size_t i2 = i1 ; i2 < bsm_fields.size() ; i2++) 
+    for(mty::Insertion state1 : std::array<mty::Insertion,2>({Incoming(bsm_fields[i1]), Incoming(AntiPart(bsm_fields[i1]))}) )
     {
-      for( size_t j1 = 0 ; j1 < psm.size() ; j1++) 
-      {
-        for( size_t j2 = j1 ; j2 < psm.size() ; j2++) 
+        for( size_t i2 = i1 ; i2 < bsm_fields.size() ; i2++) 
         {
-            Process2to2ToCompute proc_c;
-            
-            proc_c.process={Incoming(AntiPart(bsm_fields[i1])), 
-                            Incoming(bsm_fields[i2]), 
-                            Outgoing(AntiPart(psm[j1])),
-                            Outgoing(psm[j2]) };
-            proc_c.order=mty::Order::TreeLevel;
-            proc_c.leading_order=false;
-            proc_c.Wgauge=mty::gauge::Type::Feynman;
-            
-            list_of_processes.push_back(proc_c);
+            for(mty::Insertion state2 : std::array<mty::Insertion,2>({Incoming(bsm_fields[i2]), Incoming(AntiPart(bsm_fields[i2]))}) )
+            {
+                for( size_t j1 = 0 ; j1 < psm.size() ; j1++) 
+                {
+                    for(mty::Insertion state3 : std::array<mty::Insertion,2>({Outgoing(psm[j1]), Outgoing(AntiPart(psm[j1]))}) )
+                    {
+                        for( size_t j2 = j1 ; j2 < psm.size() ; j2++) 
+                        {
+                            for(mty::Insertion state4 : std::array<mty::Insertion,2>({Outgoing(psm[j2]), Outgoing(AntiPart(psm[j2]))}) )
+                            {
+                                Process2to2ToCompute proc_c;
+                                
+                                proc_c.process={(state1), 
+                                                (state2), 
+                                                (state3),
+                                                (state4) };
+                                proc_c.order=mty::Order::TreeLevel;
+                                proc_c.leading_order=false;
+                                proc_c.Wgauge=mty::gauge::Type::Feynman;
+                                
+                                list_of_processes.push_back(proc_c);
+                            }
+                        }
+                    }
+                }
+            }
         }
-      }
     }
   }
 

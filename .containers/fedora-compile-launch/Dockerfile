@@ -62,15 +62,15 @@ ENV CPATH=$INSTALLMARTYPATH/include
 # ENV CPATH=$INSTALLCMAPATH/include
 
 # Installing DarkPACK with default options
-COPY source.tar.gz /home/${username}/
-RUN mkdir darkpack-cmake && \
-    tar -xf source.tar.gz -C darkpack-cmake && \
-    cd darkpack-cmake && \
-    cmake -S . -B ./build \
-        -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_BUILD_TYPE=Release \
-        -DCMAKE_INSTALL_PREFIX=./build/.install \
-        -G Ninja && \
-    cmake --build ./build --target install_headers_all && \
-    ninja -C build
+# COPY source.tar.gz /home/${username}/
+# RUN mkdir darkpack-cmake && \
+#     tar -xf source.tar.gz -C darkpack-cmake && \
+#     cd darkpack-cmake && \
+#     cmake -S . -B ./build \
+#         -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_BUILD_TYPE=Release \
+#         -DCMAKE_INSTALL_PREFIX=./build/.install \
+#         -G Ninja && \
+#     cmake --build ./build --target install_headers_all && \
+#     ninja -C build
 
 CMD ["sleep", "infinity"]

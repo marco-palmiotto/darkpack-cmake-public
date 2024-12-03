@@ -11,8 +11,7 @@
                 "${workspaceFolder}/src/su2f2to2/include",
                 "${workspaceFolder}/src/su2f2to2/clib",
                 "${workspaceFolder}/src/dp_su2f2to2",
-                "${workspaceFolder}/build/.install/include",
-                "${workspaceFolder}/submodules/libcmaes/.install/include"
+                "${workspaceFolder}/build/.install/include"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/gcc",

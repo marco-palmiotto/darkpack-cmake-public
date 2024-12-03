@@ -96,9 +96,9 @@ struct Relicparam_t
 
     
     csl::InitSanitizer<real_t> T_RH { "T_RH" };                              // Temperature at the reheating epoch
-    csl::InitSanitizer<real_t> Sigmatildestar { "Sigmatildestar" };          // Approximated cross section times relative velocity at freeze out
-    csl::InitSanitizer<real_t> Sigmatildestar_max { "Sigmatildestar_max" };  // Maximum of the approximated cross section times relative velocity
-    csl::InitSanitizer<real_t> Tstdstar_max { "Tstdstar_max" };              // Temperature where the cross section times relative velocity is maximum
+    csl::InitSanitizer<real_t> Sigmatildestar { "Sigmatildestar" };          // 
+    csl::InitSanitizer<real_t> Sigmatildestar_max { "Sigmatildestar_max" };  // 
+    csl::InitSanitizer<real_t> Tstdstar_max { "Tstdstar_max" };              // 
 
     csl::InitSanitizer<real_t> mgravitino { "mgravitino" };      // Gravitino mass
 
@@ -113,9 +113,11 @@ struct Relicparam_t
 
     csl::InitSanitizer<int> full_comput { "full_comput" };      // Switch to deactivate the fast freeze-out temperature determination
 
-    csl::InitSanitizer<int> use_table_rhoPD { "use_table_rhoPD" };                     // Switch for using the table of rho * PD
-    csl::InitSanitizer<real_t> table_rhoPD[2][NTABMAX];  // Table of rho_PD
-    csl::InitSanitizer<size_t> size_table_rhoPD { "size_table_rhoPD" };                   // Size of the table of rho * PD
+    csl::InitSanitizer<int> use_table_rhoPD { "use_table_rhoPD" }; // Switch for using the table of rho * PD
+    csl::InitSanitizer<real_t> table_rhoPD[2][NTABMAX];            // Table of (Temperature T, dark energy density rho_PD)
+                                                                   // If this table is defined, it overrides the standard parametrisations for
+                                                                   // dark energy density that can be defined with the prevoius methods
+    csl::InitSanitizer<size_t> size_table_rhoPD { "size_table_rhoPD" }; // Size of the table of rho * PD
 
     /*---------------------*/
     /* AlterBBN parameters */

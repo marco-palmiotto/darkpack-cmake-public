@@ -565,7 +565,8 @@ void Relicparam_t::Init_dark_entropySigmaD(const real_t &Sigmad0_local, const re
     computed.
     If it is not called, no additional density will be added, and the calculation will be performed in
     the standard cosmological model. 
-    It adds a dark energy entropy as in Eq. (35) of [Manual SuperIso Relic 3.1]:                
+    It adds a dark energy entropy as in Eq. (35) of [Manual SuperIso Relic 3.1]:   
+    // Eq. (A8) of [Manual SuperIso Relic 4]:   
         \Sigma_D = \kappa_\Sigma * \Sigma_rad(T_BBN) * ( T / T_BBN )^n_\Sigma
     with 
     - Sigmad0= \kappa_\Sigma = \Sigma_D / \Sigma_rad at T_BBN
@@ -599,6 +600,7 @@ void Relicparam_t::Init_entropySigmarad(const real_t &Sigmarad0_local, const rea
      \dot s_rad  = -3 H s_rad + \Sigma_rad(T)
   If \Sigma_rad(T), then s_rad is the same of the standard cosmological model
      s_rad(T) = h_eff(T) 2 \pi^2 / 45 T^3
+  This scenario is the variation of the entropy density during reheating with injection
 
   \Sigma_rad(T) is parametrised as equation (A11):                
       \Sigma_rad = \kappa_\Sigma_rad * \Sigma_rad^eff(T_BBN) * ( T / T_BBN )^n_\Sigma_rad
@@ -728,13 +730,16 @@ void Relicparam_t::Init_neutron_decay(const real_t &tau, const real_t &tau_err, 
 real_t Relicparam_t::dark_density(const real_t &T)
 {
   /* 
-    This function computes the dark density in a modified cosmological scenario.
-    If the scenario is the standard cosmological model, this function returns 0.
+    This function computes the dark density in a modified cosmological scenario, 
+    which is not the decaying scalar field scenario.
+    If the scenario is the standard cosmological model, or the decaying scalar 
+    field, this function returns 0.
   */
+
   if(phi_model.get() != 0) return 0.;
   
   // If the table is defined, we interpolate from the table and we return that value
-  if(this->size_table_rhoPD>1&&this->use_table_rhoPD)
+  if( this->size_table_rhoPD > 1 && this->use_table_rhoPD )
   {
     size_t ie=1;
   
@@ -753,7 +758,7 @@ real_t Relicparam_t::dark_density(const real_t &T)
     const real_t logT1=std::log(this->table_rhoPD[0][ie]);
     const real_t logT2=std::log(this->table_rhoPD[0][ie-1]);
     
-    const real_t rhoD=exp((logrhoD2-logrhoD1)/(logT2-logT1)*(logT-logT1)+logrhoD1);
+    const real_t rhoD=std::exp((logrhoD2-logrhoD1)/(logT2-logT1)*(logT-logT1)+logrhoD1);
     
     return rhoD;
   }
@@ -761,8 +766,8 @@ real_t Relicparam_t::dark_density(const real_t &T)
   // If the input temperature is less than the "dark density" cutoff temperature, return 0.
   if(T<this->Tdend) return 0.;
 
-  // How to compute the energy density depends on the assumed model.
-  // If no model is defined, this function will return 0.
+  // How to compute the energy density depends on the assumed model: 
+  // if no model is defined, this function will return 0.
   switch (this->energy_model)
   {
     case 3: /* Energy model corresponding to quintessence
@@ -805,8 +810,9 @@ real_t Relicparam_t::dark_density(const real_t &T)
             // This condition is realised if Init_dark_density is the last Init that has been called for the dark energy density
       {
         if(this->dd0==0.) return 0.;
+        constexpr const real_t T_BBN= 1.0e-3; // 1MeV
         const real_t rho_photon_1MeV=pi*pi/15.*1.e-12;
-        return this->dd0*rho_photon_1MeV*std::pow(T/1.e-3,this->ndd);
+        return this->dd0*rho_photon_1MeV*std::pow(T/T_BBN,this->ndd);
       }
   }
   return 0.;
@@ -842,27 +848,27 @@ real_t Relicparam_t::dark_density_pressure(const real_t &T)
 
 real_t Relicparam_t::sigma_entropy(const real_t &T)
 {
+  // If any of the models with decaying scalar field is active, return 1
   if(phi_model.get() != 0) return 1.;
 
+  // If the model with reheating and entropy injection is active, return 1
   if(this->Sigmarad0==0.) return 1.;
     
-  real_t lnT,dlnT,Ttmp;
-  int ie,nmax;
+  // Defining the accumulator for the integral
   real_t integ=0.;
 
   real_t heffT,geffT,darkdensitytilde,heffTdT,geffTdT,darkdensitytildeTdT,Htilde;
   real_t Sigmatildestar_local,dSigmatildestar_dT;
   
-  nmax=10;
+  constexpr const int nmax=10;
   
-  lnT=std::log(1.e-15);
+  real_t lnT =std::log(1.e-15),   
+         dlnT=(std::log(T)-lnT)/nmax;
   
-  dlnT=(std::log(T)-lnT)/nmax;
-  
-  for(ie=1;ie<nmax;ie++) 
+  for(int ie=1;ie<nmax;ie++) 
   {
     lnT+=dlnT;
-    Ttmp=std::exp(lnT);
+    real_t Ttmp=std::exp(lnT);
     
     heffT=getheff(Ttmp);
     geffT=getgeff(Ttmp);
@@ -905,6 +911,11 @@ real_t Relicparam_t::sigma_entropy(const real_t &T)
 
 real_t Relicparam_t::dark_entropy(const real_t &T)
 {
+  /* This function SHOULD compute the integral in Eq (A9) of [Manual SuperIso Relic 4]
+     QUESTIONS: Why in the integral we increase by dln(T) (so points are no longer equally spaced)
+                and then we do not divide by Ttemp the integrand?
+     REMARK: We need a reference on the formula to combine the two entropy models A8 and A11
+  */
   if(phi_model.get() != 0) return 0.;
 
   if((this->sd0==0.)&&(this->Sigmad0==0.)) return 0.;
@@ -913,9 +924,10 @@ real_t Relicparam_t::dark_entropy(const real_t &T)
   
   if(this->Sigmad0==0.)
   {
+    constexpr const real_t T_BBN= 1.0e-3; // 1MeV
     const real_t s_photon_1MeV=4.*pi*pi/45.*1.e-9;
   
-    return this->sd0*s_photon_1MeV*std::pow(T/1.e-3,this->nsd);
+    return this->sd0*s_photon_1MeV*std::pow(T/T_BBN,this->nsd);
   }
   else
   {
@@ -999,6 +1011,9 @@ real_t Relicparam_t::dark_entropy_derivative(const real_t &T)
 
 real_t Relicparam_t::dark_entropy_Sigmad(const real_t &T)
 {
+  // Returns the value of \Sigma_D, as defined in Eq. (A8) of
+  // [Manual SuperIso Relic 4], corresponding to the scenario of
+  // no reheating, and entropy modification via injection
   if(phi_model.get() != 0) return 0.;
 
   if((this->sd0==0.)&&(this->Sigmad0==0.)) return 0.;
@@ -1024,11 +1039,13 @@ real_t Relicparam_t::dark_entropy_Sigmad(const real_t &T)
   {
     if(T<this->TSigmadend) return 0.;
 
+    constexpr const real_t T_BBN= 1.0e-3; // 1MeV
+
     const real_t s_photon_1MeV=4.*pi*pi/45.*1.e-9;
   
     const real_t Sigma_photon_1MeV= 1./Mplanck*std::sqrt(8.*pi*pi*pi/5.)*(1.e-6)*s_photon_1MeV;
   
-    return this->Sigmad0*Sigma_photon_1MeV*std::pow(T/1.e-3,this->nSigmad);
+    return this->Sigmad0*Sigma_photon_1MeV*std::pow(T/T_BBN,this->nSigmad);
   }
 }
 
@@ -1036,15 +1053,20 @@ real_t Relicparam_t::dark_entropy_Sigmad(const real_t &T)
 
 real_t Relicparam_t::entropy_Sigmarad(const real_t &T)
 {
+  // Returns the value of \Sigma_rad, as defined in Eq. (A11) of
+  // [Manual SuperIso Relic 4], corresponding to the scenario of
+  // reheating, and entropy modification via injection
   if( (this->phi_model).get() != 0) return 0.; //this->Gamma_phi*this->rho_phi/T;
 
   if((this->Sigmarad0==0.)||(T<this->TSigmaradend)) return 0.;
+
+  constexpr const real_t T_BBN= 1.0e-3; // 1MeV
   
   const real_t s_photon_1MeV=4.*pi*pi/45.*1.e-9;
   
   const real_t Sigma_photon_1MeV=1./Mplanck*std::sqrt(8.*pi*pi*pi/5.)*(1.e-6)*s_photon_1MeV;
   
-  return this->Sigmarad0*Sigma_photon_1MeV*std::pow(T/1.e-3,this->nSigmarad);
+  return this->Sigmarad0*Sigma_photon_1MeV*std::pow(T/T_BBN,this->nSigmarad);
 }
 
 /*--------------------------------------------------------------*/
@@ -1054,8 +1076,8 @@ real_t Relicparam_t::nonthermal(const real_t &T)
   if(phi_model.get() != 0) return 0.; //this->eta_phi*this->Gamma_phi*this->rho_phi;
 
   if((this->nt0==0.)||(T<this->Tnend)) return 0.;
-  
-  return this->nt0*1.e-50*std::pow(T/1.e-3,this->nnt);
+  constexpr const real_t T_BBN= 1.0e-3; // 1MeV 
+  return this->nt0*1.e-50*std::pow(T/T_BBN,this->nnt);
 }
 
 /*--------------------------------------------------------------*/

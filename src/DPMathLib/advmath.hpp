@@ -22,13 +22,13 @@
 #include <gsl/gsl_interp.h>
 #include <gsl/gsl_spline.h>
 #include <gsl/gsl_sf_bessel.h>
-
+#include "darkpack.hpp"
 
 
 namespace advmath 
 {
 
-using real_t = double;
+using real_t = dpk::real_t;
 using complex_floating_t = std::complex<real_t>;  
   
   

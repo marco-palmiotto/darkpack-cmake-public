@@ -925,7 +925,7 @@ real_t Relicparam_t::dark_entropy(const real_t &T)
   if(this->Sigmad0==0.)
   {
     constexpr const real_t T_BBN= 1.0e-3; // 1MeV
-    const real_t s_photon_1MeV=4.*pi*pi/45.*1.e-9;
+    constexpr const real_t s_photon_1MeV=4.*pi*pi/45.*(T_BBN*T_BBN*T_BBN);
   
     return this->sd0*s_photon_1MeV*std::pow(T/T_BBN,this->nsd);
   }
@@ -1016,18 +1016,23 @@ real_t Relicparam_t::dark_entropy_Sigmad(const real_t &T)
   // no reheating, and entropy modification via injection
   if(phi_model.get() != 0) return 0.;
 
-  if((this->sd0==0.)&&(this->Sigmad0==0.)) return 0.;
-  
-  if((this->Sigmad0==0.)&&(T<this->Tsend)) return 0.;
-  
   if(this->Sigmad0==0.)
   {  
+    // Scenario with no dark entropy injection
+    if(this->sd0==0.) // and no dark entropy production
+      return 0.;
+    
+    if( T < this->Tsend ) // and temperature lower than cutoff
+      return 0.;
+
+    // If T is larger than the cutoff, we must take into account "entropy production"
+    // and "standard entropy injection"
     const real_t heffT=getheff(T);
     const real_t geffT=getgeff(T);
-//old unused variable
+
     const real_t rhoradT=pi*pi/30.*geffT*std::pow(T,4.);
     const real_t darkdensitytilde=dark_density(T)/rhoradT;
-    const real_t Sigmarad=entropy_Sigmarad(T);
+    const real_t Sigmarad=entropy_Sigmarad(T); // Eq (A11)
   
     const real_t Htilde=std::sqrt(1.+darkdensitytilde); /*Htilde = H / std::sqrt(8 pi / 3 M_P^2) / rho_rad */
 
@@ -1037,13 +1042,16 @@ real_t Relicparam_t::dark_entropy_Sigmad(const real_t &T)
   }
   else
   {
+    /* In this case, \Sigma_D,0 = (\kappa_\Sigma) !=0 , so we're in the 
+       "dark entropy injection" (or "late reheating") scenario.
+       If the temperature is larger than the cutoff, we return the expression 
+       in Eq (A8) of [Manual of SuperIso Relic v4]
+    */
     if(T<this->TSigmadend) return 0.;
 
     constexpr const real_t T_BBN= 1.0e-3; // 1MeV
-
-    const real_t s_photon_1MeV=4.*pi*pi/45.*1.e-9;
-  
-    const real_t Sigma_photon_1MeV= 1./Mplanck*std::sqrt(8.*pi*pi*pi/5.)*(1.e-6)*s_photon_1MeV;
+    constexpr const real_t s_photon_1MeV=4.*pi*pi/45.*(T_BBN*T_BBN*T_BBN);
+    constexpr const real_t Sigma_photon_1MeV= 1./Mplanck*std::sqrt(8.*pi*pi*pi/5.)*(T_BBN*T_BBN)*s_photon_1MeV;
   
     return this->Sigmad0*Sigma_photon_1MeV*std::pow(T/T_BBN,this->nSigmad);
   }
@@ -1062,9 +1070,9 @@ real_t Relicparam_t::entropy_Sigmarad(const real_t &T)
 
   constexpr const real_t T_BBN= 1.0e-3; // 1MeV
   
-  const real_t s_photon_1MeV=4.*pi*pi/45.*1.e-9;
+  constexpr const real_t s_photon_1MeV=4.*pi*pi/45.*(T_BBN*T_BBN*T_BBN);
   
-  const real_t Sigma_photon_1MeV=1./Mplanck*std::sqrt(8.*pi*pi*pi/5.)*(1.e-6)*s_photon_1MeV;
+  constexpr const real_t Sigma_photon_1MeV=1./Mplanck*std::sqrt(8.*pi*pi*pi/5.)*(T_BBN*T_BBN)*s_photon_1MeV;
   
   return this->Sigmarad0*Sigma_photon_1MeV*std::pow(T/T_BBN,this->nSigmarad);
 }

@@ -81,3 +81,5 @@ enable_permissions.sh
 .containers/*/*.sif
 .containers/*.sif
 Yt.dat
+src/dp_scalar2to2/config.hpp
+src/dp_su2f2to2/config.hpp

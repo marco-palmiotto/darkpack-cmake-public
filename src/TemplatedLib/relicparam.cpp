@@ -911,7 +911,7 @@ real_t Relicparam_t::sigma_entropy(const real_t &T)
 
 real_t Relicparam_t::dark_entropy(const real_t &T)
 {
-  /* This function SHOULD compute the integral in Eq (A9) of [Manual SuperIso Relic 4]
+  /* This function SHOULD compute the total dark entropy in the chosen scenario
      QUESTIONS: Why in the integral we increase by dln(T) (so points are no longer equally spaced)
                 and then we do not divide by Ttemp the integrand?
      REMARK: We need a reference on the formula to combine the two entropy models A8 and A11
@@ -922,15 +922,16 @@ real_t Relicparam_t::dark_entropy(const real_t &T)
   
   if((this->Sigmad0==0.)&&(T<this->Tsend)) return 0.;
   
-  if(this->Sigmad0==0.)
+  if(this->Sigmad0==0.)// Scenario of "dark entropy production"
   {
     constexpr const real_t T_BBN= 1.0e-3; // 1MeV
     constexpr const real_t s_photon_1MeV=4.*pi*pi/45.*(T_BBN*T_BBN*T_BBN);
   
-    return this->sd0*s_photon_1MeV*std::pow(T/T_BBN,this->nsd);
+    return this->sd0*s_photon_1MeV*std::pow(T/T_BBN,this->nsd); // Formula (A7)
   }
   else
-  {
+  { // Scenario with "dark entropy injection": we need to compute the integral (A9)
+    // properly modified to take into account possible "standard entropy injection"
     real_t lnT,dlnT,Ttmp;
     int ie,nmax;
     real_t integ=0.;
@@ -955,6 +956,7 @@ real_t Relicparam_t::dark_entropy(const real_t &T)
       
       Htilde=std::sqrt(1.+darkdensitytilde); /*Htilde = H / std::sqrt(8 pi / 3 M_P^2) / rho_rad */
       
+      // Case with additional "standard entropy injection"
       if(this->Sigmarad0!=0.) Sigmatildestar_local=45.*std::sqrt(5.)/4./std::pow(pi,3.5)*Mplanck/heffT/std::sqrt(geffT)/std::pow(Ttmp,5.)/Htilde*entropy_Sigmarad(Ttmp);
       
       integ+=getsqrtgstar(Ttmp)*dark_entropy_Sigmad(Ttmp)/Htilde/(1.-Sigmatildestar_local)/sigma_entropy(Ttmp)/std::pow(heffT*std::pow(Ttmp,3.),(2.-Sigmatildestar_local)/(1.-Sigmatildestar_local));
@@ -966,6 +968,7 @@ real_t Relicparam_t::dark_entropy(const real_t &T)
     
     Htilde=std::sqrt(1.+darkdensitytilde); /*Htilde = H / std::sqrt(8 pi / 3 M_P^2) / rho_rad */
     
+    // Case with additional "standard entropy injection"
     if(this->Sigmarad0!=0.) Sigmatildestar_local=45.*std::sqrt(5.)/4./std::pow(pi,3.5)*Mplanck/heffT/std::sqrt(geffT)/std::pow(T,5.)/Htilde*entropy_Sigmarad(T);
     
     integ+=getsqrtgstar(T)*dark_entropy_Sigmad(T)/Htilde/(1.-Sigmatildestar_local)/sigma_entropy(T)/std::pow(heffT*std::pow(T,3.),(2.-Sigmatildestar_local)/(1.-Sigmatildestar_local))/2.;
@@ -987,10 +990,11 @@ real_t Relicparam_t::dark_entropy_derivative(const real_t &T)
   
   if(this->Sigmad0==0.)
   {
-    return this->nsd*dark_entropy(T)/T;
+    // Scenario of pure "dark entropy production"
+    return this->nsd*dark_entropy(T)/T; // Obtained by deriving (A7) with respect to T
   }
   else
-  {
+  {  // Scenario with "dark entropy injection"
     const real_t heffT=getheff(T);
     const real_t geffT=getgeff(T);
 //old unused variable
@@ -1063,15 +1067,13 @@ real_t Relicparam_t::entropy_Sigmarad(const real_t &T)
 {
   // Returns the value of \Sigma_rad, as defined in Eq. (A11) of
   // [Manual SuperIso Relic 4], corresponding to the scenario of
-  // reheating, and entropy modification via injection
+  // "standard entropy injection"
   if( (this->phi_model).get() != 0) return 0.; //this->Gamma_phi*this->rho_phi/T;
 
   if((this->Sigmarad0==0.)||(T<this->TSigmaradend)) return 0.;
 
   constexpr const real_t T_BBN= 1.0e-3; // 1MeV
-  
   constexpr const real_t s_photon_1MeV=4.*pi*pi/45.*(T_BBN*T_BBN*T_BBN);
-  
   constexpr const real_t Sigma_photon_1MeV=1./Mplanck*std::sqrt(8.*pi*pi*pi/5.)*(T_BBN*T_BBN)*s_photon_1MeV;
   
   return this->Sigmarad0*Sigma_photon_1MeV*std::pow(T/T_BBN,this->nSigmarad);
@@ -1239,5 +1241,4 @@ real_t neutN(const real_t &T)
 
   return std::exp(logNz);
 }
-
 } // end of namespace __SPEC_LIB_NAME__

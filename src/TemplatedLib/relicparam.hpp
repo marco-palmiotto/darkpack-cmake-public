@@ -4,7 +4,7 @@
 #endif
 
 #include "config.hpp"
-#include "params_new.hpp"
+#include <array>
 #include <vector>
 
 namespace __SPEC_LIB_NAME__

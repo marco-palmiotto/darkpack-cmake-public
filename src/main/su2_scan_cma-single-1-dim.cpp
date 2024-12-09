@@ -20,16 +20,11 @@ using namespace libcmaes;
 
 const std::string PATHPLOTS=std::string(OUTPATH);
 constexpr const double omega_h2_target=0.12;
-constexpr const double omega_h2_err=0.00091;
+constexpr const double omega_h2_err=0.01;
 
 static inline double sq(const double x)
 {
   return x*x;
-}
-
-static inline double gaussian_shape(const double val, const double mean, const double stddev)
-{
-  return -std::exp( - sq(val-mean)/2./sq(stddev) );
 }
 
 int main(int argc, char *argv[])
@@ -39,7 +34,7 @@ int main(int argc, char *argv[])
 
   constexpr const double sigma=omega_h2_err;
   constexpr const int npar=1;
-  constexpr const int n_required_args=6;
+  constexpr const int n_required_args=9;
   constexpr const char *par_names[npar] = {"g_chi"}; // Name of the parameters to be optimised
   constexpr const double m_phi_over_mv=2.;
 
@@ -53,8 +48,10 @@ int main(int argc, char *argv[])
               << " - The name of the output file\n"
               << " - The seed for the parameter g_f\n"
               << " - The value for the parameter m_chi/m_V\n"
-              << " - The value for m_V\n";
-
+              << " - The initial value for m_V\n"
+              << " - The final value for m_V\n"
+              << " - The total number of points\n"
+              << " - The current point"
   if(argc < n_required_args)
   {
     return 1;
@@ -71,38 +68,26 @@ int main(int argc, char *argv[])
   }
   std::cout << "Output file: " << argv[read_args++] << '\n';
 
+  char *end;
+
   // Initialising x0
   std::vector<double> x0;
   x0.reserve(npar);
-  char *end;
-  for(int i = 0 ; i < npar; i++)
-  {
-    const double value=std::strtod(argv[read_args],&end);
-    if(value < lbounds[i] || value > ubounds[i])
-    {
-      std::cerr << "Error in argument: " << read_args << ", parameter " << i <<  ", " << par_names[i] << '\n'
-                << "value " << value << " is out of the bound interval"
-                << " [ " << lbounds[i] << ", " << ubounds[i] << " ].\n";
-      return 2;
-    }
-    read_args++;
-    // std::cout << "x0.size()=" << x0.size() << ", emplacing back " << value << '\n';
-    x0.emplace_back(value);
-  }
-
-  if(x0.size() != npar)
-  {
-    std::cerr << "Initial parameters have wrong size: x0.size()=" << x0.size() << ", npar=" << npar << '\n';
-    return 2;
-  } 
-
+  x0.emplace_back(std::strtod(argv[read_args++], &end)
+  
   std::cout << "SEED: ";
   for(size_t i =0; i < x0.size(); i++) std::cout << par_names[i] << '=' << x0[i] << ' ';
   std::cout << '\n';
 
   // Reading parameters from CLI arguments
   const double mchi_over_mv  = std::strtod(argv[read_args++],&end);
-  const double m_V = std::strtod(argv[read_args++],&end);
+
+  const real_t m_V_init =std::strtod(argv[read_args++], &end);
+  const real_t m_V_final=std::strtod(argv[read_args++], &end);
+  const real_t npoints  =std::strtod(argv[read_args++], &end);
+  const real_t exponent =std::strtod(argv[read_args++], &end);
+
+  const real_t m_V = m_V_init*std::pow(m_V_final/m_V_init,exponent/npoints);
 
   std::cout << "m_V=" << m_V << '\n';
   

@@ -51,7 +51,7 @@ int main(int argc, char *argv[])
               << " - The initial value for m_V\n"
               << " - The final value for m_V\n"
               << " - The total number of points\n"
-              << " - The current point"
+              << " - The current point";
   if(argc < n_required_args)
   {
     return 1;
@@ -73,7 +73,7 @@ int main(int argc, char *argv[])
   // Initialising x0
   std::vector<double> x0;
   x0.reserve(npar);
-  x0.emplace_back(std::strtod(argv[read_args++], &end)
+  x0.emplace_back(std::strtod(argv[read_args++], &end));
   
   std::cout << "SEED: ";
   for(size_t i =0; i < x0.size(); i++) std::cout << par_names[i] << '=' << x0[i] << ' ';

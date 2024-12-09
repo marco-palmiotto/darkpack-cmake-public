@@ -14,6 +14,10 @@ cmake-build-debug/
 .containers/*/*.tar
 .containers/*.tar
 
+experimental/*
+/*/experimental/*
+/**/experimental/*
+
 *.sif
 
 # Prerequisites

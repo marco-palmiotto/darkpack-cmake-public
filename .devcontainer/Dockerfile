@@ -23,6 +23,8 @@ RUN yum update -y && \
         tbb \
         tbb-devel \
         wget \
+        python3 \
+        jupyter-notebook \
         -y 
 
 # Installs maquao (for profiling/development)

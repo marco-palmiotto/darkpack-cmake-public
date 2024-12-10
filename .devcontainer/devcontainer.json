@@ -18,7 +18,10 @@
 				"twxs.cmake",
 				"ms-vscode.cmake-tools",
 				"ms-vscode.cpptools-extension-pack",
-				"ms-vscode.makefile-tools"
+				"ms-vscode.makefile-tools",
+				"mhutchie.git-graph",
+				"ms-azuretools.vscode-docker",
+				"cschlosser.doxdocgen"
 			]
 		}
 	},

@@ -164,7 +164,7 @@ struct Relicparam_t //< structure containing the cosmological model parameters
       Other: Old Model (ideal gas)
 */
     void setQCDeosModel(const int x);
-    
+
     void init_heffgeff();
     void init_heffgeff(const int x);
     
@@ -419,14 +419,14 @@ struct Relicparam_t //< structure containing the cosmological model parameters
     real_t dark_entropy(const real_t &T);
 
     /**
-     * @brief This function computes the derivative total dark entropy \f$d\,s_D\f/d\,T$ in the defined cosmological scenario.
+     * @brief This function computes the derivative total dark entropy in the defined cosmological scenario.
      * 
-     *        The scenario can be:
-     *        - pure entropy production
-     *        - combination of "standard" and "dark" entropy injection.
+     * The scenario can be:
+     * 1. pure entropy production
+     * 2. combination of "standard" and "dark" entropy injection.
      * 
      * @param T The temperature
-     * @return real_t the derivative total dark entropy \f$d\,s_D\f/d\,T$
+     * @return real_t the derivative total dark entropy
      * @note We need to check the formula for the combination.
      */
     real_t dark_entropy_derivative(const real_t &T);

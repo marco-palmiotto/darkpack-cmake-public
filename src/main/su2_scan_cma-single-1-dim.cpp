@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
 
   constexpr const double sigma=omega_h2_err;
   constexpr const int npar=1;
-  constexpr const int n_required_args=8;
+  constexpr const int n_required_args=9;
   constexpr const char *par_names[npar] = {"g_chi"}; // Name of the parameters to be optimised
   constexpr const double m_phi_over_mv=2.;
 
@@ -57,10 +57,8 @@ int main(int argc, char *argv[])
     return 1;
   }
   
-  std::cout << "Reading arg " << read_args << '\n';
   Param_t input(argv[read_args]);
   std::cout << "The input file is " << argv[read_args++] << '\n';    
-  std::cout << "Reading arg " << read_args << '\n';
   
   std::ofstream outfile{argv[read_args]};
   if(!outfile)
@@ -75,7 +73,6 @@ int main(int argc, char *argv[])
   // Initialising x0
   std::vector<double> x0;
   x0.reserve(npar);
-  std::cout << "Reading arg " << read_args << '\n';
   x0.emplace_back(std::strtod(argv[read_args++], &end));
   
   std::cout << "SEED: ";
@@ -83,22 +80,12 @@ int main(int argc, char *argv[])
   std::cout << '\n';
 
   // Reading parameters from CLI arguments
-  std::cout << "Reading arg " << read_args << '\n';
   const double mchi_over_mv  = std::strtod(argv[read_args++],&end);
-  std::cout << "ratio = " << mchi_over_mv;
 
-  std::cout << "Reading arg " << read_args << '\n';
   const real_t m_V_init =std::strtod(argv[read_args++], &end);
-  std::cout << "m_V_i = " << m_V_init;
-  std::cout << "Reading arg " << read_args << '\n';
   const real_t m_V_final=std::strtod(argv[read_args++], &end);
-  std::cout << "m_V_f = " << m_V_final;
-  std::cout << "Reading arg " << read_args << '\n';
   const real_t npoints  =std::strtod(argv[read_args++], &end);
-  std::cout << "npoints = " << npoints ;
-  std::cout << "Reading arg " << read_args << '\n';
   const real_t exponent =std::strtod(argv[read_args++], &end);
-  std::cout << "Exponent = " << exponent;
 
   const real_t m_V = m_V_init*std::pow(m_V_final/m_V_init,exponent/npoints);
 

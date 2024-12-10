@@ -5,7 +5,6 @@
 
 #define MIN(X, Y) ( ( X < Y ) ? X : Y )
 
-// #define DEBUG
 namespace __SPEC_LIB_NAME__
 {
   Param_t::Param_t(const std::string filename)
@@ -64,12 +63,13 @@ namespace __SPEC_LIB_NAME__
   
   bool Param_t::operator==(const Param_t &other) const 
   {
-    /*
+#ifdef DEBUG
     bool temp = compare_param_t(*this, other);
     if(!temp)
     {
       std::cout<< "The 2 param_t are different\n";
-    }*/
+    }
+#endif 
     return( compare_param_t(*this, other) && darkpackparam_t::operator==(other) );
   }
 
@@ -139,7 +139,6 @@ namespace __SPEC_LIB_NAME__
       std::cout << "Assigning value " << count << std::endl;
 #endif
       bool isless=(std::abs(masses_vector[bsm_particles[count]].get())<m_lbsm.get());
-//       real_t tempmass = MIN(m_lbsm.get(), std::abs(masses_vector[bsm_particles[count]].get()) );
       if(isless)
       {
         part_lbsm=count;

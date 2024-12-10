@@ -76,13 +76,13 @@ inline real_t get_value_mat( mty::lha::LHAFileData data, const std::string block
     return data.getValue(block, N, N).value_or(pdgvalue);
 }
 
-namespace mathematicalconstants //!<Mathematical constants 
+namespace mathematicalconstants ///Mathematical constants 
 {
   constexpr const real_t pi = M_PI; //!<Value of \f$\pi\f$
   constexpr const real_t zeta3= 3.1415926535897932385;//!<Value of \f$\zeta_3\f$
 }
 
-namespace units_conversion //!<From the exact values of the PDG 2022
+namespace units_conversion ///From the exact values of the PDG 2022
 {
     constexpr const real_t c_in_m_s = 299792458.;
     /**< Speed of light in vacuo in m/s.
@@ -149,7 +149,7 @@ namespace units_conversion //!<From the exact values of the PDG 2022
      */
 }
 
-namespace pdg2016Value //!< Default values from PDG 2016 and their lha block code convention
+namespace pdg2016Value ///Default values from PDG 2016 and their lha block code convention
 {
     constexpr const real_t alpha_em_inv = 137.035999710;
     /**< \f$1/\alpha_{em}\f$ at the scale \f$E = 0\f$
@@ -339,10 +339,8 @@ namespace pdg2016Value //!< Default values from PDG 2016 and their lha block cod
      */
 }
 
-namespace pdgValue
+namespace pdgValue  ///Default values from PDG 2022 and their lha block code convention
 {
-    //!< Default values from PDG 2022 and their lha block code convention
-    
     /* In the block SM_INPUT 
      * a set of SM parameter is provided in order to compute 
      * the spectrum and other quantities 
@@ -919,7 +917,7 @@ public:
 
     bool operator!=(const Param_t &other) const 
     {
-        /**< Inequality comparison operator.
+        /**  Inequality comparison operator.
          *   @param other The Param_t object to compare with.
          *   @return True if objects are not equal, false otherwise.
          */
@@ -932,7 +930,7 @@ public:
      */
 };
 
-class Timer //!< The following class is defined to have an easy way of measuring time
+class Timer /// The following class is defined to have an easy way of measuring time
 {
   std::chrono::_V2::system_clock::time_point start, end;
   
@@ -963,12 +961,24 @@ class Timer //!< The following class is defined to have an easy way of measuring
 
 inline std::ostream& operator << (std::ostream& out, const __SPEC_LIB_NAME__::param_t &par)
 {
-  par.print(out); 
-  return out;
+    /**< Stream insertion operator for param_t objects.
+     *   Outputs the param_t object to the given output stream.
+     *   @param out The output stream to write to.
+     *   @param par The param_t object to output.
+     *   @return Reference to the output stream.
+     */
+    par.print(out); 
+    return out;
 }
 
 inline std::ostream& operator << (std::ostream& out, const __SPEC_LIB_NAME__::Param_t &par)
 {
-  par.Print(out); 
-  return out;
+    /**< Stream insertion operator for Param_t objects.
+     *   Outputs the Param_t object to the given output stream.
+     *   @param out The output stream to write to.
+     *   @param par The Param_t object to output.
+     *   @return Reference to the output stream.
+     */
+    par.Print(out); 
+    return out;
 }

@@ -2,9 +2,9 @@ FROM registry.fedoraproject.org/fedora:36
 
 ARG username=vscode
 
-RUN yum update -y && \
-    yum upgrade -y && \
-    yum install \
+RUN dnf update -y && \
+    dnf upgrade -y && \
+    dnf install \
         gcc \
         gfortran \
         g++ \
@@ -25,7 +25,9 @@ RUN yum update -y && \
         wget \
         python3 \
         jupyter-notebook \
-        -y 
+        doxygen \
+        -y && \ 
+    dnf clean all  
 
 # Installs maquao (for profiling/development)
 RUN cd /usr/bin && wget https://maqao.org/maqao_archive/maqao.intel64.2.17.0.tar.xz &&	\

@@ -86,3 +86,5 @@ enable_permissions.sh
 .containers/*.sif
 Yt.dat
 src/dp_*/config.hpp
+doc/*
+!doc/Doxyfile

@@ -1,4 +1,8 @@
 #include "dp_mssm2to2/all_libs.hpp"
+#include <fstream>
+#include <iostream>
+#include <iomanip>
+
 using namespace mssm2to2;
 
 // #define EMIN 419.009
@@ -76,7 +80,7 @@ void test_getSingle_ext(Process2to2 p, mssm2to2::Param_t input, bool wantrun=fal
       
     sprintf(tempstringc, "%.1f", cosine);
     const std::string filename=fileprefix+"_sumsquaredamp"+tempstringc+".dat";
-    std::ofstream outf{filename};
+    std::ofstream outf{filename.c_str()};
     if (!(outf))
     {
         // Print an error and exit

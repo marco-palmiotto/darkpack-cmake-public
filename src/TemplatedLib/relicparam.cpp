@@ -1000,7 +1000,7 @@ real_t Relicparam_t::dark_entropy_derivative(const real_t &T)
 //old unused variable
     const real_t rhoradT=pi*pi/30.*geffT*std::pow(T,4.);
     const real_t darkdensitytilde=dark_density(T)/rhoradT;
-    const real_t Sigmarad=entropy_Sigmarad(T);
+    const real_t Sigmarad=entropy_Sigmarad(T);// Combination with radiation entropy injection
     
     const real_t Htilde=std::sqrt(1.+darkdensitytilde); /*Htilde = H / std::sqrt(8 pi / 3 M_P^2) / rho_rad */
 

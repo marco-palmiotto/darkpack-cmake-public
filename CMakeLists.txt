@@ -17,7 +17,7 @@ macro(compile_all_libs)
     endforeach()
 endmacro()
 
-set(MODELS_LIBS_NAMES "dp_mssm2to2" "dp_su2f2to2")
+set(MODELS_LIBS_NAMES "dp_su2f2to2")
 
 # This submodule contains the CMA-ES algorithms for the parameter
 # space sampling

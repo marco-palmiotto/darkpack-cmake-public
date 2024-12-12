@@ -21,7 +21,8 @@
 				"ms-vscode.makefile-tools",
 				"mhutchie.git-graph",
 				"ms-azuretools.vscode-docker",
-				"cschlosser.doxdocgen"
+				"cschlosser.doxdocgen",
+				"mintlify.document"
 			]
 		}
 	},

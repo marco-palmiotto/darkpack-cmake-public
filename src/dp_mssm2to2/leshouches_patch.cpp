@@ -10,9 +10,10 @@
 //   return (static_cast<std::complex<double>>(z)).imag();
 // }
 
-void print_parameters_siso(struct parameters *p, FILE *fptr) 
+void print_parameters_siso(struct parameters* p, FILE* fptr)
 {
-  if(fptr==NULL) fptr=stdout;
+  if (fptr == NULL)
+    fptr = stdout;
   fprintf(fptr, "SM %d\n", p->SM);
   fprintf(fptr, "model %d\n", p->model);
   fprintf(fptr, "generator %d\n", p->generator);
@@ -37,60 +38,60 @@ void print_parameters_siso(struct parameters *p, FILE *fptr)
   fprintf(fptr, "Gfermi %.4e\n", p->Gfermi);
   fprintf(fptr, "GAUGE_Q %.4e\n", p->GAUGE_Q);
   fprintf(fptr, "charg_Umix:\n");
-  for (int i = 0; i < 3; i++) 
+  for (int i = 0; i < 3; i++)
   {
-    for (int j = 0; j < 3; j++) 
+    for (int j = 0; j < 3; j++)
     {
       fprintf(fptr, "%.4e ", p->charg_Umix[i][j]);
     }
     fprintf(fptr, "\n");
   }
   fprintf(fptr, "charg_Vmix:\n");
-  for (int i = 0; i < 3; i++) 
+  for (int i = 0; i < 3; i++)
   {
-    for (int j = 0; j < 3; j++) 
+    for (int j = 0; j < 3; j++)
     {
       fprintf(fptr, "%.4e ", p->charg_Vmix[i][j]);
     }
     fprintf(fptr, "\n");
   }
   fprintf(fptr, "stop_mix:\n");
-  for (int i = 0; i < 3; i++) 
+  for (int i = 0; i < 3; i++)
   {
-    for (int j = 0; j < 3; j++) 
+    for (int j = 0; j < 3; j++)
     {
       fprintf(fptr, "%.4e ", p->stop_mix[i][j]);
     }
     fprintf(fptr, "\n");
   }
   fprintf(fptr, "sbot_mix:\n");
-  for (int i = 0; i < 3; i++) 
+  for (int i = 0; i < 3; i++)
   {
-    for (int j = 0; j < 3; j++) 
+    for (int j = 0; j < 3; j++)
     {
       fprintf(fptr, "%.4e ", p->sbot_mix[i][j]);
     }
     fprintf(fptr, "\n");
   }
   fprintf(fptr, "stau_mix:\n");
-  for (int i = 0; i < 3; i++) 
+  for (int i = 0; i < 3; i++)
   {
-    for (int j = 0; j < 3; j++) 
+    for (int j = 0; j < 3; j++)
     {
       fprintf(fptr, "%.4e ", p->stau_mix[i][j]);
     }
     fprintf(fptr, "\n");
   }
   fprintf(fptr, "neut_mix:\n");
-  for (int i = 0; i < 6; i++) 
+  for (int i = 0; i < 6; i++)
   {
-    for (int j = 0; j < 6; j++) 
+    for (int j = 0; j < 6; j++)
     {
       fprintf(fptr, "%.4e ", p->neut_mix[i][j]);
     }
     fprintf(fptr, "\n");
   }
-  
+
   fprintf(fptr, "mass_neut[0] %.4e\n", p->mass_neut[0]);
   fprintf(fptr, "mass_neut[1] %.4e\n", p->mass_neut[1]);
   fprintf(fptr, "mass_neut[2] %.4e\n", p->mass_neut[2]);
@@ -132,54 +133,54 @@ void print_parameters_siso(struct parameters *p, FILE *fptr)
   fprintf(fptr, "M2H1_Q %.4e\n", p->M2H1_Q);
   fprintf(fptr, "M2H2_Q %.4e\n", p->M2H2_Q);
   fprintf(fptr, "mass_d %.4e\n", p->mass_d);
-  
-  fprintf(fptr, "mass_u %.4e\n",p->mass_u);
-  fprintf(fptr, "mass_s %.4e\n",p->mass_s);
-  fprintf(fptr, "mass_c %.4e\n",p->mass_c);
-  fprintf(fptr, "mass_t %.4e\n",p->mass_t);
-  fprintf(fptr, "mass_e %.4e\n",p->mass_e);
-  fprintf(fptr, "mass_nue %.4e\n",p->mass_nue);
-  fprintf(fptr, "mass_mu %.4e\n",p->mass_mu);
-  fprintf(fptr, "mass_num %.4e\n",p->mass_num);
-  fprintf(fptr, "mass_tau %.4e\n",p->mass_tau);
-  fprintf(fptr, "mass_nut %.4e\n",p->mass_nut);
-  fprintf(fptr, "mass_gluon %.4e\n",p->mass_gluon);
-  fprintf(fptr, "mass_photon %.4e\n",p->mass_photon);
-  fprintf(fptr, "mass_Z0 %.4e\n",p->mass_Z0);
-  fprintf(fptr, "mass_h0 %.4e\n",p->mass_h0);
-  fprintf(fptr, "mass_H0 %.4e\n",p->mass_H0);
-  fprintf(fptr, "mass_A0 %.4e\n",p->mass_A0);
-  fprintf(fptr, "mass_H %.4e\n",p->mass_H);
-  fprintf(fptr, "mass_dnl %.4e\n",p->mass_dnl);
-  fprintf(fptr, "mass_upl %.4e\n",p->mass_upl);
-  fprintf(fptr, "mass_stl %.4e\n",p->mass_stl);
-  fprintf(fptr, "mass_chl %.4e\n",p->mass_chl);
-  fprintf(fptr, "mass_b1 %.4e\n",p->mass_b1);
-  fprintf(fptr, "mass_t1 %.4e\n",p->mass_t1);
-  fprintf(fptr, "mass_el %.4e\n",p->mass_el);
-  fprintf(fptr, "mass_nuel %.4e\n",p->mass_nuel);
-  fprintf(fptr, "mass_mul %.4e\n",p->mass_mul);
-  fprintf(fptr, "mass_numl %.4e\n",p->mass_numl);
-  fprintf(fptr, "mass_tau1 %.4e\n",p->mass_tau1);
-  fprintf(fptr, "mass_nutl %.4e\n",p->mass_nutl);
-  fprintf(fptr, "mass_gluino %.4e\n",p->mass_gluino);
-  fprintf(fptr, "mass_cha1 %.4e\n",p->mass_cha1);
-  fprintf(fptr, "mass_cha2 %.4e\n",p->mass_cha2);
-  fprintf(fptr, "mass_dnr %.4e\n",p->mass_dnr);
-  fprintf(fptr, "mass_upr %.4e\n",p->mass_upr);
-  fprintf(fptr, "mass_str %.4e\n",p->mass_str);
-  fprintf(fptr, "mass_chr %.4e\n",p->mass_chr);
-  fprintf(fptr, "mass_b2 %.4e\n",p->mass_b2);
-  fprintf(fptr, "mass_t2 %.4e\n",p->mass_t2);
-  fprintf(fptr, "mass_er %.4e\n",p->mass_er);
-  fprintf(fptr, "mass_mur %.4e\n",p->mass_mur);
-  fprintf(fptr, "mass_tau2 %.4e\n",p->mass_tau2);
-  fprintf(fptr, "mass_nuer %.4e\n",p->mass_nuer);
-  fprintf(fptr, "mass_numr %.4e\n",p->mass_numr);
-  fprintf(fptr, "mass_nutr %.4e\n",p->mass_nutr);
-  fprintf(fptr, "mass_graviton %.4e\n",p->mass_graviton);
-  fprintf(fptr, "mass_gravitino %.4e\n",p->mass_gravitino);
-  
+
+  fprintf(fptr, "mass_u %.4e\n", p->mass_u);
+  fprintf(fptr, "mass_s %.4e\n", p->mass_s);
+  fprintf(fptr, "mass_c %.4e\n", p->mass_c);
+  fprintf(fptr, "mass_t %.4e\n", p->mass_t);
+  fprintf(fptr, "mass_e %.4e\n", p->mass_e);
+  fprintf(fptr, "mass_nue %.4e\n", p->mass_nue);
+  fprintf(fptr, "mass_mu %.4e\n", p->mass_mu);
+  fprintf(fptr, "mass_num %.4e\n", p->mass_num);
+  fprintf(fptr, "mass_tau %.4e\n", p->mass_tau);
+  fprintf(fptr, "mass_nut %.4e\n", p->mass_nut);
+  fprintf(fptr, "mass_gluon %.4e\n", p->mass_gluon);
+  fprintf(fptr, "mass_photon %.4e\n", p->mass_photon);
+  fprintf(fptr, "mass_Z0 %.4e\n", p->mass_Z0);
+  fprintf(fptr, "mass_h0 %.4e\n", p->mass_h0);
+  fprintf(fptr, "mass_H0 %.4e\n", p->mass_H0);
+  fprintf(fptr, "mass_A0 %.4e\n", p->mass_A0);
+  fprintf(fptr, "mass_H %.4e\n", p->mass_H);
+  fprintf(fptr, "mass_dnl %.4e\n", p->mass_dnl);
+  fprintf(fptr, "mass_upl %.4e\n", p->mass_upl);
+  fprintf(fptr, "mass_stl %.4e\n", p->mass_stl);
+  fprintf(fptr, "mass_chl %.4e\n", p->mass_chl);
+  fprintf(fptr, "mass_b1 %.4e\n", p->mass_b1);
+  fprintf(fptr, "mass_t1 %.4e\n", p->mass_t1);
+  fprintf(fptr, "mass_el %.4e\n", p->mass_el);
+  fprintf(fptr, "mass_nuel %.4e\n", p->mass_nuel);
+  fprintf(fptr, "mass_mul %.4e\n", p->mass_mul);
+  fprintf(fptr, "mass_numl %.4e\n", p->mass_numl);
+  fprintf(fptr, "mass_tau1 %.4e\n", p->mass_tau1);
+  fprintf(fptr, "mass_nutl %.4e\n", p->mass_nutl);
+  fprintf(fptr, "mass_gluino %.4e\n", p->mass_gluino);
+  fprintf(fptr, "mass_cha1 %.4e\n", p->mass_cha1);
+  fprintf(fptr, "mass_cha2 %.4e\n", p->mass_cha2);
+  fprintf(fptr, "mass_dnr %.4e\n", p->mass_dnr);
+  fprintf(fptr, "mass_upr %.4e\n", p->mass_upr);
+  fprintf(fptr, "mass_str %.4e\n", p->mass_str);
+  fprintf(fptr, "mass_chr %.4e\n", p->mass_chr);
+  fprintf(fptr, "mass_b2 %.4e\n", p->mass_b2);
+  fprintf(fptr, "mass_t2 %.4e\n", p->mass_t2);
+  fprintf(fptr, "mass_er %.4e\n", p->mass_er);
+  fprintf(fptr, "mass_mur %.4e\n", p->mass_mur);
+  fprintf(fptr, "mass_tau2 %.4e\n", p->mass_tau2);
+  fprintf(fptr, "mass_nuer %.4e\n", p->mass_nuer);
+  fprintf(fptr, "mass_numr %.4e\n", p->mass_numr);
+  fprintf(fptr, "mass_nutr %.4e\n", p->mass_nutr);
+  fprintf(fptr, "mass_graviton %.4e\n", p->mass_graviton);
+  fprintf(fptr, "mass_gravitino %.4e\n", p->mass_gravitino);
+
   fprintf(fptr, "gp %.4e\n", p->gp);
   fprintf(fptr, "g2 %.4e\n", p->g2);
   fprintf(fptr, "gp_Q %.4e\n", p->gp_Q);
@@ -215,7 +216,7 @@ void print_parameters_siso(struct parameters *p, FILE *fptr)
   fprintf(fptr, "MdR_Q %.4e\n", p->MdR_Q);
   fprintf(fptr, "MsR_Q %.4e\n", p->MsR_Q);
   fprintf(fptr, "MbR_Q %.4e\n", p->MbR_Q);
-  
+
   fprintf(fptr, "AU_Q %.4e\n", p->AU_Q);
   fprintf(fptr, "A_u %.4e\n", p->A_u);
   fprintf(fptr, "A_c %.4e\n", p->A_c);
@@ -242,10 +243,10 @@ void print_parameters_siso(struct parameters *p, FILE *fptr)
   fprintf(fptr, "PMNS_delta13 %.4e\n", p->PMNS_delta13);
   fprintf(fptr, "PMNS_alpha1 %.4e\n", p->PMNS_alpha1);
   fprintf(fptr, "PMNS_alpha2 %.4e\n", p->PMNS_alpha2);
-  
-  
+
+
   fprintf(fptr, "NMSSM parameters:\n");
-  
+
   fprintf(fptr, "lambdaNMSSM_Min %.4e\n", p->lambdaNMSSM_Min);
   fprintf(fptr, "kappaNMSSM_Min %.4e\n", p->kappaNMSSM_Min);
   fprintf(fptr, "AlambdaNMSSM_Min %.4e\n", p->AlambdaNMSSM_Min);
@@ -258,7 +259,7 @@ void print_parameters_siso(struct parameters *p, FILE *fptr)
   fprintf(fptr, "mS2NMSSM_Min %.4e\n", p->mS2NMSSM_Min);
   fprintf(fptr, "mass_H03 %.4e\n", p->mass_H03);
   fprintf(fptr, "mass_A02 %.4e\n", p->mass_A02);
-  
+
   fprintf(fptr, "NMSSMRUN_Q %.4e\n", p->NMSSMRUN_Q);
   fprintf(fptr, "lambdaNMSSM %.4e\n", p->lambdaNMSSM);
   fprintf(fptr, "kappaNMSSM %.4e\n", p->kappaNMSSM);
@@ -273,40 +274,46 @@ void print_parameters_siso(struct parameters *p, FILE *fptr)
   fprintf(fptr, "\n");
 
   fprintf(fptr, "CKM matrix:\n");
-  for (int i=0; i<=3; i++){
-    for (int j=0; j<=3; j++){
+  for (int i = 0; i <= 3; i++)
+  {
+    for (int j = 0; j <= 3; j++)
+    {
       fprintf(fptr, "CKM(%d,%d) %.4e\n", i, j, p->CKM[i][j]);
     }
   }
-//   fprintf(fptr, "CKM(1,4) %.4e\n", p->CKM[1][4]);
-//   fprintf(fptr, "CKM(2,4) %.4e\n", p->CKM[2][4]);
-//   fprintf(fptr, "CKM(3,4) %.4e\n", p->CKM[3][4]);
-//   fprintf(fptr, "CKM(4,4) %.4e\n", p->CKM[4][4]);
+  //   fprintf(fptr, "CKM(1,4) %.4e\n", p->CKM[1][4]);
+  //   fprintf(fptr, "CKM(2,4) %.4e\n", p->CKM[2][4]);
+  //   fprintf(fptr, "CKM(3,4) %.4e\n", p->CKM[3][4]);
+  //   fprintf(fptr, "CKM(4,4) %.4e\n", p->CKM[4][4]);
   fprintf(fptr, "\n");
 
   fprintf(fptr, "IMCKM matrix:\n");
-  for (int i=0; i<=3; i++){
-    for (int j=0; j<=3; j++){
+  for (int i = 0; i <= 3; i++)
+  {
+    for (int j = 0; j <= 3; j++)
+    {
       fprintf(fptr, "IMCKM(%d,%d) %.4e\n", i, j, p->IMCKM[i][j]);
     }
   }
-//   fprintf(fptr, "IMCKM(1,4) %.4e\n", p->IMCKM[1][4]);
-//   fprintf(fptr, "IMCKM(2,4) %.4e\n", p->IMCKM[2][4]);
-//   fprintf(fptr, "IMCKM(3,4) %.4e\n", p->IMCKM[3][4]);
-//   fprintf(fptr, "IMCKM(4,4) %.4e\n", p->IMCKM[4][4]);
+  //   fprintf(fptr, "IMCKM(1,4) %.4e\n", p->IMCKM[1][4]);
+  //   fprintf(fptr, "IMCKM(2,4) %.4e\n", p->IMCKM[2][4]);
+  //   fprintf(fptr, "IMCKM(3,4) %.4e\n", p->IMCKM[3][4]);
+  //   fprintf(fptr, "IMCKM(4,4) %.4e\n", p->IMCKM[4][4]);
   fprintf(fptr, "\n");
 
   fprintf(fptr, "Higgs mixing matrices:\n");
-  for (int i=0; i<=3; i++){
-    for (int j=0; j<=3; j++){
+  for (int i = 0; i <= 3; i++)
+  {
+    for (int j = 0; j <= 3; j++)
+    {
       fprintf(fptr, "H0_mix(%d,%d) %.4e\n", i, j, p->H0_mix[i][j]);
     }
   }
-//   fprintf(fptr, "H0_mix(1,4) %.4e\n", p->H0_mix[1][4]);
-//   fprintf(fptr, "H0_mix(2,4) %.4e\n", p->H0_mix[2][4]);
-//   fprintf(fptr, "H0_mix(3,4) %.4e\n", p->H0_mix[3][4]);
-//   fprintf(fptr, "H0_mix(4,4) %.4e\n", p->H0_mix[4][4]);
-  
+  //   fprintf(fptr, "H0_mix(1,4) %.4e\n", p->H0_mix[1][4]);
+  //   fprintf(fptr, "H0_mix(2,4) %.4e\n", p->H0_mix[2][4]);
+  //   fprintf(fptr, "H0_mix(3,4) %.4e\n", p->H0_mix[3][4]);
+  //   fprintf(fptr, "H0_mix(4,4) %.4e\n", p->H0_mix[4][4]);
+
   fprintf(fptr, "A0_mix %.4e\n", p->A0_mix[0][0]);
   fprintf(fptr, "sU_mix %.4e\n", p->sU_mix[0][0]);
   fprintf(fptr, "sD_mix %.4e\n", p->sD_mix[0][0]);
@@ -340,7 +347,7 @@ void print_parameters_siso(struct parameters *p, FILE *fptr)
   fprintf(fptr, "Vcd %.4e + %.4ei\n", creal(p->Vcd), cimag(p->Vcd));
   fprintf(fptr, "Vcs %.4e + %.4ei\n", creal(p->Vcs), cimag(p->Vcs));
   fprintf(fptr, "Vcb %.4e + %.4ei\n", creal(p->Vcb), cimag(p->Vcb));
-  
+
   fprintf(fptr, "Vtd %.4e\n", creal(p->Vtd));
   fprintf(fptr, "Vts %.4e\n", creal(p->Vts));
   fprintf(fptr, "Vtb %.4e\n", creal(p->Vtb));
@@ -386,4 +393,3 @@ void print_parameters_siso(struct parameters *p, FILE *fptr)
   fprintf(fptr, "width_o4 %.4e\n", p->width_o4);
   fprintf(fptr, "width_o5 %.4e\n", p->width_o5);
 }
-

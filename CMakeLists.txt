@@ -17,7 +17,8 @@ macro(compile_all_libs)
     endforeach()
 endmacro()
 
-set(MODELS_LIBS_NAMES "dp_su2f2to2")
+set(MODELS_LIBS_NAMES "dp_su2f2to2" "dp_mssm2to2")
+
 
 # This submodule contains the CMA-ES algorithms for the parameter
 # space sampling
@@ -93,3 +94,52 @@ add_subdirectory(src/Test)
 # Appending CMA-ES to the list of external libs to be linked 
 set(EXTERNAL_LIBS ${EXTERNAL_LIBS} cmaes)
 add_subdirectory(src/main)
+
+find_program(CLANG_FORMAT_BIN clang-format)
+
+# Define the patterns to exclude
+set(EXCLUDE_PATTERNS
+    "/submodules/"
+    "/build/"
+    "/src/mssm2to2/"
+    "/src/scalar2to2/"
+    "/src/su2f2to2/"
+    "/src/.*/initialise_map.*"
+    # Add more patterns as needed
+)
+
+# Function to check if a file should be excluded
+function(should_exclude FILE_PATH)
+    foreach(PATTERN ${EXCLUDE_PATTERNS})
+        if(${FILE_PATH} MATCHES ${PATTERN})
+            set(SHOULD_EXCLUDE TRUE PARENT_SCOPE)
+            return()
+        endif()
+    endforeach()
+    set(SHOULD_EXCLUDE FALSE PARENT_SCOPE)
+endfunction()
+
+# Collect all source files
+file(GLOB_RECURSE ALL_SOURCE_FILES 
+    ${CMAKE_SOURCE_DIR}/src/*.cpp
+    ${CMAKE_SOURCE_DIR}/src/*.hpp
+    ${CMAKE_SOURCE_DIR}/include/*.hpp
+)
+
+# Filter out excluded files
+set(FILTERED_SOURCE_FILES "")
+foreach(SOURCE_FILE ${ALL_SOURCE_FILES})
+    should_exclude(${SOURCE_FILE})
+    if(NOT SHOULD_EXCLUDE)
+        list(APPEND FILTERED_SOURCE_FILES ${SOURCE_FILE})
+    endif()
+endforeach()
+
+# Create the format target
+add_custom_target(format
+    COMMENT "Running clang-format to change files"
+    COMMAND ${CLANG_FORMAT_BIN}
+    -style=file
+    -i
+    ${FILTERED_SOURCE_FILES}
+)

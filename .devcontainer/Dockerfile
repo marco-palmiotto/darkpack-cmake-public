@@ -26,6 +26,7 @@ RUN dnf update -y && \
         python3 \
         jupyter-notebook \
         doxygen \
+        git-clang-format \
         -y && \ 
     dnf clean all  
 

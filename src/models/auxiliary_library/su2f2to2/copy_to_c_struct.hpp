@@ -1,75 +1,76 @@
 namespace su2f2to2
 {
-inline void update_kinematics(Param_t &input, const double sij[5][5])
-{
-  input.s_12 = sij[1][2];
-  input.s_13 = sij[1][3];
-  input.s_14 = sij[1][4];
-  input.s_23 = sij[2][3];
-  input.s_24 = sij[2][4];
-  input.s_34 = sij[3][4];
-}
-inline cparam_s copy_to_c_struct(Param_t &input)
-{
-  cparam_s output;
-#define CONVERT_COMPLEX(X) ( (static_cast<std::complex<double>>(X)).real() + _mty_I*(static_cast<std::complex<double>>(X)).imag() )
-  output.pi = input.pi;
-  output.g_f = input.g_f;
-  output.V_cb = input.V_cb;
-  output.V_tb = input.V_tb;
-  output.V_ud = input.V_ud;
-  output.V_us = input.V_us;
-  output.e_em = input.e_em;
-  output.s_12 = input.s_12;
-  output.s_13 = input.s_13;
-  output.s_14 = input.s_14;
-  output.s_23 = input.s_23;
-  output.s_24 = input.s_24;
-  output.s_34 = input.s_34;
-  output.m_cdm = input.m_cdm;
-  output.Gamma_V = input.Gamma_V;
-  output.theta_W = input.theta_W;
-  output.reg_prop = input.reg_prop;
-  output.Gamma_V_3 = input.Gamma_V_3;
-  output.theta_12_L = input.theta_12_L;
-  output.theta_12_R = input.theta_12_R;
-  output.theta_13_L = input.theta_13_L;
-  output.theta_13_R = input.theta_13_R;
-  output.theta_23_L = input.theta_23_L;
-  output.theta_23_R = input.theta_23_R;
-  output.g_s = input.g_s;
-  output.m_V = input.m_V;
-  output.m_W = input.m_W;
-  output.m_Z = input.m_Z;
-  output.m_b = input.m_b;
-  output.m_c = input.m_c;
-  output.m_d = input.m_d;
-  output.m_e = input.m_e;
-  output.m_h = input.m_h;
-  output.m_s = input.m_s;
-  output.m_t = input.m_t;
-  output.m_u = input.m_u;
-  output.m_mu = input.m_mu;
-  output.m_phi = input.m_phi;
-  output.m_tau = input.m_tau;
-  output.m_chi_dm_1 = input.m_chi_dm_1;
-  output.m_chi_dm_2 = input.m_chi_dm_2;
-  output.V_cd = CONVERT_COMPLEX(input.V_cd);
-  output.V_cs = CONVERT_COMPLEX(input.V_cs);
-  output.V_td = CONVERT_COMPLEX(input.V_td);
-  output.V_ts = CONVERT_COMPLEX(input.V_ts);
-  output.V_ub = CONVERT_COMPLEX(input.V_ub);
+  inline void update_kinematics(Param_t& input, const double sij[5][5])
+  {
+    input.s_12 = sij[1][2];
+    input.s_13 = sij[1][3];
+    input.s_14 = sij[1][4];
+    input.s_23 = sij[2][3];
+    input.s_24 = sij[2][4];
+    input.s_34 = sij[3][4];
+  }
+  inline cparam_s copy_to_c_struct(Param_t& input)
+  {
+    cparam_s output;
+#define CONVERT_COMPLEX(X)                                                                                             \
+  ((static_cast<std::complex<double>>(X)).real() + _mty_I * (static_cast<std::complex<double>>(X)).imag())
+    output.pi = input.pi;
+    output.g_f = input.g_f;
+    output.V_cb = input.V_cb;
+    output.V_tb = input.V_tb;
+    output.V_ud = input.V_ud;
+    output.V_us = input.V_us;
+    output.e_em = input.e_em;
+    output.s_12 = input.s_12;
+    output.s_13 = input.s_13;
+    output.s_14 = input.s_14;
+    output.s_23 = input.s_23;
+    output.s_24 = input.s_24;
+    output.s_34 = input.s_34;
+    output.m_cdm = input.m_cdm;
+    output.Gamma_V = input.Gamma_V;
+    output.theta_W = input.theta_W;
+    output.reg_prop = input.reg_prop;
+    output.Gamma_V_3 = input.Gamma_V_3;
+    output.theta_12_L = input.theta_12_L;
+    output.theta_12_R = input.theta_12_R;
+    output.theta_13_L = input.theta_13_L;
+    output.theta_13_R = input.theta_13_R;
+    output.theta_23_L = input.theta_23_L;
+    output.theta_23_R = input.theta_23_R;
+    output.g_s = input.g_s;
+    output.m_V = input.m_V;
+    output.m_W = input.m_W;
+    output.m_Z = input.m_Z;
+    output.m_b = input.m_b;
+    output.m_c = input.m_c;
+    output.m_d = input.m_d;
+    output.m_e = input.m_e;
+    output.m_h = input.m_h;
+    output.m_s = input.m_s;
+    output.m_t = input.m_t;
+    output.m_u = input.m_u;
+    output.m_mu = input.m_mu;
+    output.m_phi = input.m_phi;
+    output.m_tau = input.m_tau;
+    output.m_chi_dm_1 = input.m_chi_dm_1;
+    output.m_chi_dm_2 = input.m_chi_dm_2;
+    output.V_cd = CONVERT_COMPLEX(input.V_cd);
+    output.V_cs = CONVERT_COMPLEX(input.V_cs);
+    output.V_td = CONVERT_COMPLEX(input.V_td);
+    output.V_ts = CONVERT_COMPLEX(input.V_ts);
+    output.V_ub = CONVERT_COMPLEX(input.V_ub);
 #undef CONVERT_COMPLEX
-  return output;
-}
-inline cparam_s update_c_kinematics(const Param_t &input, cparam_s output)
-{
-  output.s_12 = input.s_12;
-  output.s_13 = input.s_13;
-  output.s_14 = input.s_14;
-  output.s_23 = input.s_23;
-  output.s_24 = input.s_24;
-  output.s_34 = input.s_34;
-  return output;
-}
+    return output;
+  }
+  inline cparam_s update_c_kinematics(const Param_t& input, cparam_s output)
+  {
+    output.s_12 = input.s_12;
+    output.s_13 = input.s_13;
+    output.s_14 = input.s_14;
+    output.s_23 = input.s_23;
+    output.s_24 = input.s_24;
+    output.s_34 = input.s_34;
+    return output;
+  }
 } // End of namespace su2f2to2

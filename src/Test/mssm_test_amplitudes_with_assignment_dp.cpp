@@ -1,7 +1,8 @@
-#include "all_libs.hpp"
+#include "dp_mssm2to2/all_libs.hpp"
 #include <fstream>
 #include <iomanip>
 #include <iostream>
+
 using namespace mssm2to2;
 
 // #define EMIN 419.009
@@ -30,8 +31,8 @@ using namespace mssm2to2;
   #define SPACE 20
 #endif
 
-const std::string PATHPLOTS = std::string(OUTPATH) + "MARTY/";
-const std::string PATHPLOTSRUN = std::string(OUTPATH) + "MARTY_run/";
+const std::string PATHPLOTS = std::string(OUTPATH) + "mssm/MARTY/";
+const std::string PATHPLOTSRUN = std::string(OUTPATH) + "mssm/MARTY_run/";
 
 #ifndef NUMBER_OF_CALLS
   #define NUMBER_OF_CALLS 100000
@@ -82,7 +83,7 @@ void test_getSingle_ext(Process2to2 p, mssm2to2::Param_t input, bool wantrun = f
 
     sprintf(tempstringc, "%.1f", cosine);
     const std::string filename = fileprefix + "_sumsquaredamp" + tempstringc + ".dat";
-    std::ofstream outf{filename};
+    std::ofstream outf{filename.c_str()};
     if (!(outf))
     {
       // Print an error and exit

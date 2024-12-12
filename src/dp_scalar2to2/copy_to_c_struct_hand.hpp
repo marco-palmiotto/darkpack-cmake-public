@@ -1,17 +1,18 @@
 namespace scalar2to2
 {
 
-inline void update_kinematics(Param_t &input, const double sij[5][5])
-{
-  input.s_12 = sij[1][2]; 
-  input.s_34 = sij[3][4];  
-}
+  inline void update_kinematics(Param_t& input, const double sij[5][5])
+  {
+    input.s_12 = sij[1][2];
+    input.s_34 = sij[3][4];
+  }
 
 
-inline cparam_s copy_to_c_struct(Param_t &input)
-{
+  inline cparam_s copy_to_c_struct(Param_t& input)
+  {
     cparam_s output;
-#define CONVERT_COMPLEX(X) ( (static_cast<std::complex<double>>(X)).real() + _mty_I*(static_cast<std::complex<double>>(X)).imag() ) 
+#define CONVERT_COMPLEX(X)                                                                                             \
+  ((static_cast<std::complex<double>>(X)).real() + _mty_I * (static_cast<std::complex<double>>(X)).imag())
     output.pi = input.pi;
     output.g_d = input.g_d;
     output.g_l = input.g_l;
@@ -49,14 +50,14 @@ inline cparam_s copy_to_c_struct(Param_t &input)
     output.m_phi = input.m_phi;
     output.m_tau = input.m_tau;
 #undef CONVERT_COMPLEX
-       return output;
-}
+    return output;
+  }
 
-inline cparam_s update_c_kinematics(const Param_t &input, cparam_s output)
-{
-  output.s_12 = input.s_12;
-  output.s_34 = input.s_34;
-  return output;
-}
+  inline cparam_s update_c_kinematics(const Param_t& input, cparam_s output)
+  {
+    output.s_12 = input.s_12;
+    output.s_34 = input.s_34;
+    return output;
+  }
 
 } // End of namespace scalar2to2

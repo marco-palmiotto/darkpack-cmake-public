@@ -1,71 +1,68 @@
-#include <iostream>
-#include <iomanip>
 #include "libcmaes/cmaes.h"
-#include <libcmaes/esoptimizer.h>
-#include <libcmaes/cmastrategy.h>
-#include <libcmaes/llogging.h>
 #include <fstream>
+#include <iomanip>
+#include <iostream>
+#include <libcmaes/cmastrategy.h>
+#include <libcmaes/esoptimizer.h>
+#include <libcmaes/llogging.h>
 
-#include "dp_scalar2to2/config.hpp"
-#include "dp_scalar2to2/correspondance.hpp" 
-#include "dp_scalar2to2/leshouchesfrommarty.hpp"
-#include "dp_scalar2to2/process.hpp"
 #include "dp_scalar2to2/avgsvcalculator.hpp"
 #include "dp_scalar2to2/boltzmann.hpp"
+#include "dp_scalar2to2/config.hpp"
+#include "dp_scalar2to2/correspondance.hpp"
+#include "dp_scalar2to2/leshouchesfrommarty.hpp"
+#include "dp_scalar2to2/process.hpp"
 using namespace scalar2to2;
 
 
 using namespace advmath;
 using namespace libcmaes;
 
-const std::string PATHPLOTS=std::string(OUTPATH);
-constexpr const double omega_h2_target=0.12;
-constexpr const double omega_h2_err=0.00091;
+const std::string PATHPLOTS = std::string(OUTPATH);
+constexpr const double omega_h2_target = 0.12;
+constexpr const double omega_h2_err = 0.00091;
 
-static inline double sq(const double x)
-{
-  return x*x;
-}
+static inline double sq(const double x) { return x * x; }
 
 static inline double gaussian_shape(const double val, const double mean, const double stddev)
 {
-  return -std::exp( - sq(val-mean)/2./sq(stddev) );
+  return -std::exp(-sq(val - mean) / 2. / sq(stddev));
 }
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
-  int read_args=0;
+  int read_args = 0;
   std::cout << "Running " << argv[read_args++] << '\n';
 
-  constexpr const double sigma=omega_h2_err;
-  constexpr const int npar=2;
-  constexpr const int n_required_args=8;
-  constexpr const char *par_names[npar] = {"g_chi", "m_phi/m_chi"};
+  constexpr const double sigma = omega_h2_err;
+  constexpr const int npar = 2;
+  constexpr const int n_required_args = 8;
+  constexpr const char* par_names[npar] = {"g_chi", "m_phi/m_chi"};
 
-  [[maybe_unused]] constexpr const double init_seed_g_chi=0.3;
+  [[maybe_unused]] constexpr const double init_seed_g_chi = 0.3;
 
-  double lbounds[npar]={1.e-12, 0.25}, 
-         ubounds[npar]={1.0  , 5.0 }; // arrays for lower and upper parameter bounds, respectively  
+  double lbounds[npar] = {1.e-12, 0.25},
+         ubounds[npar] = {1.0, 5.0}; // arrays for lower and upper parameter bounds, respectively
 
-  std::cout << "This function requires " << n_required_args-1 << " arguments:\n"
-              << " - The name of the input file\n"
-              << " - The name of the output file\n"
-              << " - The seed for the parameter g_chi\n"
-              << " - The seed for the parameter m_phi/m_chi\n"
-              << " - The initial value for m_chi\n"
-              << " - The final value for m_chi\n"
-              << " - The desired number of points\n";
+  std::cout << "This function requires " << n_required_args - 1 << " arguments:\n"
+            << " - The name of the input file\n"
+            << " - The name of the output file\n"
+            << " - The seed for the parameter g_chi\n"
+            << " - The seed for the parameter m_phi/m_chi\n"
+            << " - The initial value for m_chi\n"
+            << " - The final value for m_chi\n"
+            << " - The desired number of points\n";
 
-  if(argc < n_required_args)
+  if (argc < n_required_args)
   {
     return 1;
   }
-  
+
   Param_t input(argv[read_args]);
-  std::cout << "The input file is " << argv[read_args++] << '\n';    
-  
+  std::cout << "The input file is " << argv[read_args++] << '\n';
+
   std::ofstream outfile{argv[read_args]};
-  if(!outfile)
+  if (!outfile)
   {
     std::cerr << "Impossible to open " << argv[read_args] << '\n';
     return 1;
@@ -74,13 +71,13 @@ int main(int argc, char *argv[])
 
   std::vector<double> x0;
   x0.reserve(npar);
-  char *end;
-  for(int i = 0 ; i < npar; i++)
+  char* end;
+  for (int i = 0; i < npar; i++)
   {
-    const double value=strtod(argv[read_args],&end);
-    if(value < lbounds[i] || value > ubounds[i])
+    const double value = strtod(argv[read_args], &end);
+    if (value < lbounds[i] || value > ubounds[i])
     {
-      std::cerr << "Error in argument: " << read_args << ", parameter " << i <<  ", " << par_names[i] << '\n'
+      std::cerr << "Error in argument: " << read_args << ", parameter " << i << ", " << par_names[i] << '\n'
                 << "value " << value << " is out of the bound interval"
                 << " [ " << lbounds[i] << ", " << ubounds[i] << " ].\n";
       return 2;
@@ -90,64 +87,68 @@ int main(int argc, char *argv[])
     x0.emplace_back(value);
   }
 
-  if(x0.size() != npar)
+  if (x0.size() != npar)
   {
     std::cerr << "Initial parameters have wrong size: x0.size()=" << x0.size() << ", npar=" << npar << '\n';
     return 2;
-  } 
+  }
 
   std::cout << "SEED: ";
-  for(size_t i =0; i < x0.size(); i++) std::cout << par_names[i] << '=' << x0[i] << ' ';
+  for (size_t i = 0; i < x0.size(); i++)
+    std::cout << par_names[i] << '=' << x0[i] << ' ';
   std::cout << '\n';
 
-  const double init_m_chi = std::strtod(argv[read_args++],&end);
-  const double end_m_chi=std::strtod(argv[read_args++],&end);
-  const int npoints=std::strtod(argv[read_args++],&end);
-  const double stepsize=std::pow(end_m_chi/init_m_chi, 1./npoints);   
+  const double init_m_chi = std::strtod(argv[read_args++], &end);
+  const double end_m_chi = std::strtod(argv[read_args++], &end);
+  const int npoints = std::strtod(argv[read_args++], &end);
+  const double stepsize = std::pow(end_m_chi / init_m_chi, 1. / npoints);
 
   std::cout << "init_m_chi=" << init_m_chi << '\n'
-            << "end_m_chi=" << end_m_chi  << '\n'
-            << "npoints=" << npoints  << '\n';
+            << "end_m_chi=" << end_m_chi << '\n'
+            << "npoints=" << npoints << '\n';
 
   std::vector<double> absicssas(npoints);
-  for(int i=0 ; i <npoints ; i++) absicssas[i]=init_m_chi*std::pow(stepsize,i);
+  for (int i = 0; i < npoints; i++)
+    absicssas[i] = init_m_chi * std::pow(stepsize, i);
 
   std::cout << "Abscissas are:";
-  for(int i=0 ; i <npoints ; i++) std::cout << ' ' << absicssas[i] ;
+  for (int i = 0; i < npoints; i++)
+    std::cout << ' ' << absicssas[i];
   std::cout << '\n';
-  
+
   // Function definition
-  input.g_d=0.;
-  input.g_u=1.;
-  input.m_chi=init_m_chi;
+  input.g_d = 0.;
+  input.g_u = 1.;
+  input.m_chi = init_m_chi;
   input.refresh();
   BoltzmannSolver boltz(input);
 
-  auto function_to_minimize = [&] (const double *parameters, [[maybe_unused]] const int size_array=2)
+  auto function_to_minimize = [&](const double* parameters, [[maybe_unused]] const int size_array = 2)
   {
     // parameters in input will be
     input.g_chi = parameters[0];
-    input.m_phi = input.m_chi*parameters[1];
+    input.m_phi = input.m_chi * parameters[1];
     input.refresh();
     boltz.changeInput(input);
-    const double omega=boltz.relic_density();
+    const double omega = boltz.relic_density();
     return std::abs(omega - omega_h2_target);
-  };     
+  };
 
   // Minimization algorithm
 
-  GenoPheno<pwqBoundStrategy> gp(lbounds,ubounds,npar); // genotype / phenotype transform associated to bounds.  
+  GenoPheno<pwqBoundStrategy> gp(lbounds, ubounds, npar); // genotype / phenotype transform associated to bounds.
 
-  // -1 for automatically decided lambda, 0 is for random	seeding	of the internal generator.          
-  CMAParameters<GenoPheno<pwqBoundStrategy>> cmaparams(x0,sigma,-1,0,gp);                                     
+  // -1 for automatically decided lambda, 0 is for random	seeding	of the internal generator.
+  CMAParameters<GenoPheno<pwqBoundStrategy>> cmaparams(x0, sigma, -1, 0, gp);
   cmaparams.set_algo(aCMAES);
   FitFunc f = function_to_minimize;
   CMASolutions cmasols = cmaes<GenoPheno<pwqBoundStrategy>>(f, cmaparams);
 
   std::cout << "seed is\n";
-  for(int i=0; i < npar ; i++) std::cout << par_names[i] << " = " << x0[i] << '\n';
+  for (int i = 0; i < npar; i++)
+    std::cout << par_names[i] << " = " << x0[i] << '\n';
   std::cout << "\nbest solution: ";
-  cmasols.print(std::cout,0,gp);
+  cmasols.print(std::cout, 0, gp);
   std::cout << '\n';
   std::cout << "Expected Distance from Minimum: " << cmasols.edm() << '\n';
   std::cout << "optimization took " << cmasols.elapsed_time() / 1000.0 << " seconds\n ";
@@ -155,22 +156,27 @@ int main(int argc, char *argv[])
   Candidate bcand = cmasols.get_best_seen_candidate();
 
   double fmin = bcand.get_fvalue(); // min objective function value the optimizer converged to
-  Eigen::VectorXd bestparameters_dvec = gp.pheno(cmasols.get_best_seen_candidate().get_x_dvec()); // Applying pheno to the best candidate output
-  double edm = cmasols.edm(); // expected distance to the minimum.
-  int return_val=cmasols.run_status();
-  
+  Eigen::VectorXd bestparameters_dvec =
+      gp.pheno(cmasols.get_best_seen_candidate().get_x_dvec()); // Applying pheno to the best candidate output
+  double edm = cmasols.edm();                                   // expected distance to the minimum.
+  int return_val = cmasols.run_status();
+
   std::cout << "# m_chi   m_phi/m_chi    g_chi   pull-Oh2   EDM  exit_code  \nRESULT=";
-  std::cout << input.m_chi.get() << '\t' << bestparameters_dvec[1] << '\t' << bestparameters_dvec[0] << '\t' << fmin << '\t' << edm << '\t' << return_val << '\n';
+  std::cout << input.m_chi.get() << '\t' << bestparameters_dvec[1] << '\t' << bestparameters_dvec[0] << '\t' << fmin
+            << '\t' << edm << '\t' << return_val << '\n';
 
   outfile << "# m_chi   m_phi/m_chi    g_chi   pull-Oh2  EDM  exit_code \n";
-  outfile << input.m_chi.get() << '\t' << bestparameters_dvec[1] << '\t' << bestparameters_dvec[0] << '\t' << fmin  << '\t' << edm << '\t' << return_val << '\n';
+  outfile << input.m_chi.get() << '\t' << bestparameters_dvec[1] << '\t' << bestparameters_dvec[0] << '\t' << fmin
+          << '\t' << edm << '\t' << return_val << '\n';
 
-  while(input.m_chi < end_m_chi)
+  while (input.m_chi < end_m_chi)
   {
-    input.m_chi = input.m_chi*stepsize;
-    x0[0]=(fmin < 1.0e-3) ? bestparameters_dvec[0] : 0.3;
-    x0[1]=(fmin < 1.0e-3) ? bestparameters_dvec[1] : 2.2;
-    CMAParameters<GenoPheno<pwqBoundStrategy>> cmaparams1(x0,sigma,-1,0,gp); // -1 for automatically decided lambda, 0 is for random	seeding	of the internal generator.                                              
+    input.m_chi = input.m_chi * stepsize;
+    x0[0] = (fmin < 1.0e-3) ? bestparameters_dvec[0] : 0.3;
+    x0[1] = (fmin < 1.0e-3) ? bestparameters_dvec[1] : 2.2;
+    CMAParameters<GenoPheno<pwqBoundStrategy>> cmaparams1(
+        x0, sigma, -1, 0,
+        gp); // -1 for automatically decided lambda, 0 is for random	seeding	of the internal generator.
     cmaparams1.set_algo(aCMAES);
     cmasols = cmaes<GenoPheno<pwqBoundStrategy>>(f, cmaparams1);
 
@@ -179,10 +185,12 @@ int main(int argc, char *argv[])
     bestparameters_dvec = gp.pheno(bcand.get_x_dvec());
     edm = cmasols.edm(); // expected distance to the minimum.
 
-    std::cout << "RESULT=" <<input.m_chi.get() << '\t' << bestparameters_dvec[1] << '\t' << bestparameters_dvec[0] << '\t' << fmin  << '\t' << edm << '\t' << return_val << '\n';
+    std::cout << "RESULT=" << input.m_chi.get() << '\t' << bestparameters_dvec[1] << '\t' << bestparameters_dvec[0]
+              << '\t' << fmin << '\t' << edm << '\t' << return_val << '\n';
 
-    outfile << input.m_chi.get() << '\t' << bestparameters_dvec[1] << '\t' << bestparameters_dvec[0] << '\t' << fmin  << '\t' << edm << '\t' << return_val << '\n';
-    return_val=cmasols.run_status();
+    outfile << input.m_chi.get() << '\t' << bestparameters_dvec[1] << '\t' << bestparameters_dvec[0] << '\t' << fmin
+            << '\t' << edm << '\t' << return_val << '\n';
+    return_val = cmasols.run_status();
   }
 
 

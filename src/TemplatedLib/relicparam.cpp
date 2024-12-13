@@ -1021,18 +1021,16 @@ namespace __SPEC_LIB_NAME__
 
   real_t Relicparam_t::dark_entropy_derivative(const real_t& T)
   {
-    if (phi_model.get() != 0)
+    if (phi_model.get() != 0) // Scenario with the scalar field
       return 0.;
 
-    if ((this->sd0 == 0.) && (this->Sigmad0 == 0.))
-      return 0.;
-
-    if ((this->Sigmad0 == 0.) && (T < this->Tsend))
-      return 0.;
-
-    if (this->Sigmad0 == 0.)
+    if (this->Sigmad0 == 0.) // Scenario with no dark entropy injection...
     {
-      // Scenario of pure "dark entropy production"
+      if ((this->sd0 == 0.) ||
+          (T < this->Tsend)) // .. and no dark entropy production, or temperature lower than the cutff
+        return 0.;
+
+      // ... and pure "dark entropy production"
       return this->nsd * dark_entropy(T) / T; // Obtained by deriving (A7) with respect to T
     }
     else
@@ -1058,9 +1056,6 @@ namespace __SPEC_LIB_NAME__
 
   real_t Relicparam_t::dark_entropy_Sigmad(const real_t& T)
   {
-    // Returns the value of \Sigma_D, as defined in Eq. (A8) of
-    // [Manual SuperIso Relic 4], corresponding to the scenario of
-    // no reheating, and entropy modification via injection
     if (phi_model.get() != 0)
       return 0.;
 
@@ -1294,10 +1289,10 @@ namespace __SPEC_LIB_NAME__
 
     real_t logNz = 0.;
 
-    const std::array<real_t, 14> n = {-10.21703221236002,  61.24438067531452,   -340.3323864212157,  1057.2707914654834,
-                                      -2045.577491331372,  2605.9087171012848,  -2266.1521815470196, 1374.2623075963388,
-                                      -586.0618273295763,  174.87532902234145,  -35.715878215468045, 4.7538967685808755,
-                                      -0.3713438862054167, 0.012908416591272199};
+    constexpr const std::array<real_t, 14> n = {
+        -10.21703221236002,  61.24438067531452,   -340.3323864212157,  1057.2707914654834,  -2045.577491331372,
+        2605.9087171012848,  -2266.1521815470196, 1374.2623075963388,  -586.0618273295763,  174.87532902234145,
+        -35.715878215468045, 4.7538967685808755,  -0.3713438862054167, 0.012908416591272199};
 
     for (int ie = 0; ie < 14; ie++)
       logNz += n[ie] * std::pow(z, ie);

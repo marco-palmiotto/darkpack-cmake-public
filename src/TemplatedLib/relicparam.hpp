@@ -54,34 +54,27 @@ namespace __SPEC_LIB_NAME__
   {
 
 public:
+    /** @brief Enumeration for representing the QCD equation of state model
+    */
     enum QCDeosModel : int
     {
-      A = 1,
-      B,
-      B2,
-      B3,
-      C,
-      Bonn,
-      IdealGas
-    };
-    /**
-      Enumeration for representing the QCD equation of state model:
-      1: Model A (ignores hadrons)
-      2: Model B (Tc = 154 MeV, free meson and hadron gas)
-      3: Model B2 (variation of B, scaled by 0.9)
-      4: Model B3 (variation of B, scaled by 1.1)
-      5: Model C (Tc = 185.5 MeV, free meson and hadron gas)
-      Other: Old Model (ideal gas)
-     */
+      A = 1, /**<   1: Model A (ignores hadrons)*/
+      B,/**<        2: Model B (Tc = 154 MeV, free meson and hadron gas)*/
+      B2,/**<       3: Model B2 (variation of B, scaled by 0.9)*/
+      B3,/**<       4: Model B3 (variation of B, scaled by 1.1)*/
+      C,/**<        5: Model C (Tc = 185.5 MeV, free meson and hadron gas)*/
+      Bonn,/**<*/
+      IdealGas/**<  Other: Old Model (ideal gas)*/
+    };  
 
 protected:
     csl::InitSanitizer<int> model_eff{"model_eff"}; //!< Variable storing which QCD EOS model is being used
 
 private:
     std::array<DataWithTemperature_t, size_data_temperature> dataT;
-    /** This variable contains \f$h_{eff}\f$ and \f$\sqrt{g_{eff}^\ast}\f$ as
-     *  functions of the temperature.
-     *  Data are stored with decreasing temperature.
+    /**< @brief This variable contains \f$h_{eff}\f$ and \f$\sqrt{g_{eff}^\ast}\f$ 
+     *   as functions of the temperature.
+     *   Data are stored with decreasing temperature.
      */
 
 public:
@@ -150,10 +143,12 @@ public:
         "full_comput"}; //!< Switch to deactivate the fast freeze-out temperature determination
 
     csl::InitSanitizer<int> use_table_rhoPD{"use_table_rhoPD"}; //!< Switch for using the table of rho * PD
-    csl::InitSanitizer<real_t>
-        table_rhoPD[2][NTABMAX]; //!< Table of (Temperature T, dark energy density rho_PD)
-                                 //!< If this table is defined, it overrides the standard parametrisations for
-                                 //!< dark energy density that can be defined with the prevoius methods
+    csl::InitSanitizer<real_t>table_rhoPD[2][NTABMAX];
+      /**< @brief Table of (Temperature T, dark energy density rho_PD)
+           If this table is defined, it overrides the standard parametrisations for
+           dark energy density that can be defined with the prevoius methods
+      */
+
     csl::InitSanitizer<size_t> size_table_rhoPD{"size_table_rhoPD"}; //!< Size of the table of rho * PD
 
     /*---------------------*/
@@ -175,8 +170,13 @@ public:
     csl::InitSanitizer<real_t> Tinit{"Tinit"};                           //!< Initial temperature
     csl::InitSanitizer<real_t> Tnudec{"Tnudec"};                         //!< Neutrino decoupling temperature
     csl::InitSanitizer<int> wimp{"wimp"};                                //!< Switch to enable (1) / disable (0) WIMPs
-    csl::InitSanitizer<int> SMC_wimp{"SMC_wimp"}; //!< WIMP coupling to SM particles. 1 for EM, 2 for neutrino, 3
-                                                  //!< for neutrino and equivalent neutrino
+    csl::InitSanitizer<int> SMC_wimp{"SMC_wimp"}; 
+    /**< @brief WIMP coupling to SM particles. 
+     *    - 1 for EM, 
+     *    - 2 for neutrino, 
+     *    - 3 for neutrino and equivalent neutrino
+    */
+
     csl::InitSanitizer<int> selfConjugate{"selfConjugate"};
     csl::InitSanitizer<int> fermion{"fermion"};
     csl::InitSanitizer<int> EM_coupled{"EM_coupled"};
@@ -517,11 +517,13 @@ public:
 
       This function calculates the value of \f$\Sigma_D\f$ in the defined cosmological scenario.
       It returns a non-null value if the scenario is
-       1. A combination of "dark entropy production" and "standard entropy injection"
+       1. A combination of "dark entropy production" and "standard entropy injection", with a generalised version of
+      equation (38) of the SuperIso Relic Manual
        2. Pure "dark entropy injection scenario", with equation (A8) of the SuperIso Relic 4 Manual
 
       @param T The temperature at which to compute \f$\Sigma_D\f$.
       @return The value of \f$\Sigma_D\f$ at the given temperature.
+      @see SuperIso Relic Manual: https://arxiv.org/abs/1811.12736
       @see SuperIso Relic 4 Manual: https://arxiv.org/abs/1806.11489
       @note Need to check the result of point 1.
     */
@@ -536,6 +538,7 @@ public:
       @param T The temperature at which to compute \f$\Sigma_{rad}\f$.
       @return The value of \f$\Sigma_{rad}\f$ at the given temperature.
       @see SuperIso Relic 4 Manual: https://arxiv.org/abs/1806.11489
+
     */
     real_t entropy_Sigmarad(const real_t& T);
 

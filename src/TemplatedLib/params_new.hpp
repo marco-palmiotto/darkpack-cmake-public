@@ -401,6 +401,10 @@ namespace __SPEC_LIB_NAME__
      *   From the kinematics of ttbar events
      */
 
+    constexpr const real_t m_top_m_top_computed = 163.058;
+    /**< \f$m_t(m_t)\f$ computed at 2 loops from the previously defined m_top_pole.
+     */
+
     constexpr const real_t m_tau_pole = 1.77686;
     /**< Tau lepton pole mass.
      *   Corresponding LHA block: SMINPUTS N=7
@@ -434,6 +438,10 @@ namespace __SPEC_LIB_NAME__
     constexpr const real_t m_c_m_c = 1.27;
     /**< \f$m_c(m_c)\f$ in the MSbar scheme.
      *   Corresponding LHA block: SMINPUTS N=24
+     */
+
+    constexpr const real_t m_c_pole_computed = 1.66949;
+    /**< Pole mass of the c-quarks computed at 2 loops from the previously defined m_c_m_c.
      */
 
     constexpr const real_t ckm_lambda = 0.22500;

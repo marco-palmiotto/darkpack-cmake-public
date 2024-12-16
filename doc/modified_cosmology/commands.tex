@@ -1,0 +1,159 @@
+\newcommand{\ped}[1]{_{\scriptscriptstyle{\textrm{#1}}}}
+\newcommand{\apx}[1]{^{\scriptscriptstyle{\textrm{#1}}}}
+\newcommand{\peff}{p\ped{eff}}
+\newcommand{\mlsp}{m\ped{LSP}}
+\newcommand{\gstrong}{g\ped{s}}
+\newcommand{\alphastrong}{\alpha\ped{s}}
+\newcommand{\Weff}{W\ped{eff}}
+\newcommand{\TeV}{{\rm TeV}}
+% \newcommand{\MadDM}{\protect\Verb|MadDM|\xspace}
+% \newcommand{\DarkSUSY}{\protect\Verb|DarkSUSY|\xspace}
+% \newcommand{\MicrOMEGAs}{\protect\Verb|MicrOMEGAs|\xspace}
+% \newcommand{\Madgraph}{\protect\Verb|Madgraph|\xspace}
+% \newcommand{\CalcHEP}{\protect\Verb|CalcHEP|\xspace}
+% \newcommand{\SuperIsoR}{\protect\Verb|SuperIso Relic|\xspace}
+% \newcommand{\SuperIsoRF}{\protect\Verb|SuperIso Relic v4.1|\xspace}
+% \newcommand{\SuperIso}{\protect\Verb|SuperIso|\xspace}
+% \newcommand{\MARTY}{\protect\Verb|MARTY|\xspace}
+% \newcommand{\FORTRAN}{\protect\Verb|FORTRAN|\xspace}
+% \newcommand{\DarkPack}{\protect\Verb|DarkPACK|\xspace}
+% \newcommand{\FormCalc}{\protect\Verb|FormCalc|\xspace}
+\newcommand{\sigmav}{\expval{\sigma v}}
+
+\newcommand{\critdens}{{\rho\apx{c}_0}}
+\newcommand{\Ho}{H_0}
+\newcommand{\zeq}{z\ped{eq}}
+\newcommand{\Omk}{\Omega_{k}}
+\newcommand{\Omr}{\Omega\ped{r}}
+\newcommand{\Omm}{\Omega\ped{m}}
+\newcommand{\Omb}{\Omega\ped{b}}
+\newcommand{\Omc}{\Omega\ped{c}}
+\newcommand{\Omfluid}{\Omega\ped{fluid}}
+\newcommand{\Oml}{\Omega_{\Lambda}}
+\newcommand{\Omg}{\Omega_{\gamma}}
+\newcommand{\Omn}{\Omega_{\nu}}
+
+\newcommand{\sgstar}{\sqrt{g\ped{$\ast$}}}
+\newcommand{\heff}{h\ped{eff}}
+
+\newcommand{\M}{\mathcal{M}}
+\newcommand{\relphasespace}[1]{\frac{\dd[3] \vb{p}_{#1}}{(2 \pi)^3 2 E_{#1}}}
+\newcommand{\1}{\mathbb{1}}
+\renewcommand{\i}{\mathrm{i}}
+\newcommand{\vmol}{{v_{\scriptscriptstyle\textrm{M\o l}}}}
+\newcommand{\geff}{{g\ped{eff}}}
+% \newcommand{\heff}{{h_{\rm eff}}}
+\newcommand{\Tdi}{T_{d_i}}
+\newcommand{\yeq}{{Y\ped{eq}}}
+\newcommand{\sigmavmol}{\langle \sigma \vmol \rangle}
+\newcommand{\gast}{{g_\ast^{1/2}}}
+\newcommand{\sveff}{\sigmavmol\ped{eff}}
+
+% \newcommand{\peff}{p\ped{eff}}
+\newcommand{\GeV}{\mathrm{GeV}}
+
+\newcommand{\Gf}{G\ped{F}}
+
+\newcommand{\ee}{\mathrm{e}}
+\newcommand{\ii}{\mathrm{i}}
+
+\newcommand{\stilde}{\widetilde}
+\newcommand{\sbar}[1]{{\bar #1}}
+\newcommand{\Ld}{\mathcal{L}}
+\newcommand{\cc}{\textrm{c.c.}}
+\newcommand{\Hu}{H_u}
+\newcommand{\Hd}{H_d}
+\newcommand{\Hup}{{H_u^+}}
+\newcommand{\Huo}{{H_u^0}}
+\newcommand{\Hdo}{{H_d^0}}
+\newcommand{\Hdm}{{H_d^-}}
+\newcommand{\dg}[1]{{#1}^\dagger}
+
+\newcommand{\yu}{{\vb{y_u}}}
+\newcommand{\yd}{{\vb{y_d}}}
+\newcommand{\ye}{{\vb{y_e}}}
+\newcommand{\yl}{{\vb{y_l}}}
+
+\newcommand{\gammaeq}{\Gamma\ped{eq}}
+
+\DeclareMathAlphabet{\mathpzc}{OT1}{pzc}{m}{it}
+% \renewcommand{\tilde}{\widetilde}
+\newcommand{\U}{{\mathpzc{u}}}
+\newcommand{\D}{{\mathpzc{d}}}
+\newcommand{\E}{{\mathpzc{e}}}
+% Definizione dell'ambiente cppblock in minted
+
+% \usepackage{fvextra} % Required for changing the delimiter
+% % Change the delimiter characters for code blocks
+% \RecustomVerbatimEnvironment{Verbatim}{BVerbatim}{}
+
+% \definecolor{bg}{rgb}{0.97,0.97,0.97}
+% \definecolor{bg}{HTML}{FFFFF0}
+\definecolor{bg}{HTML}{f0f1ea}
+\definecolor{myred}{HTML}{ff0000} % Red
+\definecolor{mygreen}{HTML}{00ff00} % Green
+\definecolor{myblue}{HTML}{0000ff} % Blue
+\definecolor{myblack}{HTML}{000000} % Black
+\definecolor{myorange}{HTML}{ff7f00} % Orange
+
+% Set the breaklines option for minted globally\setminted{breaklines=true}
+% 
+% \newminted[cppcode2]{cpp}{
+%   style=customcpp
+% }
+% 
+% 
+% \newminted{codeblockcpp}{
+%   commentcolor=mygreen,
+%   keywordcolor=myblue,
+%   stringcolor=myred,
+%   numbercolor=myorange,
+%   identifiercolor=myblack
+% }
+
+\newcommand{\verblb}[1]{\nolinkurl{#1}}%plain verbatim inline text with line breaks admitted
+
+\usemintedstyle{borland}%bw vs borland xcode tango
+% \usemintedstyle{customcpp}
+
+\newenvironment{cppblock}{\VerbatimEnvironment\begin{minted}[breaklines, bgcolor=bg]{c++}}{\end{minted}}
+\newenvironment{cppblocknumbered}[1]{\VerbatimEnvironment\begin{minted}[breaklines, linenos, firstnumber=#1, escapeinside=§§, bgcolor=bg]{c++}}{\end{minted}}
+\newenvironment{cppblocknobg}{\VerbatimEnvironment\begin{minted}[breaklines]{c++}}{\end{minted}}
+
+\newenvironment{mintedplain}{\VerbatimEnvironment\begin{minted}[breaklines]{text}}{\end{minted}}
+
+\newcommand{\cppverb}[1]{\mintinline{c++}{#1}}
+\newcommand{\plainverb}[1]{\mintinline{text}{#1}}
+
+\newcommand{\MadDM}{\plainverb{MadDM}\xspace}
+\newcommand{\DarkSUSY}{\plainverb{DarkSUSY}\xspace}
+\newcommand{\MicrOMEGAs}{\plainverb{MicrOMEGAs}\xspace}
+\newcommand{\Madgraph}{\plainverb{Madgraph}\xspace}
+\newcommand{\CalcHEP}{\plainverb{CalcHEP}\xspace}
+\newcommand{\SuperIsoR}{\plainverb{SuperIso Relic}\xspace}
+\newcommand{\SuperIsoRF}{\plainverb{SuperIso Relic v4.1}\xspace}
+\newcommand{\SuperIso}{\plainverb{SuperIso}\xspace}
+\newcommand{\MARTY}{\plainverb{MARTY}\xspace}
+\newcommand{\FORTRAN}{\plainverb{FORTRAN}\xspace}
+\newcommand{\DarkPack}{\plainverb{DarkPACK}\xspace}
+\newcommand{\FormCalc}{\plainverb{FormCalc}\xspace}
+\newcommand{\Cpp}{\plainverb{C++}\xspace}
+
+
+% Definizione di cppblock in listling
+% \lstnewenvironment{cppblock}[1][]
+% {\lstset{language=C++,style=Nblock,#1}}
+% {}
+% \newcommand{\cppverb}[1]{\lstinline{#1}}
+
+\newcommand{\MSbar}{{\overline{\rm MS}}}
+
+\newcommand{\rhoD}{\rho\ped{D}}
+\newcommand{\rhorad}{\rho\ped{rad}}
+\newcommand{\srad}{s\ped{rad}}
+\newcommand{\sD}{s\ped{D}}
+\newcommand{\dsrad}{\dot{s}\ped{rad}}
+\newcommand{\Sigmarad}{\Sigma\ped{rad}}
+\newcommand{\Sigmatstar}{\tilde\Sigma^\ast}
+\newcommand{\SigmaD}{\Sigma\ped{D}}
+\newcommand{\Mpl}{M\ped{Planck}}

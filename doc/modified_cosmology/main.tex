@@ -1,0 +1,144 @@
+\input{header.tex}
+\input{commands.tex}
+
+\title{Thermodynamics in modified cosmological scenarios}
+\begin{document}
+\maketitle
+\section{Introduction}
+Let us consider a modified cosmological scenario, by the presence of a ``dark'' energy
+density $\rhoD$, in the radiation epoch. The Hubble rate follows the equation:
+\begin{align}
+ H^2 = \frac{8 \pi G}{3}(\rhorad + \rhoD)
+\end{align}
+where $\rhorad$ reads, as usual:
+\begin{align}
+ \rhorad = \frac{\pi^2}{30}\geff(T) T^4
+\end{align}
+where $T$, unless specified otherwise, is the temperature of the radiation.
+
+Depending on the nature of the ``dark'' energy, there can be a modification of the entropy density, that can be written always as:
+\begin{align}\label{eqn:totals}
+ s = \srad + \sD
+\end{align}
+where the relation between $\srad$ and $T$ reads, as usual:
+\begin{align}\label{expr:sradlcdm}
+ \srad = \frac{2\pi^2}{45}\heff(T) T^3,
+\end{align}
+and whose derivative reads
+\begin{align}\label{expr:dsraddT}
+ \dv{\srad}{T} = 3 \frac{\srad}{T} \qty( \frac{T}{3\heff}\dv{\heff}{T} +1).
+\end{align}
+
+
+If $\sD =0$, then $s=\srad$, and $\srad$ follows the equation:
+\begin{align}\label{eqn:sradlcdm}
+ \dsrad = -3H \srad
+\end{align}
+where the dot denotes the total derivarive with respect to the cosmological time $t$.
+By combining this last result with the expressions \eqref{expr:sradlcdm} and \eqref{expr:dsraddT}, we can derive the relation
+between $t$ and $T$ in the standard cosmological model:
+\begin{align}\label{eqn:dTdTlcdm}
+ \dv{T}{t} = - \frac{H}{T}\qty( \frac{T}{3\heff}\dv{\heff}{T} +1).
+\end{align}
+
+\section{Modification of the entropy density}
+
+We shall consider next 3 different modification to the entropy density, which may
+overlap with each others.
+
+\subsection{Standard entropy injection}
+Let us now consider a modified cosmological scenario in which equation \eqref{eqn:sradlcdm}
+is modified by adding an injection term:
+\begin{align}\label{eqn:sradlcdminj}
+ \dsrad = -3H \srad +\Sigmarad,
+\end{align}
+or, with a different parametrisation:
+\begin{align}\label{eqn:sradlcdminj2}
+ \dsrad = -3H\qty(1 - \Sigmatstar) \srad
+\end{align}
+In this case, $\srad$ remains the same as in expression \eqref{expr:sradlcdm}, and
+its $T$ derivative as in expression \eqref{expr:dsraddT}; however,
+the relation between $t$ and $T$ has to be re-determined:
+\begin{align}\label{eqn:dTdTsrad}
+ \dv{T}{t} = - \frac{H\qty(1 - \Sigmatstar)}{T}\qty( \frac{T}{3\heff}\dv{\heff}{T} +1),
+\end{align}
+which correctly reduces to \eqref{eqn:dTdTlcdm} for $\Sigmatstar=0$.
+{\bf Why is the temperature derivative always the same?}
+
+In scenario we have just described, the modification of the entropy density involves
+only the radiation, with an effect that affects the relation between $t$ ad $T$.
+This scenario can be combined with the other two.
+
+\subsection{Dark entropy production}
+In this case, we suppose that we are in the case of equation \eqref{eqn:totals},
+with $\sD$ known. We would like to parametrise $\dot s$ as:
+\begin{align}\label{eqn:dots_dark}
+ \dot s = -3Hs + \SigmaD + \Sigmarad,
+\end{align}
+and to determine $\SigmaD$ as a function of the temperature. Firstly, let us
+write:
+\begin{align}
+ \SigmaD= \dot s + 3Hs -\Sigmarad
+\end{align}
+Now, let us expand $s = \srad + \sD$, and use equation \eqref{eqn:sradlcdminj2}:
+\begin{align}
+ \SigmaD &= \dot\sD + \dsrad + 3H(\srad + \sD) -\Sigmarad
+\end{align}
+Let us use equation \eqref{eqn:sradlcdminj} to eliminate $\dsrad$:
+\begin{align}
+ \SigmaD &= \dot\sD + 3H\sD =\\
+         &= 3H\qty[\sD  + \frac{1}{3H}\dv{\sD}{T}\dv{T}{t}].
+\end{align}
+We can now use equation \eqref{eqn:dTdTsrad} to have:
+\begin{align}\label{expr:SigmaD1}
+ \SigmaD = 3H\qty[\sD - \frac{1 - \Sigmatstar}{\frac{T}{3\heff}\dv{\heff}{T} +1}\frac{T}{3}\dv{\sD}{T}].
+\end{align}
+
+This result can be further manipulated, to fully explicit the dependence on the
+thermodinamical degrees of freedom, and remove the explicit dependence on $H$.
+We can express:
+\begin{align}
+ H = H\ped{$\Lambda$CDM}\tilde H
+\end{align}
+with $H\ped{$\Lambda$CDM}$ the Hubble parameter in the standard cosmological model:
+\begin{align}
+ H\ped{$\Lambda$CDM} = \sqrt{\frac{8 \pi G}{3}\rhorad} = \sqrt{\frac{4\pi^3}{45}\geff}\frac{1}{\Mpl}T^2
+\end{align}
+and $\tilde H$ parametrises the presence of dark energy:
+\begin{align}
+ \tilde H = \sqrt{1+ \frac{\rhoD}{\rhorad}}.
+\end{align}
+By using such expressions, and by defining:
+\begin{align}
+ \sqrt{g_{\ast}} = \frac{\heff}{\sqrt{\geff}} \qty(\frac{T}{3\heff}\dv{\heff}{T} +1),
+\end{align}
+we can rewrite \eqref{expr:SigmaD1} as:
+\begin{align}\label{expr:SigmaD1}
+ \SigmaD = \sqrt{\frac{4\pi}{5}}\frac{\tilde H}{\Mpl} T^2 \qty[\sqrt{\geff}\sD - \frac{T\qty(1 - \Sigmatstar)\heff}{3\sqrt{g_\ast}}\dv{\sD}{T}].
+\end{align}
+In terms of $\tilde H$, one can also write the relation among $\Sigmarad$
+and $\Sigmatstar$ at a given temperature $T$:
+\begin{align}
+ \Sigmatstar = \frac{45\sqrt{5}\Mpl}{4 \pi^{7/2}\heff \sqrt{\geff} T^5 \tilde H}\Sigmarad.
+\end{align}
+
+
+\subsection{Dark entropy injection}
+This case is analogous to the one of ``dark entropy production''. However,
+instead of knowing the form of $\sD$, we know the form of $\SigmaD$, as it
+appears in equation \eqref{eqn:dots_dark}. Then, we are interested in computing
+$\sD$ from the known expression of $\SigmaD$.
+In order to do that, we need to invert the relation \eqref{expr:SigmaD1}.
+The relation we find is the following:
+\begin{align}
+ \sD =
+\end{align}
+
+
+
+
+
+
+
+
+\end{document}

@@ -55,24 +55,24 @@ namespace __SPEC_LIB_NAME__
 
 public:
     /** @brief Enumeration for representing the QCD equation of state model
-    */
+     */
     enum QCDeosModel : int
     {
-      A = 1, /**<   1: Model A (ignores hadrons)*/
-      B,/**<        2: Model B (Tc = 154 MeV, free meson and hadron gas)*/
-      B2,/**<       3: Model B2 (variation of B, scaled by 0.9)*/
-      B3,/**<       4: Model B3 (variation of B, scaled by 1.1)*/
-      C,/**<        5: Model C (Tc = 185.5 MeV, free meson and hadron gas)*/
-      Bonn,/**<*/
-      IdealGas/**<  Other: Old Model (ideal gas)*/
-    };  
+      A = 1,   /**<   1: Model A (ignores hadrons)*/
+      B,       /**<   2: Model B (Tc = 154 MeV, free meson and hadron gas)*/
+      B2,      /**<   3: Model B2 (variation of B, scaled by 0.9)*/
+      B3,      /**<   4: Model B3 (variation of B, scaled by 1.1)*/
+      C,       /**<   5: Model C (Tc = 185.5 MeV, free meson and hadron gas)*/
+      Bonn,    /**<*/
+      IdealGas /**<   Other: Old Model (ideal gas)*/
+    };
 
 protected:
     csl::InitSanitizer<int> model_eff{"model_eff"}; //!< Variable storing which QCD EOS model is being used
 
 private:
     std::array<DataWithTemperature_t, size_data_temperature> dataT;
-    /**< @brief This variable contains \f$h_{eff}\f$ and \f$\sqrt{g_{eff}^\ast}\f$ 
+    /**< @brief This variable contains \f$h_{eff}\f$ and \f$\sqrt{g_{eff}^\ast}\f$
      *   as functions of the temperature.
      *   Data are stored with decreasing temperature.
      */
@@ -143,11 +143,11 @@ public:
         "full_comput"}; //!< Switch to deactivate the fast freeze-out temperature determination
 
     csl::InitSanitizer<int> use_table_rhoPD{"use_table_rhoPD"}; //!< Switch for using the table of rho * PD
-    csl::InitSanitizer<real_t>table_rhoPD[2][NTABMAX];
-      /**< @brief Table of (Temperature T, dark energy density rho_PD)
-           If this table is defined, it overrides the standard parametrisations for
-           dark energy density that can be defined with the prevoius methods
-      */
+    csl::InitSanitizer<real_t> table_rhoPD[2][NTABMAX];
+    /**< @brief Table of (Temperature T, dark energy density rho_PD)
+         If this table is defined, it overrides the standard parametrisations for
+         dark energy density that can be defined with the prevoius methods
+    */
 
     csl::InitSanitizer<size_t> size_table_rhoPD{"size_table_rhoPD"}; //!< Size of the table of rho * PD
 
@@ -170,12 +170,12 @@ public:
     csl::InitSanitizer<real_t> Tinit{"Tinit"};                           //!< Initial temperature
     csl::InitSanitizer<real_t> Tnudec{"Tnudec"};                         //!< Neutrino decoupling temperature
     csl::InitSanitizer<int> wimp{"wimp"};                                //!< Switch to enable (1) / disable (0) WIMPs
-    csl::InitSanitizer<int> SMC_wimp{"SMC_wimp"}; 
-    /**< @brief WIMP coupling to SM particles. 
-     *    - 1 for EM, 
-     *    - 2 for neutrino, 
+    csl::InitSanitizer<int> SMC_wimp{"SMC_wimp"};
+    /**< @brief WIMP coupling to SM particles.
+     *    - 1 for EM,
+     *    - 2 for neutrino,
      *    - 3 for neutrino and equivalent neutrino
-    */
+     */
 
     csl::InitSanitizer<int> selfConjugate{"selfConjugate"};
     csl::InitSanitizer<int> fermion{"fermion"};
@@ -195,13 +195,7 @@ public:
 
     /**
       @brief Sets the model for the QCD equation of state.
-      @param x Integer representing the QCD equation of state model:
-        1: Model A (ignores hadrons)
-        2: Model B (Tc = 154 MeV, free meson and hadron gas)
-        3: Model B2 (variation of B, scaled by 0.9)
-        4: Model B3 (variation of B, scaled by 1.1)
-        5: Model C (Tc = 185.5 MeV, free meson and hadron gas)
-        Other: Old Model (ideal gas)
+      @param x Integer representing the QCD equation of state model.
     */
     void setQCDeosModel(const int x);
 
@@ -484,6 +478,16 @@ public:
     real_t dark_density(const real_t& T);
 
     real_t dark_density_pressure(const real_t& T);
+
+    /**
+     * @brief Function that appears in the denominator of the integral in dark_entropy.
+     * 
+     * \f$ \exp\left( - \displaystyle \int_0^T \mathrm{d}\log(T') \frac{d\tilde\Sigma^\ast}{dT}(T')  \frac{\log(h_{eff}(T')(T')^3)}{(1 - \tilde \Sigma^\ast(T') )^2} \right) \f$
+     * 
+     * @param T input temperature
+     * @return real_t value of the function
+     * @note It is equal to 1 in case of no radiation entropy injection.
+     */
     real_t sigma_entropy(const real_t& T);
 
     /**

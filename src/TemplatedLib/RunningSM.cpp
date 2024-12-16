@@ -90,7 +90,6 @@ namespace __SPEC_LIB_NAME__
   RunningSM::RunningSM()
   {
     setSanitNames();
-    int i;
     runlightquarks = false;
     runcharm = false;
     higgsloops = false;
@@ -111,7 +110,7 @@ namespace __SPEC_LIB_NAME__
     QuarkMass[UP] = pdgValue::m_u2GeV;
     QuarkMass[DOWN] = pdgValue::m_d2GeV;
     QuarkMass[STRANGE] = pdgValue::m_s2GeV;
-    for (i = STRANGE; i >= UP; i--)
+    for (short int i = STRANGE; i >= UP; i--)
       QuarkMassQ[i] = 2.;
 
     QuarkMass[CHARM] = pdgValue::m_c_m_c;
@@ -126,19 +125,27 @@ namespace __SPEC_LIB_NAME__
     Lambda3 = Lambda4 = Lambda5 = Lambda6 = 0.;
     alphasMZ_Lambda3 = alphasMZ_Lambda4 = alphasMZ_Lambda5 = alphasMZ_Lambda6 = alphas_MZ;
 
+
+#ifdef TRY_CONSTEXPR
+    QuarkMass[TOP] = pdgValue::m_top_m_top_computed;
+#else
     QuarkMass[TOP] = GetMtopMtop();
+#endif
     QuarkMassQ[TOP] = QuarkMass[TOP];
 
-    for (i = TOP; i >= UP; i--)
+    for (short int i = TOP; i >= UP; i--)
     {
       LastQuarkMass[i] = QuarkMass[i];
       LastQuarkMassQ[i] = QuarkMassQ[i];
     }
 
+#ifdef TRY_CONSTEXPR
+    mass_b_pole = pdgValue::mb_pole;
+    mass_c_pole = pdgValue::m_c_pole_computed;
+#else
     mass_b_pole = GetMbPole();
     mass_c_pole = GetMcPole();
-
-    return;
+#endif
   }
 
   bool RunningSM::operator==(const RunningSM& other) const
@@ -1232,7 +1239,7 @@ namespace __SPEC_LIB_NAME__
     std::cout << "RunningSM::GetMbPole: Called GetMbPole\n";
 #endif
 
-    real_t alphas_mb = AlphaStrong(mb_mb);
+    const real_t alphas_mb = AlphaStrong(mb_mb);
 
 #ifdef DEBUG
     std::cout << "RunningSM::GetMbPole: Evaluated AlphaStrong(mb_mb)\n";
@@ -1250,7 +1257,7 @@ namespace __SPEC_LIB_NAME__
   real_t RunningSM::GetMcPole1Loop()
   /* computes the c pole mass at 1 loop */
   {
-    real_t alphas_mc = AlphaStrong(mc_mc);
+    const real_t alphas_mc = AlphaStrong(mc_mc);
 
     return mc_mc * (1 + alphas_mc / M_PI * 4. / 3.);
   }
@@ -1258,7 +1265,7 @@ namespace __SPEC_LIB_NAME__
   real_t RunningSM::GetMbPole1Loop()
   /* computes the b pole mass at 1 loop */
   {
-    real_t alphas_mb = AlphaStrong(mb_mb);
+    const real_t alphas_mb = AlphaStrong(mb_mb);
 
     return mb_mb * (1. + alphas_mb / M_PI * 4. / 3.);
   }
@@ -1266,7 +1273,7 @@ namespace __SPEC_LIB_NAME__
   real_t RunningSM::GetMcPole3Loops()
   /* computes the c pole mass */
   {
-    real_t alphas_mc = AlphaStrong(mc_mc);
+    const real_t alphas_mc = AlphaStrong(mc_mc);
 
     return mc_mc * (1 + alphas_mc / M_PI *
                             (4. / 3. +
@@ -1278,9 +1285,9 @@ namespace __SPEC_LIB_NAME__
   real_t RunningSM::GetMb1S()
   /* computes the 1S b mass */
   {
-    real_t mb = GetMbPole();
-    real_t mu = mb_mb / 2.;
-    real_t as = AlphaStrong(mu);
+    const real_t mb = GetMbPole();
+    const real_t mu = mb_mb / 2.;
+    const real_t as = AlphaStrong(mu);
 
     return mb * (1. - 2. / 9. * pow(as, 2.));
   }
@@ -1300,12 +1307,21 @@ namespace __SPEC_LIB_NAME__
     {
       mcmc_med = (mcmc_min + mcmc_max) / 2.;
       QuarkMass[CHARM] = mcmc_med;
-      if (loop == 2)
+
+      switch (loop)
+      {
+      case 2:
         mcpole_med = GetMcPole();
-      else if (loop == 1)
+        break;
+
+      case 1:
         mcpole_med = GetMcPole1Loop();
-      else
+        break;
+
+      default:
         mcpole_med = GetMcPole3Loops();
+        break;
+      }
 
       if (mcpole_med < mcpole)
       {

@@ -479,17 +479,20 @@ public:
 
     real_t dark_density_pressure(const real_t& T);
 
+private:
     /**
      * @brief Function that appears in the denominator of the integral in dark_entropy.
-     * 
-     * \f$ \exp\left( - \displaystyle \int_0^T \mathrm{d}\log(T') \frac{d\tilde\Sigma^\ast}{dT}(T')  \frac{\log(h_{eff}(T')(T')^3)}{(1 - \tilde \Sigma^\ast(T') )^2} \right) \f$
-     * 
+     *
+     * \f$ \exp\left( - \displaystyle \int_0^T \mathrm{d}\log(T') \frac{d\tilde\Sigma^\ast}{dT}(T')
+     * \frac{\log(h_{eff}(T')(T')^3)}{(1 - \tilde \Sigma^\ast(T') )^2} \right) \f$
+     *
      * @param T input temperature
      * @return real_t value of the function
      * @note It is equal to 1 in case of no radiation entropy injection.
      */
     real_t sigma_entropy(const real_t& T);
 
+public:
     /**
      * @brief This function computes the total dark entropy \f$s_D(T)\f$ in the defined cosmological scenario.
      *

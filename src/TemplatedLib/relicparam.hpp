@@ -483,8 +483,8 @@ private:
     /**
      * @brief Function that appears in the denominator of the integral in dark_entropy.
      *
-     * \f$ \exp\left( - \displaystyle \int_0^T \mathrm{d}\log(T') \frac{d\tilde\Sigma^\ast}{dT}(T')
-     * \frac{\log(h_{eff}(T')(T')^3)}{(1 - \tilde \Sigma^\ast(T') )^2} \right) \f$
+     * \f$ \sigma_s(T)=\exp\left( - \displaystyle \int_0^T \mathrm{d}\log(\tau) \frac{d\tilde\Sigma^\ast}{dT}(\tau)
+     * \frac{\log(h_{eff}(\tau)(\tau)^3)}{(1 - \tilde \Sigma^\ast(\tau) )^2} \right) \f$
      *
      * @param T input temperature
      * @return real_t value of the function
@@ -495,10 +495,14 @@ private:
 public:
     /**
      * @brief This function computes the total dark entropy \f$s_D(T)\f$ in the defined cosmological scenario.
-     *
      *        The scenario can be:
      *        - pure entropy production
-     *        - combination of "standard" and "dark" entropy injection.
+     *        - combination of "standard" and "dark" entropy injection. In this second case, the function returns
+     *          \f$s_D = \displaystyle M_{Pl}\sqrt{\frac{45}{4\pi^3}}(h_{eff}(T)T^3)^\frac{1}{1-\tilde\Sigma^\ast(T)} \sigma_s(T)
+     *          \int_0^T d\ln(\tau) \frac{\sqrt{g_\ast}(\tau)\Sigma_D(\tau)}{\tilde H(\tau) (1- \tilde\Sigma^\ast(\tau))(h_{eff}(\tau)\tau^3)^\frac{2-\tilde\Sigma^\ast(\tau)}{1-\tilde\Sigma^\ast(\tau)}\sigma_s(\tau)}
+     *          \f$,
+     * 
+     *          where \f$\sigma_s(\tau)\f$ is defined in sigma_entropy.
      *
      * @param T The temperature
      * @return real_t the total dark entropy \f$s_D(T)\f$
@@ -512,10 +516,8 @@ public:
      * The scenario can be:
      * 1. pure entropy production
      * 2. combination of "standard" and "dark" entropy injection.
-     *
      * @param T The temperature
      * @return real_t the derivative total dark entropy
-     * @note We need to check the formula for the combination.
      */
     real_t dark_entropy_derivative(const real_t& T);
 

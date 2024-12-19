@@ -22,7 +22,10 @@
 				"mhutchie.git-graph",
 				"ms-azuretools.vscode-docker",
 				"cschlosser.doxdocgen",
-				"mintlify.document"
+				"mintlify.document",
+				"zeshuaro.vscode-python-poetry",
+				"ms-python.python",
+				"ms-toolsai.jupyter"
 			]
 		}
 	},

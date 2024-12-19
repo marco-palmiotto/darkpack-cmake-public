@@ -5,29 +5,29 @@ ARG username=vscode
 RUN dnf update -y && \
     dnf upgrade -y && \
     dnf install \
-        gcc \
-        gfortran \
-        g++ \
-        gsl \
-        gsl-devel \
-        texlive \
-        ImageMagick \
-        dvipng \
-        coreutils \
-        qtchooser \
-        cmake \
-        git \
-        ninja-build \
-        gdb \
-        eigen3-devel \
-        tbb \
-        tbb-devel \
-        wget \
-        python3 \
-        jupyter-notebook \
-        doxygen \
-        git-clang-format \
-        -y && \ 
+    gcc \
+    gfortran \
+    g++ \
+    gsl \
+    gsl-devel \
+    texlive \
+    ImageMagick \
+    dvipng \
+    coreutils \
+    qtchooser \
+    cmake \
+    git \
+    ninja-build \
+    gdb \
+    eigen3-devel \
+    tbb \
+    tbb-devel \
+    wget \
+    python3 \
+    jupyter-notebook \
+    doxygen \
+    git-clang-format \
+    -y && \ 
     dnf clean all  
 
 # Installs maquao (for profiling/development)
@@ -65,5 +65,17 @@ ENV LIBRARY_PATH=$INSTALLMARTYPATH/lib
 ENV C_INCLUDE_PATH=$INSTALLMARTYPATH/include
 ENV CPATH=$INSTALLMARTYPATH/include
 
+USER root
+RUN dnf install pipx -y && \ 
+    dnf clean all  
 
+USER ${username}
+RUN pipx ensurepath && \
+    pipx install poetry
+
+USER root
+RUN dnf install texlive-type1cm.noarch -y && \
+    dnf clean all
+
+USER ${username}
 CMD ["sleep", "infinity"]

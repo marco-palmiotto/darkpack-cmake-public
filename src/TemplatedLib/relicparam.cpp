@@ -124,8 +124,6 @@ namespace __SPEC_LIB_NAME__
     // in SuperIso Relic V 4
     full_comput = 0;
 
-    solver = 1; /* 1=logarithmic, 2=linear */
-
     failsafe = 1; // 0=fast, 1=precise (default), ... See stand_cosmo.c
     err = 0;
     Tinit = 27.;              // Starting at T = 27 x 10^9 K as default
@@ -177,7 +175,6 @@ namespace __SPEC_LIB_NAME__
       relicmass = mrelic;
 
     full_comput = scalar = 0;
-    Tfo = 0.;
 
     Tmax = 10000.;
 
@@ -240,9 +237,7 @@ namespace __SPEC_LIB_NAME__
     out << (mgravitino);
     out << (relicmass);
     out << (scalar);
-    out << (solver);
     out << (beta_samples);
-    out << (Tfo);
     out << (Tmax);
     out << (full_comput);
     out << (use_table_rhoPD);

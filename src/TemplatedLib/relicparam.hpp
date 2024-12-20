@@ -133,10 +133,8 @@ public:
     csl::InitSanitizer<real_t> relicmass{"relicmass"}; //!< Mass of the relic particles
     csl::InitSanitizer<int> scalar{"scalar"};          //!< Switch for the MSSM annihilation processes
 
-    csl::InitSanitizer<int> solver{"solver"}; //!< Switch for linear or logarithmic differential equation solver
     csl::InitSanitizer<int> beta_samples{"beta_samples"}; //!< Number of samples for the Coulomb log
 
-    csl::InitSanitizer<real_t> Tfo{"Tfo"};   //!< Freeze-out temperature
     csl::InitSanitizer<real_t> Tmax{"Tmax"}; //!< Maximum temperature
 
     csl::InitSanitizer<int> full_comput{

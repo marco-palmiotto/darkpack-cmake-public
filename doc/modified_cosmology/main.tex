@@ -15,6 +15,22 @@ where $\rhorad$ reads, as usual:
  \rhorad = \frac{\pi^2}{30}\geff(T) T^4
 \end{align}
 where $T$, unless specified otherwise, is the temperature of the radiation.
+For the sake of later convenience, we express:
+\begin{align}
+ H = H\ped{$\Lambda$CDM}\tilde H
+\end{align}
+with $H\ped{$\Lambda$CDM}$ the Hubble parameter in the standard cosmological model:
+\begin{align}
+ H\ped{$\Lambda$CDM} = \sqrt{\frac{8 \pi G}{3}\rhorad} = \sqrt{\frac{4\pi^3}{45}\geff}\frac{1}{\Mpl}T^2
+\end{align}
+and $\tilde H$ parametrises the presence of dark energy:
+\begin{align}
+ \tilde H = \sqrt{1+ \frac{\rhoD}{\rhorad}}.
+\end{align}
+We also define:
+\begin{align}
+ \sqrt{g_{\ast}} = \frac{\heff}{\sqrt{\geff}} \qty(\frac{T}{3\heff}\dv{\heff}{T} +1),
+\end{align}
 
 Depending on the nature of the ``dark'' energy, there can be a modification of the entropy density, that can be written always as:
 \begin{align}\label{eqn:totals}
@@ -57,7 +73,7 @@ or, with a different parametrisation:
  \dsrad = -3H\qty(1 - \Sigmatstar) \srad
 \end{align}
 In this case, we can keep $\srad(T)$ as in expression \eqref{expr:sradlcdm}, and,
-consequently, its $T$ derivative as in expression \eqref{expr:dsraddT}; however,
+consequently, its derivative with respect to $T$ as in expression \eqref{expr:dsraddT}; however,
 the relation between $t$ and $T$ has to be re-determined,
 since such a relation reparametrises correctly $\srad(t)$ with the additional
 injection. By doing so, one obtains:
@@ -83,11 +99,11 @@ write:
 \end{align}
 Now, let us expand $s = \srad + \sD$, and use equation \eqref{eqn:sradlcdminj2}:
 \begin{align}
- \SigmaD &= \dot\sD + \dsrad + 3H(\srad + \sD) -\Sigmarad
+ \SigmaD &= \dsD + \dsrad + 3H(\srad + \sD) -\Sigmarad
 \end{align}
 Let us use equation \eqref{eqn:sradlcdminj} to eliminate $\dsrad$:
 \begin{align}
- \SigmaD &= \dot\sD + 3H\sD =\\
+ \SigmaD &= \dsD + 3H\sD =\\
          &= 3H\qty[\sD  + \frac{1}{3H}\dv{\sD}{T}\dv{T}{t}].
 \end{align}
 We can now use equation \eqref{eqn:dTdTsrad} to have:
@@ -97,31 +113,18 @@ We can now use equation \eqref{eqn:dTdTsrad} to have:
 
 This result can be further manipulated, to fully explicit the dependence on the
 thermodinamical degrees of freedom, and remove the explicit dependence on $H$.
-We can express:
-\begin{align}
- H = H\ped{$\Lambda$CDM}\tilde H
-\end{align}
-with $H\ped{$\Lambda$CDM}$ the Hubble parameter in the standard cosmological model:
-\begin{align}
- H\ped{$\Lambda$CDM} = \sqrt{\frac{8 \pi G}{3}\rhorad} = \sqrt{\frac{4\pi^3}{45}\geff}\frac{1}{\Mpl}T^2
-\end{align}
-and $\tilde H$ parametrises the presence of dark energy:
-\begin{align}
- \tilde H = \sqrt{1+ \frac{\rhoD}{\rhorad}}.
-\end{align}
-By using such expressions, and by defining:
-\begin{align}
- \sqrt{g_{\ast}} = \frac{\heff}{\sqrt{\geff}} \qty(\frac{T}{3\heff}\dv{\heff}{T} +1),
-\end{align}
-we can rewrite \eqref{expr:SigmaD1} as:
-\begin{align}\label{expr:SigmaD1}
- \SigmaD = \sqrt{\frac{4\pi}{5}}\frac{\tilde H}{\Mpl} T^2 \qty[\sqrt{\geff}\sD - \frac{T\qty(1 - \Sigmatstar)\heff}{3\sqrt{g_\ast}}\dv{\sD}{T}].
+By using the definition of $\tilde H$ and $\sqrt{g_\ast}$, we can rewrite
+\eqref{expr:SigmaD1} as:
+\begin{align}\label{expr:SigmaD2}
+ \SigmaD = \sqrt{\frac{4\pi^3}{5}}\frac{\tilde H}{\Mpl} T^2 \qty[\sqrt{\geff}\sD - \frac{T\qty(1 - \Sigmatstar)\heff}{3\sqrt{g_\ast}}\dv{\sD}{T}].
 \end{align}
 In terms of $\tilde H$, one can also write the relation among $\Sigmarad$
 and $\Sigmatstar$ at a given temperature $T$:
 \begin{align}
  \Sigmatstar = \frac{45\sqrt{5}\Mpl}{4 \pi^{7/2}\heff \sqrt{\geff} T^5 \tilde H}\Sigmarad.
 \end{align}
+Let us remark that equation \eqref{expr:SigmaD2} can be inverted to easily compute
+$\dv{\sD}{T}$ given $\sD$ and $\SigmaD$.
 
 
 \subsection{Dark entropy injection}
@@ -129,17 +132,83 @@ This case is analogous to the one of ``dark entropy production''. However,
 instead of knowing the form of $\sD$, we know the form of $\SigmaD$, as it
 appears in equation \eqref{eqn:dots_dark}. Then, we are interested in computing
 $\sD$ from the known expression of $\SigmaD$.
-In order to do that, we need to invert the relation \eqref{expr:SigmaD1}.
+In order to do that, we need to invert the relation \eqref{expr:SigmaD2}.
+What we find is a first order linear differential equation:
 The relation we find is the following:
 \begin{align}
- \sD =
+ \dv{\sD}{T} = \frac{3 \sqrt{\geff}\sqrt{g_\ast}}{T\qty(1 - \Sigmatstar)\heff }\sD - \sqrt{\frac{45}{4 \pi^3}}\Mpl \frac{\sqrt{g_\ast}}{\qty(1 - \Sigmatstar)\qty(\heff T^3) \tilde H}\SigmaD.
+\end{align}
+The solution to the associate homogeneous equation reads:
+\begin{align}
+ \homosD(T)= C_0 \exp(\int \dd T \frac{3 \sqrt{\geff}\sqrt{g_\ast}}{T\qty(1 - \Sigmatstar)\heff } )
+\end{align}
+We can work out the integrand, and find a more explicit form for $H$:
+\begin{align}
+ \frac{3 \sqrt{\geff}}{T\qty(1 - \Sigmatstar)\heff }&\frac{\heff}{\sqrt{\geff}} \qty(\frac{T}{3\heff}\dv{\heff}{T} +1)
+  = \frac{3}{T\qty(1 - \Sigmatstar)}\qty(\frac{T}{3} \dv{\log(\heff)}{T} + 1)=\\
+  &=\frac{1}{1 - \Sigmatstar}\qty(\dv{\log(\heff)}{T} + \dv{\log(T^3)}{T})=\\
+  &=\frac{1}{1 - \Sigmatstar}\dv{\log(\heff T^3)}{T}
+\end{align}
+At this point, we can integrate by parts:
+\begin{align}
+ \int\dd T \frac{1}{1 - \Sigmatstar}\dv{\log(\heff T^3)}{T} = \frac{1}{1 - \Sigmatstar}\log(\heff T^3) -
+ \int \dd T \log(\heff T^3)\frac{1}{(1-\Sigmatstar)^2}\dv{\Sigmatstar}{T}
+\end{align}
+and finally we obtain:
+\begin{align}
+ \homosD(T)= C_0 (\heff T^3)^\frac{1}{1 - \Sigmatstar}\exp(-\int \dd T \log(\heff T^3)\frac{1}{(1-\Sigmatstar)^2}\dv{\Sigmatstar}{T})
+\end{align}
+For the sake of convenience, we can define
+\begin{align}
+ \kappa(T) &= \qty(\heff(T) T^3)^\frac{1}{1 - \Sigmatstar(T)}\\
+ \sigma_s(T) &= \exp(- \int_0^T \dd\theta \varepsilon(\theta)) \\
+ \varepsilon(T) &= \dv{\Sigmatstar(T)}{T} \frac{\log(\heff(T) T^3)}{\qty(1 - \Sigmatstar(T))^2}
+\end{align}
+and have
+\begin{align}
+ \homosD(T)= C_0\kappa(T)\sigma_s(T)
 \end{align}
 
+Now we need to find the particular solution. We can put
+the full equation in the form:
+\begin{align}\label{eqn:diffsandJ}
+ \dv{\sD}{T} + \frac{1}{J}\dv{J}{T}\sD=- \sqrt{\frac{45}{4 \pi^3}}\Mpl \frac{\sqrt{g_\ast}}{\qty(1 - \Sigmatstar)\qty(\heff T^3) \tilde H}\SigmaD,
+\end{align}
+where $J$ is a function of the temperature such that:
+\begin{align}\label{eqn:diffJ}
+ \frac{1}{J}\dv{J}{T}=-\frac{3 \sqrt{\geff}\sqrt{g_\ast}}{T\qty(1 - \Sigmatstar)\heff }.
+\end{align}
+In fact, once $J$ is known, we can write equation \eqref{eqn:diffsandJ} as:
+\begin{align}
+ \frac{1}{J}\dv{(J\sD)}{T} =- \sqrt{\frac{45}{4 \pi^3}}\Mpl \frac{\sqrt{g_\ast}}{\qty(1 - \Sigmatstar)\qty(\heff T^3) \tilde H}\SigmaD,
+\end{align}
+and therefore the form of a particular solution is:
+\begin{equation}\label{eqn:particularsD}
+   \sD(T) = - \frac{1}{J(T)}\qty{\sqrt{\frac{45}{4 \pi^3}}\Mpl \int^T_{0} \dd \theta
+ \qty[\frac{\sqrt{g_\ast(\theta)}\SigmaD(\theta)J(\theta)}{\qty(1 - \Sigmatstar(\theta))\heff(\theta)\theta^3\tilde H(\theta)} ] - C_1}
+\end{equation}
+We are only left to find $J$. We can easily relate it to $\homosD$:
+\begin{align}
+ \frac{1}{J}\dv{J}{T}&=-\frac{3 \sqrt{\geff}\sqrt{g_\ast}}{T\qty(1 - \Sigmatstar)\heff } = -\frac{1}{\homosD}\dv{\homosD}{T} \\
+  \dv{\log(J)}{T} &=- \dv{\log(\homosD)}{T}= \dv{\log(\homosD^{-1})}{T}\\
+  J &= \frac{1}{\homosD} = \frac{1}{\kappa \sigma_s}
+\end{align}
+Note that the choice of the initial condition for $J$ is irrelevant, since the multiplicative constant disappears in the ratios.
 
-
-
-
-
+By summing the particular and homogeneous solutions, we get:
+\begin{equation}
+\begin{split}
+     \sD(T) = - \frac{1}{\kappa\sigma_s}\sqrt{\frac{45}{4 \pi^3}}\Mpl \int^T_{0} \dd \theta
+ \qty[\frac{\sqrt{g_\ast(\theta)}\SigmaD(\theta)}{\qty(1 - \Sigmatstar(\theta))\heff(\theta)\theta^3\tilde H(\theta)\kappa(\theta)\sigma_s(\theta)} ] +\\
+ + (C_1 + C_0)\kappa\sigma_s,
+\end{split}
+\end{equation}
+and we find, consistently with the unicity of the solution, that $C_1$ and $C_0$ are not independent integration constants. Finally, by chosing as initial condition $\sD(0)=0$, we find that:
+\begin{align}
+    \sD(T) = - \sqrt{\frac{45}{4 \pi^3}}\Mpl &\qty(\heff(T) T^3)^\frac{1}{1 - \Sigmatstar(T)} \sigma_s(T) \cdot \nolabel \\
+    \cdot &\int^T_{0} \dd \theta
+ \qty[\frac{\sqrt{g_\ast(\theta)}\SigmaD(\theta)}{\qty(1 - \Sigmatstar(\theta))\tilde H(\theta)\qty(\heff(\theta) \theta^3)^\frac{2- \Sigmatstar(\theta)}{1 - \Sigmatstar(\theta)}\sigma_s(\theta)} ]
+\end{align}
 
 
 \end{document}

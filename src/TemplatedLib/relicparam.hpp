@@ -291,9 +291,9 @@ public:
       the standard cosmological model.
 
       It adds a dark energy density according to the equation:
-      \f[ \rho_D = \kappa_\rho \cdot \rho_{rad}(T_{BBN}) \cdot \left( \frac{T}{T_{BBN}} \right)^{n_\rho} \f]
-      @param dd0_local \f$\kappa_\rho\f$: ratio of dark energy density to radiation energy density at \f$T_{BBN}\f$
-      @param ndd_local \f$n_\rho\f$: the decreasing exponent of dark energy density
+      \f[ ρ_D = κ_ρ \cdot ρ_{rad}(T_{BBN}) \cdot \left( \frac{T}{T_{BBN}} \right)^{n_ρ} \f]
+      @param dd0_local \f$κ_ρ\f$: ratio of dark energy density to radiation energy density at \f$T_{BBN}\f$
+      @param ndd_local \f$n_ρ\f$: the decreasing exponent of dark energy density
       @param T_end Reheating temperature
       @note This equation is referenced as Eq. (33) in the SuperIso Relic 3.1 Manual.
       @see SuperIso Relic Manual: https://arxiv.org/abs/1811.12736
@@ -308,11 +308,11 @@ public:
       the standard cosmological model.
 
       The dark energy density is computed as:
-      \f[ \rho_D(T) = \rho_{rad}(T) \cdot \frac{g_{eff}(T_{ddeq})}{g_{eff}(T)} \cdot
+      \f[ ρ_D(T) = ρ_{rad}(T) \cdot \frac{g_{eff}(T_{ddeq})}{g_{eff}(T)} \cdot
       \left(\frac{h_{eff}(T)}{h_{eff}(T_{ddeq})}\right)^{n_{dd}/3} \cdot \left(\frac{T}{T_{ddeq}}\right)^{n_{dd}}
       \f]
       @param ndd_local \f$n_{dd}\f$: the decreasing exponent of dark energy density
-      @param Tddeq_local \f$T_{ddeq}\f$: temperature at which \f$\rho_D = \rho_{rad}\f$ (radiation energy density)
+      @param Tddeq_local \f$T_{ddeq}\f$: temperature at which \f$ρ_D = ρ_{rad}\f$ (radiation energy density)
       @param T_end Reheating temperature
       @note This parameterization provides an alternative to the one used in Init_dark_density().
       @see SuperIso Relic v4 Manual: https://arxiv.org/abs/1806.11489
@@ -349,10 +349,10 @@ public:
       If not called, the calculation uses the standard cosmological model without additional entropy.
 
       It adds a dark entropy component according to the equation:
-      \f[ s_D = \kappa_s \cdot s_{rad}(T_{BBN}) \cdot \left( \frac{T}{T_{BBN}} \right)^{n_s} \f]
+      \f[ s_D = κ_s \cdot s_{rad}(T_{BBN}) \cdot \left( \frac{T}{T_{BBN}} \right)^{n_s} \f]
       corresponding to the "dark entropy production" scenario.
 
-      @param sd0_local \f$\kappa_s\f$: ratio of dark entropy density to radiation entropy density at \f$T_{BBN}\f$
+      @param sd0_local \f$κ_s\f$: ratio of dark entropy density to radiation entropy density at \f$T_{BBN}\f$
       @param nsd_local \f$n_s\f$: the decreasing exponent of dark entropy density
       @param T_end Reheating temperature
       @note This equation is referenced as Eq. (34) in the SuperIso Relic 3.1 Manual.
@@ -368,11 +368,11 @@ public:
       If not called, the calculation uses the standard cosmological model without additional entropy injection.
 
       It adds a dark entropy injection component according to the equation:
-      \f[ \Sigma_D = \kappa_\Sigma \cdot \Sigma_{rad}(T_{BBN}) \cdot \left( \frac{T}{T_{BBN}} \right)^{n_\Sigma} \f]
+      \f[ Σ_D = κ_Σ \cdot Σ_{rad}(T_{BBN}) \cdot \left( \frac{T}{T_{BBN}} \right)^{n_Σ} \f]
 
-      @param Sigmad0_local \f$\kappa_\Sigma\f$: ratio of dark entropy injection to radiation entropy injection at
+      @param Sigmad0_local \f$κ_Σ\f$: ratio of dark entropy injection to radiation entropy injection at
       \f$T_{BBN}\f$
-      @param nSigmad_local \f$n_\Sigma\f$: the decreasing exponent of dark entropy injection
+      @param nSigmad_local \f$n_Σ\f$: the decreasing exponent of dark entropy injection
       @param T_end Reheating temperature
       @note This equation is referenced as Eq. (35) in the SuperIso Relic 3.1 Manual and Eq. (A8) in the SuperIso
       Relic 4 Manual.
@@ -389,13 +389,13 @@ public:
       If not called, the calculation uses the standard cosmological model without additional entropy injection.
 
       It adds a standard entropy injection component according to the equation:
-      \f[ \Sigma_{rad} = \kappa_{\Sigma_{rad}} \cdot \Sigma_{rad}^{eff}(T_{BBN}) \cdot \left( \frac{T}{T_{BBN}}
-      \right)^{n_{\Sigma_{rad}}} \f] This modifies the radiation entropy density \f$s_{rad}\f$ following: \f[
-      \dot{s}_{rad} = -3 H s_{rad} + \Sigma_{rad}(T) \f] or, equivalently: \f[ \dot{s}_{rad} = -3 H ( 1 -
-      \tilde\Sigma_{rad}^\ast) s_{rad}\f]
-      @param Sigmarad0_local \f$\kappa_{\Sigma_{rad}}\f$: ratio of standard entropy injection to effective standard
+      \f[ Σ_{rad} = κ_{Σ_{rad}} \cdot Σ_{rad}^{eff}(T_{BBN}) \cdot \left( \frac{T}{T_{BBN}}
+      \right)^{n_{Σ_{rad}}} \f] This modifies the radiation entropy density \f$s_{rad}\f$ following: \f[
+      \dot{s}_{rad} = -3 H s_{rad} + Σ_{rad}(T) \f] or, equivalently: \f[ \dot{s}_{rad} = -3 H ( 1 -
+      \tildeΣ_{rad}^\ast) s_{rad}\f]
+      @param Sigmarad0_local \f$κ_{Σ_{rad}}\f$: ratio of standard entropy injection to effective standard
       entropy injection at \f$T_{BBN}\f$
-      @param nSigmarad_local \f$n_{\Sigma_{rad}}\f$: the decreasing exponent of standard entropy injection
+      @param nSigmarad_local \f$n_{Σ_{rad}}\f$: the decreasing exponent of standard entropy injection
       @param T_end Reheating temperature
       @note This parameterization is based on equations (A10) and (A11) in the SuperIso Relic 4 Manual.
       @see SuperIso Relic 4 Manual: https://arxiv.org/abs/1806.11489
@@ -483,8 +483,8 @@ private:
     /**
      * @brief Function that appears in the denominator of the integral in dark_entropy.
      *
-     * \f$ \sigma_s(T)=\exp\left( - \displaystyle \int_0^T \mathrm{d}\log(\tau) \frac{d\tilde\Sigma^\ast}{dT}(\tau)
-     * \frac{\log(h_{eff}(\tau)(\tau)^3)}{(1 - \tilde \Sigma^\ast(\tau) )^2} \right) \f$
+     * \f[ σ_s(T)=\exp\left( - \displaystyle \int_0^T \mathrm{d}τ \frac{d\tildeΣ^\ast}{dT}(τ)
+     * \frac{\log(h_{eff}(τ)(τ)^3)}{(1 - \tilde Σ^\ast(τ) )^2} \right) \f]
      *
      * @param T input temperature
      * @return real_t value of the function
@@ -496,13 +496,13 @@ public:
     /**
      * @brief This function computes the total dark entropy \f$s_D(T)\f$ in the defined cosmological scenario.
      *        The scenario can be:
-     *        - pure entropy production
-     *        - combination of "standard" and "dark" entropy injection. In this second case, the function returns
-     *          \f$s_D = \displaystyle M_{Pl}\sqrt{\frac{45}{4\pi^3}}(h_{eff}(T)T^3)^\frac{1}{1-\tilde\Sigma^\ast(T)} \sigma_s(T)
-     *          \int_0^T d\ln(\tau) \frac{\sqrt{g_\ast}(\tau)\Sigma_D(\tau)}{\tilde H(\tau) (1- \tilde\Sigma^\ast(\tau))(h_{eff}(\tau)\tau^3)^\frac{2-\tilde\Sigma^\ast(\tau)}{1-\tilde\Sigma^\ast(\tau)}\sigma_s(\tau)}
-     *          \f$,
-     * 
-     *          where \f$\sigma_s(\tau)\f$ is defined in sigma_entropy.
+     *        1. pure entropy production
+     *        2. combination of "standard" and "dark" entropy injection. In this second case, the function returns
+     *          \f[s_D = -\displaystyle M_{Pl}\sqrt{\frac{45}{4π^3}}(h_{eff}(T)T^3)^\frac{1}{1-\tilde Σ^\ast(T)}
+     * σ_s(T) \int_0^T dτ \frac{\sqrt{g_\ast}(τ)Σ_D(τ)}{\tilde H(τ) (1-
+     * \tildeΣ^\ast(τ))(h_{eff}(τ)τ^3)^\frac{2-\tildeΣ^\ast(τ)}{1-\tildeΣ^\ast(τ)}σ_s(τ)}
+     *          \f]
+     *          where \f$σ_s(τ)\f$ is defined in sigma_entropy.
      *
      * @param T The temperature
      * @return real_t the total dark entropy \f$s_D(T)\f$
@@ -522,30 +522,30 @@ public:
     real_t dark_entropy_derivative(const real_t& T);
 
     /**
-      @brief Computes the dark entropy injection \f$\Sigma_D\f$ at a given temperature.
-
-      This function calculates the value of \f$\Sigma_D\f$ in the defined cosmological scenario.
-      It returns a non-null value if the scenario is
-       1. A combination of "dark entropy production" and "standard entropy injection", with a generalised version of
-      equation (38) of the SuperIso Relic Manual
-       2. Pure "dark entropy injection scenario", with equation (A8) of the SuperIso Relic 4 Manual
-
-      @param T The temperature at which to compute \f$\Sigma_D\f$.
-      @return The value of \f$\Sigma_D\f$ at the given temperature.
-      @see SuperIso Relic Manual: https://arxiv.org/abs/1811.12736
-      @see SuperIso Relic 4 Manual: https://arxiv.org/abs/1806.11489
-      @note Need to check the result of point 1.
-    */
+     * @brief Computes the dark entropy injection \f$Σ_D\f$ at a given temperature.
+     *
+     * This function calculates the value of \f$Σ_D\f$ in the defined cosmological scenario.
+     * It returns a non-null value if the scenario is
+     *   1. A combination of "dark entropy production" and "standard entropy injection", with a generalised
+     *     version of equation (38) of the SuperIso Relic Manual:
+     *     \f[Σ_D = \displaystyle \sqrt{\frac{4π^3}{5}}\frac{\tilde H}{M_{Pl}} T^2
+     *     \left[\sqrt{g_{eff}}s_D - \frac{T(1 - \tildeΣ^\ast)h_{eff}}{3\sqrt{g_\ast}}\frac{ds_D}{dT}\right]. \f]
+     *   2. Pure "dark entropy injection scenario", with equation (A8) of the SuperIso Relic 4 Manual
+     *
+     * @param T The temperature at which to compute \f$Σ_D\f$.
+     * @return The value of \f$Σ_D\f$ at the given temperature.
+     * @see SuperIso Relic Manual: https://arxiv.org/abs/1811.12736
+     * @see SuperIso Relic 4 Manual: https://arxiv.org/abs/1806.11489
+     * @note Need to check the result of point 1.
+     */
     real_t dark_entropy_Sigmad(const real_t& T);
 
-    // real_t dark_entropy_Sigmarad(const real_t &T);
-
     /**
-      @brief Computes the standard entropy injection \f$\Sigma_{rad}\f$ at a given temperature.
-      This function calculates the value of \f$\Sigma_{rad}\f$ as defined in Eq. (A11) of
+      @brief Computes the standard entropy injection \f$Σ_{rad}\f$ at a given temperature.
+      This function calculates the value of \f$Σ_{rad}\f$ as defined in Eq. (A11) of
       the SuperIso Relic 4 Manual. It corresponds to the scenario of "standard entropy injection".
-      @param T The temperature at which to compute \f$\Sigma_{rad}\f$.
-      @return The value of \f$\Sigma_{rad}\f$ at the given temperature.
+      @param T The temperature at which to compute \f$Σ_{rad}\f$.
+      @return The value of \f$Σ_{rad}\f$ at the given temperature.
       @see SuperIso Relic 4 Manual: https://arxiv.org/abs/1806.11489
 
     */

@@ -886,7 +886,8 @@ namespace __SPEC_LIB_NAME__
     for (int ie = 1; ie < nmax; ie++)
     {
       lnT += dlnT;
-      real_t Ttmp = std::exp(lnT);
+      const real_t Ttmp = std::exp(lnT);
+      const real_t Jacobian = Ttmp;
 
       heffT = getheff(Ttmp);
       geffT = getgeff(Ttmp);
@@ -907,7 +908,8 @@ namespace __SPEC_LIB_NAME__
            Sigmatildestar_local) /
           0.001 / Ttmp;
 
-      integ += -dSigmatildestar_dT / std::pow(1. - Sigmatildestar_local, 2.) * std::log(heffT * std::pow(Ttmp, 3.));
+      integ += -Jacobian * dSigmatildestar_dT / std::pow(1. - Sigmatildestar_local, 2.) *
+               std::log(heffT * std::pow(Ttmp, 3.));
     }
 
     heffT = getheff(T);
@@ -929,7 +931,7 @@ namespace __SPEC_LIB_NAME__
          Sigmatildestar_local) /
         0.001 / T;
 
-    integ += -dSigmatildestar_dT / std::pow(1. - Sigmatildestar_local, 2.) * std::log(heffT * std::pow(T, 3.)) / 2.;
+    integ += -T * dSigmatildestar_dT / std::pow(1. - Sigmatildestar_local, 2.) * std::log(heffT * std::pow(T, 3.)) / 2.;
 
     integ *= dlnT;
 
@@ -939,11 +941,6 @@ namespace __SPEC_LIB_NAME__
 
   real_t Relicparam_t::dark_entropy(const real_t& T)
   {
-    /* This function SHOULD compute the total dark entropy in the chosen scenario
-       QUESTIONS: Why in the integral we increase by dln(T) (so points are no longer equally spaced)
-                  and then we do not divide by Ttemp the integrand?
-       REMARK: We need a reference on the formula to combine the two entropy models A8 and A11
-    */
     if (phi_model.get() != 0)
       return 0.;
 
@@ -980,6 +977,7 @@ namespace __SPEC_LIB_NAME__
       {
         lnT += dlnT;
         Ttmp = std::exp(lnT);
+        const real_t Jacobian = Ttmp;
 
         heffT = getheff(Ttmp);
         geffT = getgeff(Ttmp);
@@ -992,7 +990,7 @@ namespace __SPEC_LIB_NAME__
           Sigmatildestar_local = 45. * std::sqrt(5.) / 4. / std::pow(pi, 3.5) * Mplanck / heffT / std::sqrt(geffT) /
                                  std::pow(Ttmp, 5.) / Htilde * entropy_Sigmarad(Ttmp);
 
-        integ += getsqrtgstar(Ttmp) * dark_entropy_Sigmad(Ttmp) / Htilde / (1. - Sigmatildestar_local) /
+        integ += Jacobian * getsqrtgstar(Ttmp) * dark_entropy_Sigmad(Ttmp) / Htilde / (1. - Sigmatildestar_local) /
                  sigma_entropy(Ttmp) /
                  std::pow(heffT * std::pow(Ttmp, 3.), (2. - Sigmatildestar_local) / (1. - Sigmatildestar_local));
       }
@@ -1008,12 +1006,12 @@ namespace __SPEC_LIB_NAME__
         Sigmatildestar_local = 45. * std::sqrt(5.) / 4. / std::pow(pi, 3.5) * Mplanck / heffT / std::sqrt(geffT) /
                                std::pow(T, 5.) / Htilde * entropy_Sigmarad(T);
 
-      integ += getsqrtgstar(T) * dark_entropy_Sigmad(T) / Htilde / (1. - Sigmatildestar_local) / sigma_entropy(T) /
+      integ += T * getsqrtgstar(T) * dark_entropy_Sigmad(T) / Htilde / (1. - Sigmatildestar_local) / sigma_entropy(T) /
                std::pow(heffT * std::pow(T, 3.), (2. - Sigmatildestar_local) / (1. - Sigmatildestar_local)) / 2.;
 
       integ *= dlnT;
 
-      return Mplanck * std::sqrt(45. / 4. / std::pow(pi, 3.)) *
+      return -Mplanck * std::sqrt(45. / 4. / std::pow(pi, 3.)) *
              std::pow(heffT * std::pow(T, 3.), 1. / (1. - Sigmatildestar_local)) * sigma_entropy(T) * integ;
     }
   }

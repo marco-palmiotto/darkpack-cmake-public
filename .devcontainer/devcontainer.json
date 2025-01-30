@@ -5,11 +5,11 @@
 	"build": {
 		"dockerfile": "Dockerfile"
 	},
-	"runArgs": [
-    "--memory=8g",
-	"--memory-swap=10g",
-    "--cpus=6"
-  ],
+	// "runArgs": [
+  //   "--memory=8g",
+	//   "--memory-swap=10g",
+  //   "--cpus=6"
+  // ],
 	"customizations": {
 		"vscode": {
 			"extensions": [

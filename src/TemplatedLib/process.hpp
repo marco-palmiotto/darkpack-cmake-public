@@ -13,13 +13,28 @@
 // #define DEBUG
 namespace __SPEC_LIB_NAME__
 {
+  /**
+   * @brief This structure is defined to have an alternative wa of defining a particle in a process.
+   *
+   */
   struct Insertion
   {
-    int field;
-    bool part;
+    int field; //!< The field of the particle
+    bool part; //!< True if the particle is a particle, false if it is an antiparticle
 
+    /**
+     * @brief Construct a new Insertion object, supposing that field excitation is a particle, not an antiparticle.
+     *
+     * @param i The integer corresponding to the field of the particle
+     */
     Insertion(const int i) : field(i), part(true) {}
 
+    /**
+     * @brief Construct a new Insertion object
+     *
+     * @param i The integer corresponding to the field of the particle
+     * @param b True if the particle is a particle, false if it is an antiparticle
+     */
     Insertion(const int i, const bool b) : field(i), part(b) {}
   };
 
@@ -34,26 +49,69 @@ private:
     csl::InitSanitizer<bool> Exists;     //!< Flag indicating if the process exists in the library.
 
     csl::InitSanitizer<Cfptr_t> sumSquaredAmpl{
-        "sumSquaredAmpl_Cfptr"};                //!< Function pointer to the sum of squared amplitudes.
-    csl::InitSanitizer<short int> Sf34{"Sf34"}; //!< Symmetry factor for the final state.
-    csl::InitSanitizer<short int> CPfac{"CPfac"};
-    csl::InitSanitizer<short int> combinFac{"dof"};
+        "sumSquaredAmpl_Cfptr"};                    //!< Function pointer to the sum of squared amplitudes.
+    csl::InitSanitizer<short int> Sf34{"Sf34"};     //!< Symmetry factor for the final state.
+    csl::InitSanitizer<short int> CPfac{"CPfac"};   //!< CP symmetry factor for the reaction
+    csl::InitSanitizer<short int> combinFac{"dof"}; //!< Combinatorial factor for the reaction
 
-    RunningSM* runptr;
-    csl::InitSanitizer<bool> isRunDataExternal{"isRunDataExternal"}; // Basic
-    csl::InitSanitizer<bool> isRunningExternal{"isRunningExternal"}; // Basic
-    csl::InitSanitizer<bool> haveToFreerunptr{"haveToFreerunptr"};   // Basic
+    RunningSM*
+        runptr; //!< Pointer to the RunningSM instace to be used for the running in the current instance of Process2to2
+    csl::InitSanitizer<bool> isRunDataExternal{
+        "isRunDataExternal"}; //!< Flag indicating if the RunningSM data are external
+    csl::InitSanitizer<bool> isRunningExternal{
+        "isRunningExternal"}; //!< Flag indicating if the RunningSM instance is owned by something other than the
+                              //!< current instance of Process2to2
+    csl::InitSanitizer<bool> haveToFreerunptr{
+        "haveToFreerunptr"}; //!< Flag indicating if the RunningSM instance has to be freed
 
-    std::array<csl::InitSanitizer<int>, 4> part_g{csl::InitSanitizer<int>("g_1"), csl::InitSanitizer<int>("g_2"),
-                                                  csl::InitSanitizer<int>("g_3"), csl::InitSanitizer<int>("g_4")};
+    std::array<csl::InitSanitizer<int>, 4> part_g{
+        csl::InitSanitizer<int>("g_1"), csl::InitSanitizer<int>("g_2"), csl::InitSanitizer<int>("g_3"),
+        csl::InitSanitizer<int>("g_4")}; //!< Array containing the degrees of freedom of each particle in the process.
+
 
     // Private methods needed by the constructor or the setters
+    /**
+     * @brief Find the key for the process in the hash table.
+     *
+     * @return The key for the process in the hash table.
+     */
     std::string findKey();
+
+    /**
+     * @brief Performs the setup of the process.
+     */
     void handleSetup();
 
     // Private methods needed in computations
+    /**
+     * @brief Computes the energy and the momentum (in absoluite value) of the particles 1 and 3 in the center of mass
+     * frame.
+     *
+     * @param input The numerical parameters.
+     * @param sqrts The centre-of-mass energy.
+     * @param p1 The momentum of particle 1.
+     * @param p3 The momentum of particle 3.
+     * @param E1 The energy of particle 1.
+     * @param E3 The energy of particle 3.
+     * @return true If the process is kinematically allowed and the calculation was successful.
+     * @return false Otherwise.
+     */
     bool EP13calculation(const Param_t& input, const real_t& sqrts, real_t& p1, real_t& p3, real_t& E1,
                          real_t& E3) const;
+
+    /**
+     * @brief Set the kinematical variables for the process.
+     *
+     * @param input The numerical parameters.
+     * @param sqrts The centre-of-mass energy.
+     * @param ctheta The cosine of the angle between particles 1 and 3 in the centre-of-mass frame.
+     * @param p1 The momentum of particle 1.
+     * @param p3 The momentum of particle 3.
+     * @param sigdfj Matrix containing the scalar products of the momenta of the particles in the process, in the for s_ij
+     * = p_i * p_j.
+     * @return true If the process is kinematically allowed and the calculation was successful.
+     * @return false Otherwise.
+     */
     bool setKinematics(Param_t& input, const real_t& sqrts, const real_t& ctheta, real_t& p1, real_t& p3,
                        real_t sij[5][5]) const;
 

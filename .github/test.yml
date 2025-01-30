@@ -1,0 +1,21 @@
+name: Test darkpack
+
+on:
+  pull_request:
+    branches:
+      - main
+  
+  push:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: fedora36
+
+    Dockerfile: .devcontainer/Dockerfile
+
+    steps:
+      - uses: actions/checkout@v2
+
+ 

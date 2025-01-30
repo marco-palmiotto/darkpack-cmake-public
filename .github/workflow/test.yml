@@ -1,0 +1,70 @@
+name: Test darkpack
+
+on:
+  pull_request:
+    branches:
+      - main
+  
+  push:
+    branches:
+      - main
+
+jobs:
+  builds-fedora36:
+    runs-on: fedora:36
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: check-linting
+        run: \
+            sudo dnf update -y 
+            sudo dnf install git-clang-format -y 
+            
+      - name: install-deps
+        run: \
+              sudo dnf update -y 
+              sudo dnf upgrade -y 
+              sudo dnf install \
+                          gcc \
+                          gfortran \
+                          g++ \
+                          gsl \
+                          gsl-devel \
+                          texlive \
+                          ImageMagick \
+                          dvipng \
+                          coreutils \
+                          qtchooser \
+                          cmake \
+                          git \
+                          ninja-build \
+                          gdb \
+                          eigen3-devel \
+                          tbb \
+                          tbb-devel \
+                          wget \
+                          python3 \
+                          jupyter-notebook \
+                          doxygen \
+                          git-clang-format \
+                          -y 
+              sudo dnf clean all  
+      - name: download-and-install-marty
+        run: \
+              cd $HOME 
+              git clone https://github.com/docbrown1955/marty-public.git 
+              cd marty-public 
+              git checkout master
+              mkdir bin include lib build
+              cd build 
+              cmake .. -DCMAKE_INSTALL_PREFIX=.install -G Ninja
+              cmake --build . 
+              cmake --install . 
+              export INSTALLMARTYPATH="$HOME/marty-public/build/.install"
+              export PATH=$INSTALLMARTYPATH/bin:$PATH
+              export LD_LIBRARY_PATH=$INSTALLMARTYPATH/lib
+              export LIBRARY_PATH=$INSTALLMARTYPATH/lib
+              export C_INCLUDE_PATH=$INSTALLMARTYPATH/include
+              export CPATH=$INSTALLMARTYPATH/include 
+
+ 

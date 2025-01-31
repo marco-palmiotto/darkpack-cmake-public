@@ -17,8 +17,7 @@ macro(compile_all_libs)
     endforeach()
 endmacro()
 
-set(MODELS_LIBS_NAMES "dp_su2f2to2" "dp_mssm2to2")
-
+set(MODELS_LIBS_NAMES "dp_su2f2to2" "dp_mssm2to2" "dp_scalar2to2")
 
 # This submodule contains the CMA-ES algorithms for the parameter
 # space sampling
@@ -95,9 +94,10 @@ add_subdirectory(src/Test)
 set(EXTERNAL_LIBS ${EXTERNAL_LIBS} cmaes)
 add_subdirectory(src/main)
 
+# Add a custom target to run clang-format on all source files
 find_program(CLANG_FORMAT_BIN clang-format)
 
-# Define the patterns to exclude
+## Define the patterns to exclude
 set(EXCLUDE_PATTERNS
     "/submodules/"
     "/build/"
@@ -108,7 +108,7 @@ set(EXCLUDE_PATTERNS
     # Add more patterns as needed
 )
 
-# Function to check if a file should be excluded
+## Function to check if a file should be excluded
 function(should_exclude FILE_PATH)
     foreach(PATTERN ${EXCLUDE_PATTERNS})
         if(${FILE_PATH} MATCHES ${PATTERN})
@@ -126,7 +126,7 @@ file(GLOB_RECURSE ALL_SOURCE_FILES
     ${CMAKE_SOURCE_DIR}/include/*.hpp
 )
 
-# Filter out excluded files
+## Filter out excluded files
 set(FILTERED_SOURCE_FILES "")
 foreach(SOURCE_FILE ${ALL_SOURCE_FILES})
     should_exclude(${SOURCE_FILE})
@@ -135,7 +135,7 @@ foreach(SOURCE_FILE ${ALL_SOURCE_FILES})
     endif()
 endforeach()
 
-# Create the format target
+## Create the format target
 add_custom_target(format
     COMMENT "Running clang-format to change files"
     COMMAND ${CLANG_FORMAT_BIN}

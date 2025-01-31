@@ -3,13 +3,13 @@
 {
 	"name": "DarkPackTesting",
 	"build": {
-		"dockerfile": "Dockerfile"
+		"dockerfile": "Dockerfile-fedora"
 	},
 	// "runArgs": [
-  //   "--memory=8g",
+	//   "--memory=8g",
 	//   "--memory-swap=10g",
-  //   "--cpus=6"
-  // ],
+	//   "--cpus=6"
+	// ],
 	"customizations": {
 		"vscode": {
 			"extensions": [

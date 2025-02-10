@@ -46,31 +46,4 @@ ENV LIBRARY_PATH=$INSTALLMARTYPATH/lib
 ENV C_INCLUDE_PATH=$INSTALLMARTYPATH/include
 ENV CPATH=$INSTALLMARTYPATH/include
 
-# Installing CMA-ES
-# RUN git clone https://github.com/CMA-ES/libcmaes.git && \
-#     cd libcmaes && \
-#     cmake -S . -B build -DCMAKE_INSTALL_PREFIX=.install -G Ninja && \
-#     cd build && \
-#     cmake --build . && \
-#     cmake --install .
-
-# ENV INSTALLCMAPATH="/home/${username}/libcmaes/build/.install"
-# ENV PATH=$INSTALLCMAPATH/bin:$PATH
-# ENV LD_LIBRARY_PATH=$INSTALLCMAPATH/lib
-# ENV LIBRARY_PATH=$INSTALLCMAPATH/lib
-# ENV C_INCLUDE_PATH=$INSTALLCMAPATH/include
-# ENV CPATH=$INSTALLCMAPATH/include
-
-# Installing DarkPACK with default options
-# COPY source.tar.gz /home/${username}/
-# RUN mkdir darkpack-cmake && \
-#     tar -xf source.tar.gz -C darkpack-cmake && \
-#     cd darkpack-cmake && \
-#     cmake -S . -B ./build \
-#         -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_BUILD_TYPE=Release \
-#         -DCMAKE_INSTALL_PREFIX=./build/.install \
-#         -G Ninja && \
-#     cmake --build ./build --target install_headers_all && \
-#     ninja -C build
-
 CMD ["sleep", "infinity"]

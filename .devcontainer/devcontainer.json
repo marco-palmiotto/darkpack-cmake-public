@@ -3,7 +3,7 @@
 {
 	"name": "DarkPackTesting",
 	"build": {
-		"dockerfile": "Dockerfile-fedora"
+		"dockerfile": "Dockerfile-fedora-dev"
 	},
 	// "runArgs": [
 	//   "--memory=8g",

@@ -27,12 +27,14 @@ RUN dnf update -y && \
     jupyter-notebook \
     doxygen \
     git-clang-format \
+    pipx \
+    texlive-type1cm.noarch \
     -y && \ 
     dnf clean all  
 
-
 RUN useradd ${username}
 
+# Installing MARTY
 USER ${username}
 
 WORKDIR /home/${username}
@@ -54,20 +56,12 @@ ENV LIBRARY_PATH=$INSTALLMARTYPATH/lib
 ENV C_INCLUDE_PATH=$INSTALLMARTYPATH/include
 ENV CPATH=$INSTALLMARTYPATH/include
 
-USER root
-RUN dnf install pipx -y && \ 
-    dnf clean all  
-
+# Setting up pipx and poetry
 USER ${username}
 RUN pipx ensurepath && \
     pipx install poetry
 
-USER root
-RUN dnf install texlive-type1cm.noarch -y && \
-    dnf clean all
-
 USER ${username}
-
 
 # Installs maquao (for profiling/development)
 # RUN cd /usr/bin && wget https://maqao.org/maqao_archive/maqao.intel64.2.17.0.tar.xz &&	\
@@ -80,6 +74,5 @@ USER ${username}
 #     ./install.sh /usr/ && \
 #     cd .. && \
 #     rm -fr MicroBenchmark
-
 
 CMD ["sleep", "infinity"]

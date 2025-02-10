@@ -19,6 +19,9 @@ option(BUILD_DOCUMENTATION "Generate documentation with Doxygen" ${DOXYGEN_FOUND
 # Define MODELS_LIBS_NAMES as a cache variable with an empty default value
 set(MODELS_LIBS_NAMES "" CACHE STRING "List of model libraries to compile")
 
+# Define a cache variable for enabling/disabling the submodule compilation
+option(ENABLE_SUBMODULE_CMA "Enable compilation of the submodule CMA and dependent libraries" OFF)
+
 # Function to list all models
 function(list_all_models RESULT_VAR)
     set(LOCAL_MODELS_LIBS_NAMES "")
@@ -49,10 +52,6 @@ foreach(lib ${MODELS_LIBS_NAMES})
     list(APPEND PLAIN_MODELS_LIBS_NAMES ${plain_lib})
 endforeach()
 print(PLAIN_MODELS_LIBS_NAMES)
-
-# This submodule contains the CMA-ES algorithms for the parameter
-# space sampling
-add_subdirectory(submodules/CMA-ES)
 
 # Options to be applied to ALL the projects
     # Set C++ standard globally
@@ -122,8 +121,21 @@ add_subdirectory(src/Test)
 
 # Options to be applied to the dp_ libraries and the executables
 # Appending CMA-ES to the list of external libs to be linked 
-set(EXTERNAL_LIBS ${EXTERNAL_LIBS} cmaes)
-add_subdirectory(src/main)
+if(ENABLE_SUBMODULE_CMA)
+    if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/submodules/CMA-ES/CMakeLists.txt")
+        # This submodule contains the CMA-ES algorithms for the parameter
+        # space sampling
+        add_subdirectory(submodules/CMA-ES)
+        set(EXTERNAL_LIBS ${EXTERNAL_LIBS} cmaes)
+        add_subdirectory(src/main)
+        message(STATUS "CMA submodule and dependent libraries are now enabled for compilation")
+    else()
+        message(WARNING "CMA submodule directory not found. Please initialize and update the submodule.")
+        set(ENABLE_SUBMODULE_CMA OFF CACHE BOOL "Enable compilation of the CMA submodule and dependent libraries" FORCE)
+    endif()
+else()
+    message(STATUS "Submodule and dependent libraries disabled")
+endif()
 
 if(BUILD_DOCUMENTATION)
     if(DOXYGEN_FOUND)
@@ -162,6 +174,7 @@ set(EXCLUDE_PATTERNS
     "/submodules/"
     "/build/"
     "/src/.*/initialise_map.*"
+    "/src/dp_.*/config.hpp"
     # Add more patterns as needed
 )
 

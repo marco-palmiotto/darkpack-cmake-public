@@ -107,8 +107,8 @@ private:
      * @param ctheta The cosine of the angle between particles 1 and 3 in the centre-of-mass frame.
      * @param p1 The momentum of particle 1.
      * @param p3 The momentum of particle 3.
-     * @param sigdfj Matrix containing the scalar products of the momenta of the particles in the process, in the for s_ij
-     * = p_i * p_j.
+     * @param sigdfj Matrix containing the scalar products of the momenta of the particles in the process, in the for
+     * s_ij = p_i * p_j.
      * @return true If the process is kinematically allowed and the calculation was successful.
      * @return false Otherwise.
      */

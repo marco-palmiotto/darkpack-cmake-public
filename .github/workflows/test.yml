@@ -17,17 +17,19 @@ jobs:
         distro: ['fedora36', 'debian']
     
     steps:
-    - uses: actions/checkout@v2
+    - name: Cloning the last commit
+      uses: actions/checkout@v2
 
     - name: List files in the workspace
       run: ls ${GITHUB_WORKSPACE}
 
-    # - name: Set up Docker
-    #   uses: docker/setup-docker-action@v4
+    - name: Set up Docker
+      uses: docker/setup-docker-action@v4
 
-    # - name: Pull the docker images
-    #   run: docker pull docker.io/marcopalmiotto/darkpack-deploy:${{ matrix.distro }}
+    - name: Pull the docker images
+      run: docker pull docker.io/marcopalmiotto/darkpack-deploy:${{ matrix.distro }}
 
-    # - name: Run tests in ${{ matrix.distro }} container
-    #   run: echo "Running tests in ${{ matrix.distro }} container"
+    - name: Run tests in ${{ matrix.distro }} container
+      run: echo "Running tests in ${{ matrix.distro }} container" && \
+           docker run -v ${GITHUB_WORKSPACE}:/darkpack -w /darkpack docker.io/marcopalmiotto/darkpack-deploy:${{ matrix.distro }} /bin/bash -c "make test"
            

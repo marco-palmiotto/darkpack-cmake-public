@@ -1,5 +1,9 @@
 #!/bin/bash
 
+echo "Setting compilers"
+export CC=gcc
+export CXX=g++
+
 echo "Configuring cmake"
 cmake -S . -B ./build \
       -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_BUILD_TYPE=Release \

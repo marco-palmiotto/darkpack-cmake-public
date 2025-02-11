@@ -36,5 +36,5 @@ jobs:
       run: docker pull docker.io/marcopalmiotto/darkpack-deploy:${{ matrix.distro }}
 
     - name: Run tests in ${{ matrix.distro }} container
-      run: docker run --mount type=bind,src=${GITHUB_WORKSPACE},target=~/darkpack,U=true -w /darkpack docker.io/marcopalmiotto/darkpack-deploy:${{ matrix.distro }} /bin/bash -c "./run_CI.sh"
+      run: docker run --mount type=bind,src=${GITHUB_WORKSPACE},target=/home/darkpack,U=true -w /darkpack docker.io/marcopalmiotto/darkpack-deploy:${{ matrix.distro }} /bin/bash -c "cd /home/darkpack && ./run_CI.sh"
            

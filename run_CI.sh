@@ -21,8 +21,5 @@ cmake --build ./build --target format-check || exit 1
 echo "Installing headers"
 cmake --build ./build --target install_headers_all  || exit 1
 
-echo "Building documentation"
-cmake --build ./build --target darkpack_doc || exit 1
-
 echo "Building darkpack"
 ninja -C build || exit 1

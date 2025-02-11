@@ -37,6 +37,7 @@ jobs:
       run: |
         docker run --rm \
           --user $(id -u):$(id -g) \
+          --userns=keep-id \
           --mount type=bind,src=${GITHUB_WORKSPACE},target=/home/darkpack \
           -w /home/darkpack \
           docker.io/marcopalmiotto/darkpack-deploy:${{ matrix.distro }} \

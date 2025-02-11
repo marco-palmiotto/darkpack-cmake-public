@@ -1,6 +1,6 @@
 #!/bin/bash
 
-distros=( "fedora36" )
+distros=( "fedora36" "debian" )
 
 for distro in ${distros[@]}
 do

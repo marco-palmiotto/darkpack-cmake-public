@@ -23,6 +23,12 @@ jobs:
     - name: List files in the workspace
       run: ls ${GITHUB_WORKSPACE}
 
+    - name: Create build directory
+      run: |
+        mkdir -p ${GITHUB_WORKSPACE}/build
+        chmod -R 777 ${GITHUB_WORKSPACE}/build
+    
+
     - name: Set up Docker
       uses: docker/setup-docker-action@v4
 
@@ -30,5 +36,5 @@ jobs:
       run: docker pull docker.io/marcopalmiotto/darkpack-deploy:${{ matrix.distro }}
 
     - name: Run tests in ${{ matrix.distro }} container
-      run: docker run -v ${GITHUB_WORKSPACE}:/darkpack -w /darkpack docker.io/marcopalmiotto/darkpack-deploy:${{ matrix.distro }} /bin/bash -c "./run_CI.sh"
+      run: docker run -v "${GITHUB_WORKSPACE}:/darkpack:rw" -w /darkpack docker.io/marcopalmiotto/darkpack-deploy:${{ matrix.distro }} /bin/bash -c "mkdir -p build && chmod -R 777 build && ./run_CI.sh"
            

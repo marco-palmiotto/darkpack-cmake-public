@@ -4,6 +4,9 @@ echo "Setting compilers"
 export CC=gcc
 export CXX=g++
 
+echo "Testing read/write permissions"
+touch file_try.txt || exit 1
+
 echo "Configuring cmake"
 cmake -S . -B ./build \
       -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_BUILD_TYPE=Release \

@@ -4,7 +4,6 @@ on:
   pull_request:
     branches:
       - main
-  
   push:
     branches:
       - main
@@ -21,20 +20,25 @@ jobs:
       uses: actions/checkout@v2
 
     - name: List files in the workspace
-      run: ls ${GITHUB_WORKSPACE}
+      run: ls -la ${GITHUB_WORKSPACE}
 
-    - name: Create build directory
+    - name: Create build directory and set permissions
       run: |
         mkdir -p ${GITHUB_WORKSPACE}/build
-        chmod -R 777 ${GITHUB_WORKSPACE}/build
-    
+        sudo chown -R $(id -u):$(id -g) ${GITHUB_WORKSPACE}
+        chmod -R 755 ${GITHUB_WORKSPACE}
 
     - name: Set up Docker
-      uses: docker/setup-docker-action@v4
+      uses: docker/setup-buildx-action@v1
 
     - name: Pull the docker images
       run: docker pull docker.io/marcopalmiotto/darkpack-deploy:${{ matrix.distro }}
 
     - name: Run tests in ${{ matrix.distro }} container
-      run: docker run --mount type=bind,src=${GITHUB_WORKSPACE},target=/home/darkpack -w /darkpack docker.io/marcopalmiotto/darkpack-deploy:${{ matrix.distro }} /bin/bash -c "cd /home/darkpack && ./run_CI.sh"
-           
+      run: |
+        docker run --rm \
+          --user $(id -u):$(id -g) \
+          --mount type=bind,src=${GITHUB_WORKSPACE},target=/home/darkpack \
+          -w /home/darkpack \
+          docker.io/marcopalmiotto/darkpack-deploy:${{ matrix.distro }} \
+          /bin/bash -c "./run_CI.sh"

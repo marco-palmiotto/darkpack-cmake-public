@@ -30,6 +30,5 @@ jobs:
       run: docker pull docker.io/marcopalmiotto/darkpack-deploy:${{ matrix.distro }}
 
     - name: Run tests in ${{ matrix.distro }} container
-      run: echo "Running tests in ${{ matrix.distro }} container" && \
-           docker run -v ${GITHUB_WORKSPACE}:/darkpack -w /darkpack docker.io/marcopalmiotto/darkpack-deploy:${{ matrix.distro }} /bin/bash -c "make test"
+      run: docker run -v ${GITHUB_WORKSPACE}:/darkpack -w /darkpack docker.io/marcopalmiotto/darkpack-deploy:${{ matrix.distro }} /bin/bash -c "make test"
            

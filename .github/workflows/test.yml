@@ -21,9 +21,11 @@ jobs:
 
     - name: Set up Docker
       uses: docker/setup-docker-action@v4
-      
+
     - name: Pull the docker images
       run: docker pull docker.io/marcopalmiotto/darkpack-deploy:${{ matrix.distro }}
 
     - name: Run tests in ${{ matrix.distro }} container
-      run: echo "Running tests in ${{ matrix.distro }} container"
+      run: echo "Running tests in ${{ matrix.distro }} container" && \
+           ls ${GITHUB_WORKSPACE}/darkpack-cmake
+           

@@ -5,7 +5,7 @@ export CC=gcc
 export CXX=g++
 
 echo "Testing read/write permissions"
-touch file_try.txt || exit 1
+mkdir build || exit 1
 
 echo "Configuring cmake"
 cmake -S . -B ./build \

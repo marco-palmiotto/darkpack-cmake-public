@@ -22,11 +22,10 @@ jobs:
     - name: List files in the workspace
       run: ls -la ${GITHUB_WORKSPACE}
 
-    # - name: Create build directory and set permissions
-    #   run: |
-    #     mkdir -p ${GITHUB_WORKSPACE}/build
-    #     sudo chown -R $(id -u):$(id -g) ${GITHUB_WORKSPACE}
-    #     chmod -R 755 ${GITHUB_WORKSPACE}
+    - name: Set permissions on workspace
+      run: |
+        sudo chown -R $(id -u):$(id -g) ${GITHUB_WORKSPACE}
+        chmod -R 755 ${GITHUB_WORKSPACE}
 
     - name: Set up Docker
       uses: docker/setup-buildx-action@v1

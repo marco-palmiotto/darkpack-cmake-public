@@ -5,11 +5,14 @@
 	"build": {
 		"dockerfile": "Dockerfile-fedora-dev"
 	},
-	// "runArgs": [
+	"runArgs": [
+		// This argument is needed to allow podman containers to have writing permission into the host filesystem
+		// Note: to use podman, you need to set "podman" as docker binary and "podman compose up" as docker compose binary in the settings
+		"--userns=keep-id"
 	//   "--memory=8g",
 	//   "--memory-swap=10g",
 	//   "--cpus=6"
-	// ],
+	],
 	"customizations": {
 		"vscode": {
 			"extensions": [
@@ -25,7 +28,8 @@
 				"mintlify.document",
 				"zeshuaro.vscode-python-poetry",
 				"ms-python.python",
-				"ms-toolsai.jupyter"
+				"ms-toolsai.jupyter",
+				"github.vscode-github-actions"
 			]
 		}
 	},

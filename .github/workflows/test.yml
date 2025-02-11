@@ -20,8 +20,8 @@ jobs:
     - uses: actions/checkout@v2
 
     - name: Set up Docker
-      uses: docker-practice/actions-setup-docker@master
-
+      uses: docker/setup-docker-action@v4
+      
     - name: Pull the docker images
       run: docker pull docker.io/marcopalmiotto/darkpack-deploy:${{ matrix.distro }}
 

@@ -22,6 +22,9 @@ jobs:
       matrix:
         distro: ['fedora36', 'debian']
     steps:
+      - name: Clean workspace
+        run: if [ -d workspace ] ; then rm -rf workspace ; fi && mkdir workspace && cd workspace
+
       - name: Check out repository code
         uses: actions/checkout@v4
 
@@ -37,4 +40,4 @@ jobs:
         run: podman pull docker.io/marcopalmiotto/darkpack-deploy:${{ matrix.distro }}
 
       - name: Test on podman container
-        run: podman run --rm --user $(id -u):$(id -g) --mount type=bind,src=${GITHUB_WORKSPACE},target=/home/darkpack,U=true -w /home/darkpack docker.io/marcopalmiotto/darkpack-deploy:${{ matrix.distro }} /bin/bash -c "./run_CI.sh"     
+        run: podman run --rm --userns=keep-id --mount type=bind,src=${GITHUB_WORKSPACE},target=/home/darkpack,U=true -w /home/darkpack docker.io/marcopalmiotto/darkpack-deploy:${{ matrix.distro }} /bin/bash -c "./run_CI.sh"     

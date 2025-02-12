@@ -37,4 +37,4 @@ jobs:
         run: podman pull docker.io/marcopalmiotto/darkpack-deploy:${{ matrix.distro }}
 
       - name: Test on podman container
-        run: podman run --rm --user $(id -u):$(id -g) --mount type=bind,src=.,target=/home/darkpack -w /home/darkpack docker.io/marcopalmiotto/darkpack-deploy:${{ matrix.distro }} /bin/bash -c "./run_CI.sh"     
+        run: podman run --rm --user $(id -u):$(id -g) --mount type=bind,src=${GITHUB_WORKSPACE},target=/home/darkpack,U=true -w /home/darkpack docker.io/marcopalmiotto/darkpack-deploy:${{ matrix.distro }} /bin/bash -c "./run_CI.sh"     

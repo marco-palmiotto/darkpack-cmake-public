@@ -30,9 +30,9 @@ jobs:
   
       - name: Set permissions on workspace
         run: |
-          sudo chown -R $(id -u):$(id -g) ${GITHUB_WORKSPACE}
+          chown -R $(id -u):$(id -g) ${GITHUB_WORKSPACE}
           chmod -R 755 ${GITHUB_WORKSPACE}
-          
+
       - name: Pull image
         run: podman pull docker.io/marcopalmiotto/darkpack-deploy:${{ matrix.distro }}
 

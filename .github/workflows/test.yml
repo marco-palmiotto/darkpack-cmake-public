@@ -16,22 +16,28 @@ jobs:
         distro: ['fedora36', 'debian']
     
     steps:
-    - name: Cloning the last commit
-      uses: actions/checkout@v2
+      - name: Install Podman
+        uses: gacts/install-podman@v1
 
-    - name: List files in the workspace
-      run: ls -la ${GITHUB_WORKSPACE}
+      - name: Check Podman version
+        run: podman version
 
-    - name: Set permissions on workspace
-      run: |
-        sudo chown -R $(id -u):$(id -g) ${GITHUB_WORKSPACE}
-        chmod -R 755 ${GITHUB_WORKSPACE}
+      - name: Clean workspace
+        run: if [ -d workspace ] ; then rm -rf workspace ; fi && mkdir workspace && cd workspace
 
-    - name: Set up Docker
-      uses: docker/setup-buildx-action@v1
+      - name: Check out repository code
+        uses: actions/checkout@v4
 
-    - name: Pull the docker images
-      run: docker pull docker.io/marcopalmiotto/darkpack-deploy:${{ matrix.distro }}
+      - name: List files in the workspace
+        run: ls -la ${GITHUB_WORKSPACE}
+  
+      - name: Set permissions on workspace
+        run: |
+          chown -R $(id -u):$(id -g) ${GITHUB_WORKSPACE}
+          chmod -R 755 ${GITHUB_WORKSPACE}
 
-    - name: Run tests in ${{ matrix.distro }} container
-      run: docker run --rm --user $(id -u):$(id -g) --mount type=bind,src=${GITHUB_WORKSPACE},target=/home/darkpack,U=true -w /home/darkpack docker.io/marcopalmiotto/darkpack-deploy:${{ matrix.distro }} /bin/bash -c "./run_CI.sh"     
+      - name: Pull image
+        run: podman pull docker.io/marcopalmiotto/darkpack-deploy:${{ matrix.distro }}
+
+      - name: Test on podman container
+        run: podman run --rm --userns=keep-id --mount type=bind,src=${GITHUB_WORKSPACE},target=/home/darkpack,U=true -w /home/darkpack docker.io/marcopalmiotto/darkpack-deploy:${{ matrix.distro }} /bin/bash -c "./run_CI.sh"     

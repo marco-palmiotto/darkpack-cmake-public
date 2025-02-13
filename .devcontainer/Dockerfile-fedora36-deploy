@@ -2,9 +2,9 @@ FROM registry.fedoraproject.org/fedora:36
 
 ARG username=vscode
 
-RUN yum update -y && \
-    yum upgrade -y && \
-    yum install \
+RUN dnf update -y && \
+    dnf upgrade -y && \
+    dnf install \
         gcc \
         gfortran \
         g++ \
@@ -19,7 +19,8 @@ RUN yum update -y && \
         git \
         ninja-build \
         git-clang-format \
-        -y 
+        -y && \
+    dnf clean all  
 
 RUN useradd ${username}
 

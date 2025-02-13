@@ -6,6 +6,7 @@
 /**/out/
 src/models/*2to2*/
 cmake-build-debug*/
+*/shell_scripts/*
 
 *config.hpp
 /*/config.hpp

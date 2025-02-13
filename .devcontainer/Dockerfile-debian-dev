@@ -3,14 +3,28 @@ FROM mcr.microsoft.com/devcontainers/cpp:1-debian-12
 ARG username=vscode
 
 # Installing packages for MARTY's dependencies
-RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
-    && apt-get -y install --no-install-recommends \
-    libgsl-dev libgslcblas0 texlive texlive-luatex dvipng coreutils imagemagick \
-    qtbase5-dev qtchooser qt5-qmake qtbase5-dev-tools \
-    make cmake g++ gcc gfortran git \
-    ninja-build doxygen doxygen-latex \
-    autoconf automake libtool libgoogle-glog-dev libgflags-dev libeigen3-dev \
-    neofetch 
+RUN apt-get update && \
+    export DEBIAN_FRONTEND=noninteractive && \
+    apt-get -y install --no-install-recommends \
+        libgsl-dev \
+        libgslcblas0 \
+        texlive \
+        texlive-luatex \
+        dvipng \
+        coreutils \
+        imagemagick \
+        qtbase5-dev \
+        qtchooser \
+        qt5-qmake \
+        qtbase5-dev-tools \
+        ninja-build \
+        cmake \
+        g++ \
+        gcc \
+        gfortran \
+        git \
+        clang-format && \
+    apt-get clean
 
 USER ${username}
 
@@ -34,4 +48,23 @@ ENV LIBRARY_PATH=$INSTALLMARTYPATH/lib
 ENV C_INCLUDE_PATH=$INSTALLMARTYPATH/include
 ENV CPATH=$INSTALLMARTYPATH/include
 
+# Installing CMA-ES dependencies
+USER root
+RUN  apt-get -y install --no-install-recommends \   
+        autoconf \
+        automake \
+        libtool \
+        libgoogle-glog-dev \
+        libgflags-dev \
+        libeigen3-dev \
+     apt-get clean
+
+# Installing dev dependencies
+RUN apt-get -y install --no-install-recommends \  
+            doxygen \
+            doxygen-latex \
+            neofetch && \
+    apt-get clean
+
+USER ${username}
 CMD ["sleep", "infinity"]

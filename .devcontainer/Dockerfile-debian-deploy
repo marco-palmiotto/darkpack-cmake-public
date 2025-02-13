@@ -3,11 +3,27 @@ FROM mcr.microsoft.com/devcontainers/cpp:1-debian-12
 ARG username=vscode
 
 # Installing packages for MARTY's dependencies
-RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
-    && apt-get -y install --no-install-recommends \
-    libgsl-dev libgslcblas0 texlive texlive-luatex dvipng coreutils imagemagick \
-    qtbase5-dev qtchooser qt5-qmake qtbase5-dev-tools \
-    ninja-build cmake g++ gcc gfortran git clang-format && \
+RUN apt-get update && \
+    export DEBIAN_FRONTEND=noninteractive && \
+    apt-get -y install --no-install-recommends \
+        libgsl-dev \
+        libgslcblas0 \
+        texlive \
+        texlive-luatex \
+        dvipng \
+        coreutils \
+        imagemagick \
+        qtbase5-dev \
+        qtchooser \
+        qt5-qmake \
+        qtbase5-dev-tools \
+        ninja-build \
+        cmake \
+        g++ \
+        gcc \
+        gfortran \
+        git \
+        clang-format && \
     apt-get clean
 
 USER ${username}

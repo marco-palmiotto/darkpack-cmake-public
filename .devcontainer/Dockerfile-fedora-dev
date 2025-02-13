@@ -5,31 +5,31 @@ ARG username=vscode
 RUN dnf update -y && \
     dnf upgrade -y && \
     dnf install \
-    gcc \
-    gfortran \
-    g++ \
-    gsl \
-    gsl-devel \
-    texlive \
-    ImageMagick \
-    dvipng \
-    coreutils \
-    qtchooser \
-    cmake \
-    git \
-    ninja-build \
-    gdb \
-    eigen3-devel \
-    tbb \
-    tbb-devel \
-    wget \
-    python3 \
-    jupyter-notebook \
-    doxygen \
-    git-clang-format \
-    pipx \
-    texlive-type1cm.noarch \
-    -y && \ 
+                gcc \
+                gfortran \
+                g++ \
+                gsl \
+                gsl-devel \
+                texlive \
+                ImageMagick \
+                dvipng \
+                coreutils \
+                qtchooser \
+                cmake \
+                git \
+                ninja-build \
+                gdb \
+                eigen3-devel \
+                tbb \
+                tbb-devel \
+                wget \
+                python3 \
+                jupyter-notebook \
+                doxygen \
+                git-clang-format \
+                pipx \
+                texlive-type1cm.noarch \
+                -y && \ 
     dnf clean all  
 
 RUN useradd ${username}

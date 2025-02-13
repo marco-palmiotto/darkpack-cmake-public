@@ -2,6 +2,7 @@ FROM registry.fedoraproject.org/fedora:36
 
 ARG username=vscode
 
+# Installing common dependencies
 RUN dnf update -y && \
     dnf upgrade -y && \
     dnf install \
@@ -18,11 +19,6 @@ RUN dnf update -y && \
                 cmake \
                 git \
                 ninja-build \
-                eigen3-devel \
-                tbb \
-                tbb-devel \
-                wget \
-                doxygen \
                 git-clang-format \
                 -y && \ 
     dnf clean all  
@@ -50,6 +46,16 @@ ENV LD_LIBRARY_PATH=$INSTALLMARTYPATH/lib
 ENV LIBRARY_PATH=$INSTALLMARTYPATH/lib
 ENV C_INCLUDE_PATH=$INSTALLMARTYPATH/include
 ENV CPATH=$INSTALLMARTYPATH/include
+
+#Installing CMA-ES dependencies
+USER root   
+RUN dnf install \                 
+        eigen3-devel \
+        tbb \
+        tbb-devel \
+        wget \
+        doxygen -y && \ 
+    dnf clean all 
 
 USER ${username}
 

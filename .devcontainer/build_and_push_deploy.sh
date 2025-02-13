@@ -1,18 +1,22 @@
 #!/bin/bash
 
 distros=( "fedora36" "debian" )
-suffix=deploy
+suffix=( "dev" "scan" "deploy") #deploy must be the last one
 
 for distro in ${distros[@]}
 do
-    echo Working on $distro
-    name_output=darkpack-$suffix-$distro
+    for suffix in ${suffixes[@]}
+    do
+        name_output=darkpack-$suffix-$distro
+        filename=Dockerfile-${distro}-$suffix
+        echo Working on $filename
 
-    podman build -t $name_output:latest -f Dockerfile-${distro}-$suffix
+        [ -f $filename ] && podman build -t $name_output:latest -f $filename
+    done
 
-    podman tag localhost/${name_output} docker.io/marcopalmiotto/darkpack-deploy:$distro
+    # [ -f $filename ] && podman tag localhost/${name_output} docker.io/marcopalmiotto/darkpack-deploy:$distro
 
-    podman push docker.io/marcopalmiotto/darkpack-deploy:$distro
+    # [ -f $filename ] && podman push docker.io/marcopalmiotto/darkpack-deploy:$distro
 
     # To save the image in a sif file
     # podman save --format oci-archive -o $name_output.tar localhost/$name_output:latest

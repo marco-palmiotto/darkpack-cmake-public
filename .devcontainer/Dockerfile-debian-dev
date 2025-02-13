@@ -56,7 +56,7 @@ RUN  apt-get -y install --no-install-recommends \
         libtool \
         libgoogle-glog-dev \
         libgflags-dev \
-        libeigen3-dev \
+        libeigen3-dev && \
      apt-get clean
 
 # Installing dev dependencies

@@ -3,7 +3,7 @@
 {
 	"name": "DarkPackTesting",
 	"build": {
-		"dockerfile": "Dockerfile-fedora-dev"
+		"dockerfile": "Dockerfile-fedora36-dev"
 	},
 	"runArgs": [
 		// This argument is needed to allow podman containers to have writing permission into the host filesystem

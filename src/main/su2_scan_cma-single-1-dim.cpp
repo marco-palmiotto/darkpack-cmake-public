@@ -59,7 +59,7 @@ int main(int argc, char* argv[])
   std::ofstream outfile{argv[read_args]};
   if (!outfile)
   {
-    std::out << "Impossible to open " << argv[read_args] << '\n';
+    std::cout << "Impossible to open " << argv[read_args] << '\n';
   }
   std::cout << "Output file: " << argv[read_args++] << '\n';
 

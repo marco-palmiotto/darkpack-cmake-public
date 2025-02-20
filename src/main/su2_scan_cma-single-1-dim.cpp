@@ -137,11 +137,11 @@ int main(int argc, char* argv[])
   std::cout << m_phi_over_mv << '\t' << mchi_over_mv << '\t' << input.m_V.get() << '\t' << bestparameters_dvec[0]
             << '\t' << fmin << '\t' << edm << '\t' << return_val << '\n';
 
-  if(outfile)
+  if (outfile)
   {
     outfile << "# m_phi/m_V  m_chi/m_V m_V  g_f   pull-Oh2   EDM  exit_code \n";
-    outfile << m_phi_over_mv << '\t' << mchi_over_mv << '\t' << input.m_V.get() << '\t' << bestparameters_dvec[0] << '\t'
-            << fmin << '\t' << edm << '\t' << return_val << '\n';
+    outfile << m_phi_over_mv << '\t' << mchi_over_mv << '\t' << input.m_V.get() << '\t' << bestparameters_dvec[0]
+            << '\t' << fmin << '\t' << edm << '\t' << return_val << '\n';
   }
 
 

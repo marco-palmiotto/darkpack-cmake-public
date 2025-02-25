@@ -63,7 +63,7 @@ int main(int argc, char* argv[])
   }
   else
   {
-    outfile << "# m_phi/m_V  m_chi/m_V m_V  g_f   pull-Oh2   EDM  exit_code \n";
+    outfile << "# m_phi/m_V  m_chi/m_V m_V  g_f   pull-Oh2   EDM  exit_code \nRESULT=";
   }
   std::cout << "Output file: " << argv[read_args++] << '\n';
 
@@ -149,5 +149,5 @@ int main(int argc, char* argv[])
   }
 
 
-  return return_val;
+  return 0;
 }

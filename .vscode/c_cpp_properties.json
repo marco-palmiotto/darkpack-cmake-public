@@ -8,9 +8,9 @@
                 "${workspaceFolder}/build/.install/include",
                 "${workspaceFolder}/src/DPMathLib",
                 "${workspaceFolder}/src/TemplatedLib",
-                "${workspaceFolder}/src/su2f2to2/include",
-                "${workspaceFolder}/src/su2f2to2/clib",
-                "${workspaceFolder}/src/dp_su2f2to2",
+                "${workspaceFolder}/src/u1f2to2/include",
+                "${workspaceFolder}/src/u1f2to2/clib",
+                "${workspaceFolder}/src/dp_u1f2to2",
                 "${workspaceFolder}/build/.install/include"
             ],
             "defines": [],

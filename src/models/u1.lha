@@ -1,0 +1,45 @@
+#
+BLOCK  SMINPUTS      
+     1  1.2795100E+02  # alpha_em_MZ
+     2  1.1663788E-05  # Gfermi
+     3  1.1790000E-01  # alpha_str_MZ
+     4  9.1153600E+01  # M_Z_pole
+     5  4.1800000E+00  # m_b(m_b)
+     6  1.7269000E+02  # m_top_pole
+     7  1.7768600E+00  # m_tau_pole
+    11  5.1099895E-04  # m_el_pole
+    12  0.0000000E+00  
+    13  1.0565838E-01  # m_mu_pole
+    14  0.0000000E+00  
+    21  4.6700000E-03  # m_d_2GeV
+    22  2.1600000E-03  # m_u_2GeV
+    23  9.3400000E-02  # m_s_2GeV
+    24  1.2700000E+00  # m_c(m_c)
+#
+BLOCK  VCKMIN      
+     1  2.2500000E-01  # lambda
+     2  8.2600000E-01  # A
+     3  1.5900000E-01  # rhobar
+     4  3.4800000E-01  # etabar
+#
+BLOCK  MASS      
+    11  5.1099895E-04  # m_el
+    12  0.0000000E+00  
+    13  1.0565838E-01  # m_mu
+    14  0.0000000E+00  
+    25  1.2525000E+02  # m_h
+    23  9.1153600E+01  # M_Z
+    24  7.9788648E+01  # M_W
+# 
+BLOCK U1LEPTONIC
+     1  0.0 # theta_12_L
+     2  0.0 # theta_12_R 
+     3  0.0 # theta_13_L 
+     4  0.0 # theta_13_R 
+     5  1.0E-1 # theta_23_L 
+     6  1.0E-1 # theta_23_R 
+     7  1.0E-1 # g_f         # to be varied in minimum
+     8  200    # m_V_3         # to be varied
+     9  400    # m_phi       # 2*m_v
+    10  400    # m_chi_dm_1  # same as below, fix ratio withh m_V, init =3,2.5,0.25
+    11  400    # m_chi_dm_2

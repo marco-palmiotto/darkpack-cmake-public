@@ -9,7 +9,7 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/build/src/Test/u1_try.x",
-            "args": ["${workspaceFolder}/src/models/u1f.lha"],
+            "args": ["${workspaceFolder}/src/models/u1.lha"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],

@@ -72,6 +72,7 @@
         "any": "cpp",
         "unordered_set": "cpp",
         "forward_list": "cpp",
-        "shared_mutex": "cpp"
+        "shared_mutex": "cpp",
+        "ranges": "cpp"
     }
 }

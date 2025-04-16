@@ -161,11 +161,43 @@ public:
     inline short int getSf34() const { return Sf34; };
     inline short int getDof() const { return combinFac; };
 
+
+    /**
+     * @brief Prints the name of the process and its specifications to the given output stream.
+     *
+     * @param out Output stream to print to (default is std::cout).
+     */
     inline void print(std::ostream& out = std::cout) const
     {
       out << getMname() << "\nSf_34 = " << getSf34() << " dof = " << getDof() << " Cpfac " << CPfac.get() << '\n'
           << part_g[0] << part_g[1] << part_g[2] << part_g[3] << std::endl;
     }
+
+    /**
+     * @brief Returns true if the process is kinematically allowed at a certain centre-of-mass energy, otherwise returns
+     * false.
+     *
+     * @param input numerical parameters
+     * @param sqrts centre-of-mass energy
+     * @return true
+     * @return false
+     */
+    inline bool isAllowedAtDefinedEcm(const Param_t& input, const real_t& sqrts) const
+    {
+      return ((sqrts < getMass(3, input) + getMass(4, input)) || (sqrts < getMass(1, input) + getMass(2, input)));
+    };
+
+    /**
+     * @brief Returns true if the mass of the final state is larger or equal than the mass in the initial state.
+     *
+     * @param input numerical parameters
+     * @return true
+     * @return false
+     */
+    inline bool isAllowedAtZeroMomentum(const Param_t& input) const
+    {
+      return ((sqrts < getMass(3, input) + getMass(4, input)) || (sqrts < getMass(1, input) + getMass(2, input)));
+    };
 
     inline Cfptr_t getSumSquaredAmpl_ptr() const { return sumSquaredAmpl; };
 

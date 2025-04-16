@@ -11,4 +11,4 @@ cmake -S . -B ./build \
 cmake --build ./build --target format && \
 cmake --build ./build --target format-check && \
 cmake --build ./build --target install_headers_all 
-# cmake --build ./build --target darkpack_doc 
+cmake --build ./build --target darkpack_doc 

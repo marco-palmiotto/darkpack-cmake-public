@@ -12,8 +12,6 @@ endfunction()
 
 # Find Doxygen package
 find_package(Doxygen QUIET)
-find_package(libcmaes REQUIRED)
-find_package(marty REQUIRED)
 # Define a cache variable for enabling/disabling documentation
 option(BUILD_DOCUMENTATION "Generate documentation with Doxygen" ${DOXYGEN_FOUND})
 

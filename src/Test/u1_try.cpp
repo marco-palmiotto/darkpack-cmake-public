@@ -25,15 +25,9 @@ int main(int argc, char* argv[])
   int read_args = 0;
   std::cout << "Running " << argv[read_args++] << '\n';
 
-  constexpr const double sigma = omega_h2_err;
-  constexpr const int npar = 1;
   constexpr const int n_required_args = 2;
-  // constexpr const char* par_names[npar] = {"g_chi"}; // Name of the parameters to be optimised
   constexpr const double m_phi_over_mv = 2.;
 
-  [[maybe_unused]] constexpr const double init_seed_g_chi = 0.3;
-
-  double lbounds[npar] = {1.e-6}, ubounds[npar] = {1.0}; // arrays for lower and upper parameter bounds, respectively
 
   std::cout << "This function requires " << n_required_args - 1 << " arguments:\n"
             << " - The name of the input file\n";

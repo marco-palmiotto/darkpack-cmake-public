@@ -69,7 +69,7 @@ int main(int argc, char* argv[])
       input.refresh();
       asv.changeInput(input);
       std::cout << "m_V = " << *m_V << ", g_f = " << *g_f << ", 2*m_chi = " << 2. * input.m_chi_dm_1.get() << '\n';
-      asv.print_contributing_processes(2 * input.m_chi_dm_1);
+      asv.print_contributing_processes();
       std::cout << '\n';
     }
   }

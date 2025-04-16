@@ -16,7 +16,8 @@
 
 namespace __SPEC_LIB_NAME__
 {
-  constexpr const short unsigned int NlowTsv = 10;
+  constexpr const short unsigned int NlowTsv =
+      10; //!< Maximum order of the Taylor expansion for \f$<\sigma v>\f$ at low T
   constexpr const std::array<std::array<real_t, NlowTsv + 1>, NlowTsv + 1> CoefflowTsv = {
       {{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
        {-3, 3. / 2, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -35,9 +36,11 @@ namespace __SPEC_LIB_NAME__
         230945. / 65536, 0},
        {-(38822473644075. / 8589934592), -(43047242435475. / 8589934592), -(10584016875. / 67108864),
         275065875. / 4194304, 412279875. / 8388608, -(170176545. / 2097152), 154459305. / 2097152,
-        -(13610025. / 262144), 31177575. / 1048576, -(3464175. / 262144), 969969. / 262144}}};
+        -(13610025. / 262144), 31177575. / 1048576, -(3464175. / 262144),
+        969969. / 262144}}}; //!< Coefficients of the Taylor expansion for \f$<\sigma v>\f$ at low T
 
-  constexpr const unsigned short int NlowTsv_split = 4;
+  constexpr const unsigned short int NlowTsv_split =
+      4; //!< Maximum order for the Taylor expansion for \f$<\sigma v>\f$ at low T for small mass splitting
   constexpr const real_t Qnij[NlowTsv_split + 1][NlowTsv_split + 1][NlowTsv_split + 1] = {
       {{1., 0., 0., 0., 0.}, {0., 0., 0., 0., 0.}, {0., 0., 0., 0., 0.}, {0., 0., 0., 0., 0.}, {0., 0., 0., 0., 0.}},
       {{0.75, 1., 0., 0., 0.}, {1.5, 0., 0., 0., 0.}, {0., 0., 0., 0., 0.}, {0., 0., 0., 0., 0.}, {0., 0., 0., 0., 0.}},
@@ -55,29 +58,37 @@ namespace __SPEC_LIB_NAME__
        {0., 1.17188, 2.625, 1.5, 0.},
        {0., 6.09375, 1.875, 0., 0.},
        {0., 2.1875, 0., 0., 0.},
-       {2.46094, 0., 0., 0., 0.}}};
+       {2.46094, 0., 0., 0., 0.}}}; //!< $Q_{n,i,j}$ coefficients for the Taylor expansion for \f$<\sigma v>\f$ at low T
+                                    //!< for small mass splitting
 
   // Using the notation phitilde_n = beta_n + eta*lambda_n
-  constexpr const std::array<real_t, NlowTsv_split + 1> sv_beta = {1., -3.75, 8.90625, -16.5234, 25.1147};
-  constexpr const std::array<real_t, NlowTsv_split + 1> sv_lambda = {-2., 2.75, 5.15625, -41.3672, 145.085};
+  constexpr const std::array<real_t, NlowTsv_split + 1> sv_beta = {
+      1., -3.75, 8.90625, -16.5234, 25.1147}; //!< $\beta_n$ coefficients for the Taylor expansion for \f$<\sigma v>\f$
+                                              //!< at low T for small mass splitting
+  constexpr const std::array<real_t, NlowTsv_split + 1> sv_lambda = {
+      -2., 2.75, 5.15625, -41.3672, 145.085}; //!< $\lambda_n$ coefficients for the Taylor expansion for \f$<\sigma
+                                              //!< v>\f$ at low T for small mass splitting
 
   class AvgSvCalculator
   {
 protected:
-    Param_t input;
-    RunningSM run;
-    std::shared_ptr<std::vector<Process2to2>> p_ptr;
-    csl::InitSanitizer<bool> Weffcuts;
+    Param_t input;                                   //!< Input parameters
+    RunningSM run;                                   //!< Runnig class
+    std::shared_ptr<std::vector<Process2to2>> p_ptr; //!< Pointer to the list of processes
+    csl::InitSanitizer<bool> Weffcuts;               //!< Flag to enable/disable the kinematical cuts on Weff
 
-    std::vector<real_t> sqrtStab, pefftab, g2_Wefftab;
+    std::vector<real_t> sqrtStab, //!< Vector of the centre-of-mass energies for each process
+        pefftab,                  //!< Vector of the \f$p_{eff}\f$ for each process
+        g2_Wefftab;               //!< Vector of the \f$g^2 W_{eff}\f$ for each process
 
-    csl::InitSanitizer<real_t> T_lim_sigmav;
+    csl::InitSanitizer<real_t> T_lim_sigmav; //!< Threshold temperature for the calculation of \f$<\sigma v>\f$ with the
+                                             //!< algorithm for high temperatures
     short int orderT;
     std::array<int, corr::SIZEPHYSICALBSM> bsm_particles_sorted;
     std::vector<real_t> ytab;
     std::vector<real_t> Weffderiv;
     std::vector<real_t> Weffderiv_err;
-    std::vector<real_t> TaylorCoeffSVT; // Taylor coefficients of <sigma v> (T) at low T
+    std::vector<real_t> TaylorCoeffSVT; // Taylor coefficients of \f$<\sigma v>\f$ (T) at low T
     bool wastherenosplitting, werealldeltaxinull;
 
 
@@ -115,6 +126,23 @@ public:
       print_coefficients(out);
     };
 
+    /**
+     * @brief Prints the processes kinematically allowed at the energy Ecm
+     *
+     * @param Ecm Centre-of-mass energy
+     * @param out Stream where to print the processes
+     */
+    inline void print_contributing_processes(const real_t& Ecm, std::ostream& out = std::cout) const
+    {
+      for (const auto& proc : *p_ptr)
+      {
+        if (proc.isAllowed(input, Ecm))
+        {
+          out << proc.getMname() << '\n';
+        }
+      }
+    };
+
     inline void runAtScale(const real_t& Q)
     {
       if (runningenabled)
@@ -143,10 +171,6 @@ public:
     inline size_t getN() const { return p_ptr->size(); };
     inline Process2to2 getProcess(const size_t index) const { return (*p_ptr)[index]; };
     inline Param_t getInput() const { return input; };
-    //     inline Param_t & getInputRef()
-    //     {
-    //       return input;
-    //     };
     inline std::shared_ptr<std::vector<Process2to2>> getProcList() const { return p_ptr; }
     inline int getLSP() const { return input.getLightestBSMpart(); };
     inline real_t getMassLBSM() const { return input.getLightestBSMmass(); };

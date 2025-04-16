@@ -17,7 +17,7 @@
 namespace __SPEC_LIB_NAME__
 {
   constexpr const short unsigned int NlowTsv =
-      10; //!< Maximum order of the Taylor expansion for \f$<\sigma v>\f$ at low T
+      10; //!< Maximum order of the Taylor expansion for \f$\langle\sigma v\rangle\f$ at low T
   constexpr const std::array<std::array<real_t, NlowTsv + 1>, NlowTsv + 1> CoefflowTsv = {
       {{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
        {-3, 3. / 2, 0, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -37,10 +37,10 @@ namespace __SPEC_LIB_NAME__
        {-(38822473644075. / 8589934592), -(43047242435475. / 8589934592), -(10584016875. / 67108864),
         275065875. / 4194304, 412279875. / 8388608, -(170176545. / 2097152), 154459305. / 2097152,
         -(13610025. / 262144), 31177575. / 1048576, -(3464175. / 262144),
-        969969. / 262144}}}; //!< Coefficients of the Taylor expansion for \f$<\sigma v>\f$ at low T
+        969969. / 262144}}}; //!< Coefficients of the Taylor expansion for \f$\langle\sigma v\rangle\f$ at low T
 
   constexpr const unsigned short int NlowTsv_split =
-      4; //!< Maximum order for the Taylor expansion for \f$<\sigma v>\f$ at low T for small mass splitting
+      4; //!< Maximum order for the Taylor expansion for \f$\langle\sigma v\rangle\f$ at low T for small mass splitting
   constexpr const real_t Qnij[NlowTsv_split + 1][NlowTsv_split + 1][NlowTsv_split + 1] = {
       {{1., 0., 0., 0., 0.}, {0., 0., 0., 0., 0.}, {0., 0., 0., 0., 0.}, {0., 0., 0., 0., 0.}, {0., 0., 0., 0., 0.}},
       {{0.75, 1., 0., 0., 0.}, {1.5, 0., 0., 0., 0.}, {0., 0., 0., 0., 0.}, {0., 0., 0., 0., 0.}, {0., 0., 0., 0., 0.}},
@@ -58,13 +58,13 @@ namespace __SPEC_LIB_NAME__
        {0., 1.17188, 2.625, 1.5, 0.},
        {0., 6.09375, 1.875, 0., 0.},
        {0., 2.1875, 0., 0., 0.},
-       {2.46094, 0., 0., 0., 0.}}}; //!< $Q_{n,i,j}$ coefficients for the Taylor expansion for \f$<\sigma v>\f$ at low T
-                                    //!< for small mass splitting
+       {2.46094, 0., 0., 0., 0.}}}; //!< $Q_{n,i,j}$ coefficients for the Taylor expansion for \f$\langle\sigma
+                                    //!< v\rangle\f$ at low T for small mass splitting
 
   // Using the notation phitilde_n = beta_n + eta*lambda_n
   constexpr const std::array<real_t, NlowTsv_split + 1> sv_beta = {
-      1., -3.75, 8.90625, -16.5234, 25.1147}; //!< $\beta_n$ coefficients for the Taylor expansion for \f$<\sigma v>\f$
-                                              //!< at low T for small mass splitting
+      1., -3.75, 8.90625, -16.5234, 25.1147}; //!< $\beta_n$ coefficients for the Taylor expansion for \f$\langle\sigma
+                                              //!< v\rangle\f$ at low T for small mass splitting
   constexpr const std::array<real_t, NlowTsv_split + 1> sv_lambda = {
       -2., 2.75, 5.15625, -41.3672, 145.085}; //!< $\lambda_n$ coefficients for the Taylor expansion for \f$<\sigma
                                               //!< v>\f$ at low T for small mass splitting
@@ -81,14 +81,14 @@ protected:
         pefftab,                  //!< Vector of the \f$p_{eff}\f$ for each process
         g2_Wefftab;               //!< Vector of the \f$g^2 W_{eff}\f$ for each process
 
-    csl::InitSanitizer<real_t> T_lim_sigmav; //!< Threshold temperature for the calculation of \f$<\sigma v>\f$ with the
-                                             //!< algorithm for high temperatures
+    csl::InitSanitizer<real_t> T_lim_sigmav; //!< Threshold temperature for the calculation of \f$\langle\sigma
+                                             //!< v\rangle\f$ with the algorithm for high temperatures
     short int orderT;
     std::array<int, corr::SIZEPHYSICALBSM> bsm_particles_sorted;
     std::vector<real_t> ytab;
     std::vector<real_t> Weffderiv;
     std::vector<real_t> Weffderiv_err;
-    std::vector<real_t> TaylorCoeffSVT; // Taylor coefficients of \f$<\sigma v>\f$ (T) at low T
+    std::vector<real_t> TaylorCoeffSVT; // Taylor coefficients of \f$\langle\sigma v\rangle\f$ (T) at low T
     bool wastherenosplitting, werealldeltaxinull;
 
 
@@ -132,14 +132,30 @@ public:
      * @param Ecm Centre-of-mass energy
      * @param out Stream where to print the processes
      */
-    inline void print_contributing_processes(const real_t& Ecm, std::ostream& out = std::cout) const
+    inline void print_contributing_processes(std::ostream& out = std::cout) const
     {
-      for (const auto& proc : *p_ptr)
+      unsigned int i = 0;
+      std::vector<const Process2to2*> list_allowed;
+
+      // Collect allowed processes
+      for (const auto& proc : (*p_ptr))
       {
-        if (proc.isAllowed(input, Ecm))
+        if (proc.isAllowedAtZeroMomentum(input))
         {
-          out << proc.getMname() << '\n';
+          list_allowed.push_back(&proc);
         }
+      }
+
+      // Sort by sum of masses (3rd and 4th particles)
+      std::sort(list_allowed.begin(), list_allowed.end(),
+                [&](const Process2to2* a, const Process2to2* b) {
+                  return (a->getMass(3, input) + a->getMass(4, input)) < (b->getMass(3, input) + b->getMass(4, input));
+                });
+
+      // Print sorted list
+      for (const auto* proc : list_allowed)
+      {
+        out << ++i << ": " << proc->getMname() << '\n';
       }
     };
 

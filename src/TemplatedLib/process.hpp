@@ -196,7 +196,7 @@ public:
      */
     inline bool isAllowedAtZeroMomentum(const Param_t& input) const
     {
-      return ((sqrts < getMass(3, input) + getMass(4, input)) || (sqrts < getMass(1, input) + getMass(2, input)));
+      return (getMass(3, input) + getMass(4, input)) <= (getMass(1, input) + getMass(2, input));
     };
 
     inline Cfptr_t getSumSquaredAmpl_ptr() const { return sumSquaredAmpl; };

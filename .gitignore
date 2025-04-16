@@ -7,7 +7,6 @@
 src/models/*2to2*/
 cmake-build-debug*/
 */shell_scripts/*
-deps/
 
 *config.hpp
 /*/config.hpp

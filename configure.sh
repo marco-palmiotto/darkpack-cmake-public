@@ -8,7 +8,7 @@ cmake -S . -B ./build \
       -DENABLE_SUBMODULE_CMA=ON \
       -G Ninja
 
-cmake --build ./build --target format && \
-cmake --build ./build --target format-check && \
-cmake --build ./build --target install_headers_all 
-cmake --build ./build --target darkpack_doc 
+cmake --build ./build --target format format-check install_headers_all darkpack_doc # && \
+# cmake --build ./build --target format-check && \
+# cmake --build ./build --target install_headers_all 
+# cmake --build ./build --target darkpack_doc 

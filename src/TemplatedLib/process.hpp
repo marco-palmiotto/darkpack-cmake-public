@@ -117,18 +117,32 @@ private:
 
     // Constructors
 public:
-    // Empty constructor, destructor
+    /**
+     * @brief Empty constructor for the Process2to2 class.
+     *
+     */
     Process2to2();
+
+    /**
+     * @brief Destructor for the Process2to2 class.
+     *
+     */
     ~Process2to2();
 
     /**
-      @brief Constructor for Process2to2.
-      @param particles Array of 4 integers representing particle fields.
-      @param antiparticles Array of 4 booleans indicating if each particle is an antiparticle.
-    */
-    Process2to2(const std::array<int, 4>&, const std::array<bool, 4>&);
+     * @brief Construct a new Process 2to 2 object
+     *
+     * @param field The fields of the particles in the process.
+     * @param isParticle True if the particle is a particle, false if it is an antiparticle.
+     */
+    Process2to2(const std::array<int, 4>& field, const std::array<bool, 4>& isParticle);
 
-    Process2to2(const std::array<Insertion, 4>&);
+    /**
+     * @brief Construct a new Process 2to 2 object from an array of Insertion objects.
+     *
+     * @param insertArray
+     */
+    Process2to2(const std::array<Insertion, 4>& insertArray);
 
     /**
       @brief Set the n-th particle in the process.
@@ -140,25 +154,100 @@ public:
     short int set(short int n, const int& ip, const bool iap);
 
     // Copy constructor and operators
+    /**
+     * @brief Copy-constructor for the Process2to2 class.
+     *
+     * @param other
+     */
     Process2to2(const Process2to2& other);
+
+    /**
+     * @brief Comparison operator for the Process2to2 class.
+     *
+     * @return true if the processes have the same key
+     * @return false otherwise
+     */
     bool operator==(const Process2to2&) const;
+
+    /**
+     * @brief Comparison operator for the Process2to2 class.
+     *
+     * @return true if the processes have different keys
+     * @return false otherwise
+     */
     bool operator!=(const Process2to2&) const;
-    Process2to2& operator=(const Process2to2&);
+
+    /**
+     * @brief Assignment operator for the Process2to2 class. Constructs a new Process2to2 object, with the same key
+     *        of the argument given.
+     *
+     * @param other
+     * @return Process2to2&
+     */
+    Process2to2& operator=(const Process2to2& other);
 
     /** @brief Checks if the process exists in the hash table.
         @return True if the process exists, false otherwise.
     */
     inline bool checkExistance() const { return Exists; };
 
+    /**
+     * @brief Get the Field object corresponding to the i-th particle in the process.
+     *
+     * @param i Number of the field (1-4).
+     * @return The enumeration corresponding to the field of the i-th particle in the process.
+     */
     inline int getField(const size_t i) const { return p[i]; };
 
+    /**
+     * @brief Returns true if the i-th particle is a particle, false if it is an antiparticle.
+     *
+     * @param i Number of the field (1-4).
+     * @return true if the i-th particle is a particle
+     * @return false otherwise
+     */
     inline bool getMatter(const size_t i) const { return ap[i]; };
 
+    /**
+     * @brief Returns the key of the process in the hash table.
+     *
+     * @return The key of the process in the hash table.
+     */
     std::string getKey() const;
+
+    /**
+     * @brief Returns the name of the process.
+     *
+     * @return The name of the process.
+     */
     std::string getName() const;
+
+    /**
+     * @brief Same as getName().
+     */
     std::string getMname() const;
+
+    /**
+     * @brief Returns the mass of the i-th particle in the process.
+     *
+     * @param i  Number of the field (1-4).
+     * @param input Param_t object containing numerical inputs.
+     * @return real_t The value of the mass of the i-th particle in the process.
+     */
     inline real_t getMass(const short int i, const Param_t& input) const { return input.masses_vector[p[i - 1]]; };
+
+    /**
+     * @brief Get the symmetry factor for the final state.
+     *
+     * @return short int the symmetry factor for the final state.
+     */
     inline short int getSf34() const { return Sf34; };
+
+    /**
+     * @brief Get the degrees of freedom for the process.
+     *
+     * @return short int the degrees of freedom for the process.
+     */
     inline short int getDof() const { return combinFac; };
 
 
@@ -177,7 +266,7 @@ public:
      * @brief Returns true if the process is kinematically allowed at a certain centre-of-mass energy, otherwise returns
      * false.
      *
-     * @param input numerical parameters
+     * @param input Param_t object containing numerical inputs.
      * @param sqrts centre-of-mass energy
      * @return true
      * @return false
@@ -190,7 +279,7 @@ public:
     /**
      * @brief Returns true if the mass of the final state is larger or equal than the mass in the initial state.
      *
-     * @param input numerical parameters
+     * @param input Param_t object containing numerical inputs.
      * @return true
      * @return false
      */
@@ -199,9 +288,19 @@ public:
       return (getMass(3, input) + getMass(4, input)) <= (getMass(1, input) + getMass(2, input));
     };
 
+    /**
+     * @brief Get the function pointer to the sum of squared amplitudes.
+     *
+     * @return Cfptr_t the function pointer to the sum of squared amplitudes.
+     */
     inline Cfptr_t getSumSquaredAmpl_ptr() const { return sumSquaredAmpl; };
 
     // setters
+
+    /**
+     * @brief Returns true if the process is complete, i.e. all the particles are defined.
+     *
+     */
     inline bool isComplete() const
     {
       for (int i = 0; i < 4; i++)
@@ -210,13 +309,34 @@ public:
       return true;
     };
 
+    /**
+     * @brief Enables external running, by taking the pointer of the RunningSM instance as input.
+     *
+     * @param runin the pointer of the external RunningSM instance to be used for running
+     */
     inline void setRunningData(RunningSM* runin)
     {
       runptr = runin;
       isRunDataExternal = true;
     };
+
+    /**
+     * @brief Sets to true the flag indicating that the running is external.
+     *
+     */
     inline void setRunningExternal() { isRunningExternal = true; };
+
+    /**
+     * @brief Sets to false the flag indicating that the running is external.
+     *
+     */
     inline void setRunningInternal() { isRunningExternal = false; };
+
+    /**
+     * @brief Sets the running as internal, by creating a new instance of RunningSM.
+     *
+     * @param input The parameters needed to create the RunningSM instance.
+     */
     inline void setRunDataInternal(Param_t& input)
     {
       runptr = new RunningSM(input);
@@ -225,6 +345,13 @@ public:
 
 
     // Methods to perform computations
+
+    /**
+     * @brief Handles the running of the parameters.
+     *
+     * @param input Param_t object containing numerical inputs.
+     * @param Ecm The centre-of-mass energy.
+     */
     inline void handleRunning(Param_t& input, const real_t& Ecm)
     {
       if (runptr == nullptr)
@@ -241,7 +368,7 @@ public:
 
     /**
      * @brief Returns the sum of the sum of the squared amplitudes for the instance of the class.
-     * @param input numerical parameters
+     * @param input Param_t object containing numerical inputs.
      * @param sqrts centre-of-mass energy
      * @param ctheta cosine of the angle
      * @return real_t \f$\sum |\mathcal{M}|^2\f$ for the instance of the class
@@ -251,10 +378,10 @@ public:
     /**
      * @brief Returns the sum of the sum of the squared amplitudes, avereaged with the combinatorial factor, for the
      * instance of the class.
-     * @param input numerical parameters
+     * @param input Param_t object containing numerical inputs.
      * @param sqrts centre-of-mass energy
      * @param ctheta Cosine of the angle between particle 1 and 3.
-     * @return real_t \f$\sum |\bar \mathcal{M}|^2\f$  for the instance of the class
+     * @return real_t \f$\sum |\bar M|^2\f$  for the instance of the class
      */
     inline real_t getAvgSquaredAmpl(Param_t& input, const real_t& sqrts, const real_t& ctheta)
     {
@@ -280,7 +407,7 @@ public:
       @param input Param_t object containing numerical inputs.
       @param sqrts Centre of mass energy.
       @param ctheta Cosine of the angle between particle 1 and 3.
-      @return Contribution to dWeff/d(cos(theta)).
+      @return real_t Contribution to dWeff/d(cos(theta)).
     */
     real_t get_g2_dweff_dcos(Param_t& input, const real_t& sqrts, const real_t& ctheta);
 
@@ -290,23 +417,42 @@ public:
       @param input Param_t object containing numerical inputs.
       @param sqrts Centre of mass energy.
       @param ctheta Cosine of the angle between particle 1 and 3.
-      @return Contribution to dWeff/d(cos(theta)).
+      @return real_t Contribution to dWeff/d(cos(theta)).
     */
     real_t getDiffWeffContrib(Param_t& input, const real_t& Ecm, const real_t& ctheta);
 
+    /**
+       @brief Computes the differential cross-section at the given centre-of-mass energy Ecm and \f$cos(\theta_{13})\f$.
+
+       @param input Param_t object containing numerical inputs.
+       @param sqrts Centre of mass energy.
+       @param ctheta Cosine of the angle between particle 1 and 3.
+       @return real_t Differential cross-section.
+     */
     real_t getDiffCrossSection(Param_t& input, const real_t& sqrts, const real_t& ctheta);
+
+    /**
+       @brief Computes the total cross-section at the given centre-of-mass energy Ecm.
+
+       @param input Param_t object containing numerical inputs.
+       @param sqrts Centre of mass energy.
+       @param ctheta Cosine of the angle between particle 1 and 3.
+       @return real_t Differential cross-section.
+     */
     real_t getTotalCrossSection(Param_t& input, const real_t& sqrts, real_t* discr = nullptr);
 
     /**
       @brief Function defined for testing purposes. Get the Diff W12 Contrib object.
             It returns
-            g_1 g_2 p1 W_12->34,
+            $$ g_1 g_2 p_1 W_{12\to 34} $$
             using the identity
-            g_1 g_2 p1 W_12->34 = (g_1 g_2 p_1)*4* sqrts p1 * dsigma_12->34 / dcostheta
+            $$ g_1 g_2 p_1 W_{12\to 34} = 4(g_1 g_2 p_1) \sqrt{s} p_1 \frac{d \sigma_{12\to 34}}{d \cos(\theta)} $$
+
       @param input Param_t object containing numerical inputs.
       @param sqrts Centre of mass energy.
       @param ctheta Cosine of the angle between particle 1 and 3.
-      @param wantWeffPrefac
+      @param wantWeffPrefac Optional boolean to indicate if the prefactor of the effective potential is wanted
+      (default=false).
       @return real_t
      */
     real_t getDiffW12Contrib(Param_t& input, const real_t& sqrts, const real_t& ctheta,
@@ -335,8 +481,15 @@ public:
     friend real_t getContributionSingle(const Process2to2 p, Param_t input, const real_t Ecm, const real_t ctheta);
     friend real_t getContribution(const std::shared_ptr<std::vector<Process2to2>>& vp, Param_t input, const real_t Ecm,
                                   const real_t ctheta, const bool cut);
-  };
+  }; // End of the class Process2to2
 
+  /**
+   * @brief Overloading of the << operator on an output stram reference, to print the Process2to2 object.
+   *
+   * @param out The reference to the output stream.
+   * @param proc The process to be printed.
+   * @return std::ostream& The modified output stream.
+   */
   inline std::ostream& operator<<(std::ostream& out, const Process2to2& proc)
   {
     proc.print(out);

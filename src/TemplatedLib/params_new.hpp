@@ -894,6 +894,9 @@ public:
      */
     unsigned int change_values(const Param_t& other);
 
+    using darkpackparam_t::operator==; // Expose base class method
+    using darkpackparam_t::operator!=; // Expose base class method
+
     /**  @brief Equality comparison operator.
      *   @param other The Param_t object to compare with.
      *   @return True if objects are equal, false otherwise.

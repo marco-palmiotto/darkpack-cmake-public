@@ -411,7 +411,7 @@ int computeAndAddToLibFromList(mty::Model& model, // model
     if (i != lastproc - 1)
       correspondancefileh << ",\n";
   #endif // End of ifdef CORRESPONDANCE
-  }      // Ends the cycle on the processes
+  } // Ends the cycle on the processes
   #ifdef CORRESPONDANCE
   correspondancefileh << "};\n}\n";
   correspondancefileh.close();

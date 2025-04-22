@@ -27,7 +27,7 @@ namespace __SPEC_LIB_NAME__
     /**
       @brief Construct an empty DataWithTemperature_t object
     */
-    DataWithTemperature_t(){};
+    DataWithTemperature_t() {};
 
     /**
       @brief Construct a DataWithTemperature_t object with given values
@@ -36,7 +36,7 @@ namespace __SPEC_LIB_NAME__
       @param heff_in Effective entropy degrees of freedom
     */
     DataWithTemperature_t(const real_t& T_in, const real_t& sqrtgstar_in, const real_t& heff_in)
-            : T(T_in), sqrtgstar(sqrtgstar_in), heff(heff_in){};
+            : T(T_in), sqrtgstar(sqrtgstar_in), heff(heff_in) {};
 
     /**
       @brief Print the contents of the DataWithTemperature_t object
@@ -232,7 +232,7 @@ public:
     /**
      * @brief Virtual destructor for the Relicparam_t object
      */
-    virtual ~Relicparam_t(){};
+    virtual ~Relicparam_t() {};
 
     //  Metod to print the elements
     void print_relicparam(std::ostream& out = std::cout) const;

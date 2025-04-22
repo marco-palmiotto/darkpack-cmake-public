@@ -127,5 +127,5 @@ namespace su2f2to2
         return -1.;
       }
     } // End of getMassFirst
-  }   // End of namespace corr
+  } // End of namespace corr
 } // End of namespace su2f2to2

@@ -116,5 +116,5 @@ namespace scalar2to2
         return -1.;
       }
     } // End of getMassFirst
-  }   // End of namespace corr
+  } // End of namespace corr
 } // End of namespace scalar2to2

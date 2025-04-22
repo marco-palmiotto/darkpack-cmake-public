@@ -147,10 +147,9 @@ public:
       }
 
       // Sort by sum of masses (3rd and 4th particles)
-      std::sort(list_allowed.begin(), list_allowed.end(),
-                [&](const Process2to2* a, const Process2to2* b) {
-                  return (a->getMass(3, input) + a->getMass(4, input)) < (b->getMass(3, input) + b->getMass(4, input));
-                });
+      std::sort(
+          list_allowed.begin(), list_allowed.end(), [&](const Process2to2* a, const Process2to2* b)
+          { return (a->getMass(3, input) + a->getMass(4, input)) < (b->getMass(3, input) + b->getMass(4, input)); });
 
       // Print sorted list
       for (const auto* proc : list_allowed)

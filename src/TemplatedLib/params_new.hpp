@@ -78,7 +78,7 @@ namespace __SPEC_LIB_NAME__
   {
     constexpr const real_t pi = M_PI;                     //!< Value of \f$\pi\f$
     constexpr const real_t zeta3 = 3.1415926535897932385; //!< Value of \f$\zeta_3\f$
-  }                                                       // namespace mathematicalconstants
+  } // namespace mathematicalconstants
 
   namespace units_conversion /// From the exact values of the PDG 2022
   {
@@ -864,7 +864,7 @@ public:
     /** @brief Default constructor.
      *  Initializes the object using the darkpackparam_t constructor.
      */
-    Param_t() : darkpackparam_t(){};
+    Param_t() : darkpackparam_t() {};
 
     /**  @brief Constructor that reads parameters from an LHA file.
      *   @param filename The name of the LHA file to read from.

@@ -132,14 +132,11 @@ public:
     };
 
     /**
-     * @brief Prints the processes kinematically allowed at the energy Ecm
+     * @brief Returns the list of processes that are allowed at zero momentum.
      *
-     * @param Ecm Centre-of-mass energy
-     * @param out Stream where to print the processes
      */
-    inline void print_contributing_processes(std::ostream& out = std::cout) const
+    inline std::vector<const Process2to2*> get_contributing_processes() const
     {
-      unsigned int i = 0;
       std::vector<const Process2to2*> list_allowed;
 
       // Collect allowed processes
@@ -156,11 +153,7 @@ public:
           list_allowed.begin(), list_allowed.end(), [&](const Process2to2* a, const Process2to2* b)
           { return (a->getMass(3, input) + a->getMass(4, input)) < (b->getMass(3, input) + b->getMass(4, input)); });
 
-      // Print sorted list
-      for (const auto* proc : list_allowed)
-      {
-        out << ++i << ": " << proc->getMname() << '\n';
-      }
+      return list_allowed;
     };
 
     inline void runAtScale(const real_t& Q)

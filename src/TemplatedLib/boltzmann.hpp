@@ -1,11 +1,15 @@
 #pragma once
 
-#ifndef __cplusplus
-  #define __cplusplus
-#endif
+#ifndef BOLTZMANNSOLVER__SPEC_LIB_NAME__
+  #define BOLTZMANNSOLVER__SPEC_LIB_NAME__
 
-#include "avgsvcalculator.hpp"
-#include "relicparam.hpp"
+  #ifndef __cplusplus
+    #define __cplusplus
+  #endif
+
+  #include "avgsvcalculator.hpp"
+  #include "config.hpp"
+  #include "relicparam.hpp"
 
 namespace __SPEC_LIB_NAME__
 {
@@ -206,3 +210,5 @@ inline std::ostream& operator<<(std::ostream& out, const __SPEC_LIB_NAME__::Bolt
   var.print(out);
   return out;
 }
+
+#endif // BOLTZMANNSOLVER__SPEC_LIB_NAME__

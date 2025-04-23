@@ -3,9 +3,12 @@
   #define __cplusplus
 #endif
 
-#include "config.hpp"
-#include <array>
-#include <vector>
+#ifndef RELICPARAM__SPEC_LIB_NAME__
+  #define RELICPARAM__SPEC_LIB_NAME__
+
+  #include "config.hpp"
+  #include <array>
+  #include <vector>
 
 namespace __SPEC_LIB_NAME__
 {
@@ -609,3 +612,4 @@ inline std::ostream& operator<<(std::ostream& out, const __SPEC_LIB_NAME__::Reli
   var.print_relicparam(out);
   return out;
 }
+#endif //  __RELICPARAM_T_H__

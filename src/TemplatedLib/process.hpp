@@ -1,13 +1,17 @@
 #pragma once
 
-#ifndef __cplusplus
-  #define __cplusplus
-#endif
+#ifndef PROCESS__SPEC_LIB_NAME__
+  #define PROCESS__SPEC_LIB_NAME__
 
-#include "RunningSM.hpp"
-#include "advmath.hpp"
-#include "correspondance.hpp"
-#include "gsl/gsl_sf_psi.h"
+  #ifndef __cplusplus
+    #define __cplusplus
+  #endif
+
+  #include "RunningSM.hpp"
+  #include "advmath.hpp"
+  #include "config.hpp"
+  #include "correspondance.hpp"
+  #include "gsl/gsl_sf_psi.h"
 
 // #define DEBUG_COPY
 // #define DEBUG
@@ -360,10 +364,10 @@ public:
         haveToFreerunptr = true;
       }
       runptr->HandleParamRunning(input, Ecm);
-#ifdef DEBUG
+  #ifdef DEBUG
       std::cout << "parameter running handled: input is \n";
       input.Print();
-#endif
+  #endif
     };
 
     /**
@@ -497,3 +501,5 @@ public:
   }
 
 } // end of namespace __SPEC_LIB_NAME__
+
+#endif // PROCESS__SPEC_LIB_NAME__

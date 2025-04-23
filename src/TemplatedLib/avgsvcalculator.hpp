@@ -1,24 +1,29 @@
 #pragma once
 
-#ifndef __cplusplus
-  #define __cplusplus
-#endif
+#ifndef AVGSVCALCULATOR__SPEC_LIB_NAME__
+  #define AVGSVCALCULATOR__SPEC_LIB_NAME__
 
-#include <list>
+  #ifndef __cplusplus
+    #define __cplusplus
+  #endif
 
-#include "advmath.hpp"
-#include "correspondance.hpp"
-#include "process.hpp"
-#include <future>
-#include <gsl/gsl_deriv.h>
+  #include <list>
+
+  #include "advmath.hpp"
+  #include "config.hpp"
+  #include "correspondance.hpp"
+  #include "process.hpp"
+  #include <future>
+  #include <gsl/gsl_deriv.h>
+  #include <list>
 
 // #define DEBUG
 
 namespace __SPEC_LIB_NAME__
 {
-  constexpr const short unsigned int NlowTsv =
+  inline constexpr const short unsigned int NlowTsv =
       10; //!< Maximum order of the Taylor expansion for \f$\langle\sigma v\rangle\f$ at low T
-  constexpr const std::array<std::array<real_t, NlowTsv + 1>, NlowTsv + 1> CoefflowTsv = {
+  inline constexpr const std::array<std::array<real_t, NlowTsv + 1>, NlowTsv + 1> CoefflowTsv = {
       {{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
        {-3, 3. / 2, 0, 0, 0, 0, 0, 0, 0, 0, 0},
        {6, -3, 15. / 8, 0, 0, 0, 0, 0, 0, 0, 0},
@@ -39,9 +44,9 @@ namespace __SPEC_LIB_NAME__
         -(13610025. / 262144), 31177575. / 1048576, -(3464175. / 262144),
         969969. / 262144}}}; //!< Coefficients of the Taylor expansion for \f$\langle\sigma v\rangle\f$ at low T
 
-  constexpr const unsigned short int NlowTsv_split =
+  inline constexpr const unsigned short int NlowTsv_split =
       4; //!< Maximum order for the Taylor expansion for \f$\langle\sigma v\rangle\f$ at low T for small mass splitting
-  constexpr const real_t Qnij[NlowTsv_split + 1][NlowTsv_split + 1][NlowTsv_split + 1] = {
+  inline constexpr const real_t Qnij[NlowTsv_split + 1][NlowTsv_split + 1][NlowTsv_split + 1] = {
       {{1., 0., 0., 0., 0.}, {0., 0., 0., 0., 0.}, {0., 0., 0., 0., 0.}, {0., 0., 0., 0., 0.}, {0., 0., 0., 0., 0.}},
       {{0.75, 1., 0., 0., 0.}, {1.5, 0., 0., 0., 0.}, {0., 0., 0., 0., 0.}, {0., 0., 0., 0., 0.}, {0., 0., 0., 0., 0.}},
       {{-0.09375, 0.75, 1., 0., 0.},
@@ -62,10 +67,10 @@ namespace __SPEC_LIB_NAME__
                                     //!< v\rangle\f$ at low T for small mass splitting
 
   // Using the notation phitilde_n = beta_n + eta*lambda_n
-  constexpr const std::array<real_t, NlowTsv_split + 1> sv_beta = {
+  inline constexpr const std::array<real_t, NlowTsv_split + 1> sv_beta = {
       1., -3.75, 8.90625, -16.5234, 25.1147}; //!< $\beta_n$ coefficients for the Taylor expansion for \f$\langle\sigma
                                               //!< v\rangle\f$ at low T for small mass splitting
-  constexpr const std::array<real_t, NlowTsv_split + 1> sv_lambda = {
+  inline constexpr const std::array<real_t, NlowTsv_split + 1> sv_lambda = {
       -2., 2.75, 5.15625, -41.3672, 145.085}; //!< $\lambda_n$ coefficients for the Taylor expansion for \f$<\sigma
                                               //!< v>\f$ at low T for small mass splitting
 
@@ -105,9 +110,9 @@ public:
 
     virtual ~AvgSvCalculator()
     {
-#ifdef DEBUG
+  #ifdef DEBUG
       std::cout << "Called ~AvgSvCalculator()\n";
-#endif
+  #endif
     };
 
     AvgSvCalculator(const AvgSvCalculator&);
@@ -163,14 +168,14 @@ public:
       if (runningenabled)
       {
         run.HandleParamRunning(input, Q);
-#ifdef DEBUG
+  #ifdef DEBUG
         std::cout << "Running is enabled\n";
-#endif
+  #endif
       }
-#ifdef DEBUG
+  #ifdef DEBUG
       else
         std::cout << "Running is disabled\n";
-#endif
+  #endif
     };
 
     real_t get_g2_Weff(const real_t& sqrtS);
@@ -246,6 +251,8 @@ inline std::ostream& operator<<(std::ostream& out, const __SPEC_LIB_NAME__::AvgS
   return out;
 }
 
-#ifdef DEBUG
-  #undef DEBUG
-#endif
+  #ifdef DEBUG
+    #undef DEBUG
+  #endif
+#endif // AVGSVCALCULATOR__SPEC_LIB_NAME__
+       // End of file

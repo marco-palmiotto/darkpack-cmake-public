@@ -5,15 +5,18 @@
 
 #pragma once
 
-#ifndef __cplusplus
-  #define __cplusplus
-#endif
-#include "config.hpp"
-#include "correspondance.hpp"
-#include "cparams.h"
-#include "marty/lha/lha.h"
-#include <chrono>
-#include <cstring>
+#ifndef PARAMS_NEW__SPEC_LIB_NAME__
+  #define PARAMS_NEW__SPEC_LIB_NAME__
+
+  #ifndef __cplusplus
+    #define __cplusplus
+  #endif
+  #include "config.hpp"
+  #include "correspondance.hpp"
+  #include "cparams.h"
+  #include "marty/lha/lha.h"
+  #include <chrono>
+  #include <cstring>
 
 namespace __SPEC_LIB_NAME__
 {
@@ -964,3 +967,4 @@ inline std::ostream& operator<<(std::ostream& out, const __SPEC_LIB_NAME__::Para
   par.Print(out);
   return out;
 }
+#endif // __SPEC_LIB_NAME__PARAMS_H

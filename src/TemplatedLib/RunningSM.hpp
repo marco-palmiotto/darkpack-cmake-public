@@ -4,9 +4,12 @@
   #define __cplusplus
 #endif
 
-#include "config.hpp"
-#include "correspondance.hpp"
-#include "params_new.hpp"
+#ifndef RUNNINGSM__SPEC_LIB_NAME__
+  #define RUNNINGSM__SPEC_LIB_NAME__
+
+  #include "config.hpp"
+  #include "correspondance.hpp"
+  #include "params_new.hpp"
 
 namespace __SPEC_LIB_NAME__
 {
@@ -167,9 +170,9 @@ public:
 
     ~RunningSM()
     {
-#ifdef DEBUG
+  #ifdef DEBUG
       std::cout << "Called ~RunningSM\n";
-#endif
+  #endif
     };
 
     /**
@@ -344,3 +347,5 @@ inline std::ostream& operator<<(std::ostream& out, const __SPEC_LIB_NAME__::Runn
   var.print(out);
   return out;
 }
+
+#endif // RUNNINGSM__SPEC_LIB_NAME__

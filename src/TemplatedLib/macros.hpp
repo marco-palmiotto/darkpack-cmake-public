@@ -1,8 +1,11 @@
 #pragma once
 
-#ifndef __cplusplus
-  #define __cplusplus
-#endif
+#ifndef MACROS__SPEC_LIB_NAME__
+  #define MACROS__SPEC_LIB_NAME__
+
+  #ifndef __cplusplus
+    #define __cplusplus
+  #endif
 
 /*--------------------------------------------------------------------*/
 /*                             AlterBBN                               */
@@ -25,6 +28,7 @@
 // /* 3*k_B/(2*c^2*Mu) in GeV^-1 */ #define k_B			8.617330e-5		/* Boltzmann's constant in GeV/GK */ #define
 // alphaem  		0.007297353 /* fine-structure constant */
 
-#include "params_new.hpp"
+  #include "params_new.hpp"
 using namespace __SPEC_LIB_NAME__::mathematicalconstants;
 using namespace __SPEC_LIB_NAME__::pdg2016Value;
+#endif // MACROS__SPEC_LIB_NAME__

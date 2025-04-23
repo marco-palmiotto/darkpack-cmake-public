@@ -1,6 +1,11 @@
 #pragma once
+#ifndef CONFIG_HPP_@__SPEC_LIB_NAME__@
+#define CONFIG_HPP_@__SPEC_LIB_NAME__@
+
 #define __SPEC_LIB_NAME__               @__SPEC_LIB_NAME__@
 #define __SPEC_LIB_NAME__VERSION_MAJOR  ${${PROJECT_NAME}_VERSION_MAJOR}
 #define __SPEC_LIB_NAME__VERSION_MINOR  ${${PROJECT_NAME}_VERSION_MINOR}
 #include "@__SPEC_LIB_NAME__@.h"
 constexpr const char * OUTPATH = "@__OUTPATH__@";
+
+#endif // CONFIG_HPP__SPEC_LIB_NAME__

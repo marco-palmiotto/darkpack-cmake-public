@@ -434,7 +434,8 @@ namespace __SPEC_LIB_NAME__
     std::cout << "Running performed\n";
 #endif
 
-    auto lambda = [=](real_t costheta) mutable { return getContribution(p_ptr, input, sqrtS, costheta, Weffcuts); };
+    auto lambda = [=, this](real_t costheta) mutable
+    { return getContribution(p_ptr, input, sqrtS, costheta, Weffcuts); };
 
     real_t discr;
 
@@ -496,7 +497,7 @@ namespace __SPEC_LIB_NAME__
     std::cout << "Running performed\n";
 #endif
 
-    auto lambda = [=](real_t costheta) mutable { return getdWeff_dcos_fromW12(sqrtS, costheta); };
+    auto lambda = [=, this](real_t costheta) mutable { return getdWeff_dcos_fromW12(sqrtS, costheta); };
 
     real_t discr;
 

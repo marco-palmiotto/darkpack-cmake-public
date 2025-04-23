@@ -559,7 +559,7 @@ namespace __SPEC_LIB_NAME__
 
     // Defining a lambda function for the differential cross section
     // Everything has to be passed by value because we use multithreading
-    auto lambda_opti = [=](real_t cosine) mutable
+    auto lambda_opti = [=, this](real_t cosine) mutable
     {
       real_t p1_local, p3_local, sij_local[5][5];
       if (!setKinematics(input, Ecm, cosine, p1_local, p3_local, sij_local))

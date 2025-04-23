@@ -3,7 +3,7 @@
 {
 	"name": "DarkPackTesting",
 	"build": {
-		"dockerfile": "test/Dockerfile-ubuntu2404-deploy" //"Dockerfile-fedora41gcc13-dev"
+		"dockerfile": "Dockerfile-fedora41-dev" // "test/Dockerfile-ubuntu2404-deploy" //
 	},
 	"runArgs": [
 		// This argument is needed to allow podman containers to have writing permission into the host filesystem

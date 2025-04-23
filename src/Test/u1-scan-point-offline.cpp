@@ -37,8 +37,37 @@ int main(int argc, char* argv[])
 
   constexpr const double mchi_over_mv = 0.33;
 
-  const std::vector<real_t> m_V_jumps = {10.7978, 11.007};
-  const std::vector<real_t> g_f_jumps = {0.055293, 0.0521988};
+  // File path
+  std::string file_path = "/workspaces/darkpack-cmake/out/scans/results/u1-theta23=0/growing_intervals.txt";
+
+  std::vector<real_t> m_V_jumps;
+  std::vector<real_t> g_f_jumps;
+
+  // Open the file
+  std::ifstream file(file_path);
+  if (!file.is_open())
+  {
+    std::cerr << "Error: Could not open file " << file_path << std::endl;
+    return 1;
+  }
+
+  // Read the file line by line
+  std::string line;
+  while (std::getline(file, line))
+  {
+    std::istringstream iss(line);
+    real_t x, y;
+
+    // Parse x and y values from the line
+    if (iss >> x >> y)
+    {
+      m_V_jumps.push_back(x);
+      g_f_jumps.push_back(y);
+    }
+  }
+
+  // Close the file
+  file.close();
 
   // auto [a, b] = std::views::zip(m_V_jumps, g_f_jumps);
 
@@ -54,24 +83,32 @@ int main(int argc, char* argv[])
 
   input.refresh();
   AvgSvCalculator asv(input);
+  size_t n = 0;
 
+  for (auto m_V = m_V_jumps.begin(), g_f = g_f_jumps.begin(); m_V != m_V_jumps.end() || g_f != g_f_jumps.end();
+       ++m_V, ++g_f)
   {
-    auto m_V = m_V_jumps.begin();
-    auto g_f = g_f_jumps.begin();
-    for (; m_V != m_V_jumps.end() || g_f != g_f_jumps.end(); ++m_V, ++g_f)
-    {
 
-      input.m_V_3 = *m_V;
-      input.g_f = *g_f;
-      input.m_phi = m_phi_over_mv * input.m_V_3;
-      input.m_chi_dm_1 = mchi_over_mv * input.m_V_3;
-      input.m_chi_dm_2 = mchi_over_mv * input.m_V_3;
-      input.refresh();
-      asv.changeInput(input);
-      std::cout << "m_V = " << *m_V << ", g_f = " << *g_f << ", 2*m_chi = " << 2. * input.m_chi_dm_1.get() << '\n';
-      asv.print_contributing_processes();
-      std::cout << '\n';
+    input.m_V_3 = *m_V;
+    input.g_f = *g_f;
+    input.m_phi = m_phi_over_mv * input.m_V_3;
+    input.m_chi_dm_1 = mchi_over_mv * input.m_V_3;
+    input.m_chi_dm_2 = mchi_over_mv * input.m_V_3;
+    input.refresh();
+    asv.changeInput(input);
+    std::cout << "m_V = " << *m_V << " g_f = " << *g_f << " 2*m_chi = " << 2. * input.m_chi_dm_1.get() << '\n';
+    std::vector<const Process2to2*> list_allowed(asv.get_contributing_processes());
+    if (n < list_allowed.size())
+    {
+      n = list_allowed.size();
+      size_t i = 1;
+      for (const auto* proc : list_allowed)
+      {
+        std::cout << i++ << ": " << proc->getMname() << '\n';
+      }
     }
+
+    std::cout << '\n';
   }
 
 

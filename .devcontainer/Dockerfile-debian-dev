@@ -23,6 +23,7 @@ RUN apt-get update && \
         gcc \
         gfortran \
         git \
+        bc \
         clang-format && \
     apt-get clean
 

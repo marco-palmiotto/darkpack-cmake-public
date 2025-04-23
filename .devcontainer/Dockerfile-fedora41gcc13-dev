@@ -30,6 +30,7 @@ RUN dnf update -y && \
                 git-clang-format \
                 pipx \
                 texlive-type1cm.noarch \
+                bc \
                 -y && \ 
     dnf clean all   
 

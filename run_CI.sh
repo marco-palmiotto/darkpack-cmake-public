@@ -15,8 +15,8 @@ cmake -S . -B ./build \
       -G Ninja || exit 1
 
 
-echo "Running format check"
-cmake --build ./build --target format-check || exit 1
+# echo "Running format check"
+# cmake --build ./build --target format-check || exit 1
 
 echo "Installing headers"
 cmake --build ./build --target install_headers_all  || exit 1

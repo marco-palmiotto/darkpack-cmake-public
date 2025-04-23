@@ -127,7 +127,7 @@ if(ENABLE_SUBMODULE_CMA)
         # space sampling
         add_subdirectory(submodules/CMA-ES)
         set(EXTERNAL_LIBS ${EXTERNAL_LIBS} cmaes)
-        # add_subdirectory(src/main)
+        add_subdirectory(src/main)
         message(STATUS "CMA submodule and dependent libraries are now enabled for compilation")
     else()
         message(WARNING "CMA submodule directory not found. Please initialize and update the submodule.")

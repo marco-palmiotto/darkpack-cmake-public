@@ -1,6 +1,6 @@
 #!/bin/bash
 
-distros=( "fedora36" "debian" "ubuntu")
+distros=( "fedora36" "debian" "ubuntu2204" "fedora41" "fedora41gcc13")
 suffixes=( "dev" "scan" "deploy") #deploy must be the last one
 
 for distro in ${distros[@]}

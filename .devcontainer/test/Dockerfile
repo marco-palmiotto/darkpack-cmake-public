@@ -1,43 +1,50 @@
-FROM mcr.microsoft.com/devcontainers/cpp:1-debian-12
+FROM ubuntu:noble
 
 ARG username=vscode
 
 # Installing packages for MARTY's dependencies
 RUN apt-get update && \
-    export DEBIAN_FRONTEND=noninteractive && \
     apt-get -y install --no-install-recommends \
+        coreutils \
+        build-essential \
+        gcc-14 \
+        g++-14 \
+        gfortran-14 \
         libgsl-dev \
         libgslcblas0 \
-        texlive \
-        texlive-luatex \
-        dvipng \
-        coreutils \
-        imagemagick \
         qtbase5-dev \
         qtchooser \
         qt5-qmake \
         qtbase5-dev-tools \
-        ninja-build \
+        dvipng \
+        lcov \
         cmake \
-        g++ \
-        gcc \
-        gfortran \
+        texlive \
+        texlive-latex-extra \
+        texlive-luatex \
+        imagemagick \
+        ninja-build \
         git \
         clang-format && \
     apt-get clean
+
+RUN apt-get install -y ca-certificates && \
+    update-ca-certificates
+
+RUN useradd -s /bin/bash ${username}
 
 USER ${username}
 
 WORKDIR /home/${username}
 
-ENV CC=gcc
-ENV CXX=g++
-ENV FC=gfortran
-
 RUN git clone https://github.com/docbrown1955/marty-public.git && \
     cd marty-public && \
     git checkout master && \
     mkdir bin include lib build 
+
+ENV CC="/usr/bin/gcc-14"
+ENV CXX="/usr/bin/g++-14"
+ENV FC="/usr/bin/gfortran-14"
 
 RUN cd /home/${username}/marty-public/build && \
     cmake .. -DCMAKE_INSTALL_PREFIX=.install -G Ninja && \

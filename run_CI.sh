@@ -1,9 +1,5 @@
 #!/bin/bash
 
-echo "Setting compilers"
-export CC=gcc
-export CXX=g++
-
 echo "Testing read/write permissions"
 mkdir build || exit 1
 

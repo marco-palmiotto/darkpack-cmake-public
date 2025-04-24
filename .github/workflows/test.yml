@@ -12,6 +12,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         distro: ['fedora36', 'debian', 'fedora41gcc13', 'fedora41']
     

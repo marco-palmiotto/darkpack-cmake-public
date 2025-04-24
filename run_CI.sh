@@ -14,8 +14,6 @@ cmake -S . -B ./build \
       -DENABLE_CLANG_FORMAT=ON \
       -G Ninja || exit 1
 
-
-# echo "Running format check"
 if [[ $(clang-format --version | cut -f 3 -d " ") == "19.1.7" ]]; then
     echo "Running format check"
     cmake --build ./build --target format-check || exit 1   

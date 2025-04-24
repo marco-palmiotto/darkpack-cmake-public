@@ -148,6 +148,13 @@ public:
      */
     void setTfo(real_t delta = 1.5);
 
+    /**
+     * @brief Returns the freeze-out temperature.
+     *
+     * @return real_t
+     */
+    real_t getTfo() const { return Tfo; };
+
     real_t boltzright_phi(const real_t& T, const real_t& Y, const real_t& Yphi);
 
     /**

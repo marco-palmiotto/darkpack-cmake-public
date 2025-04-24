@@ -51,4 +51,8 @@ ENV LIBRARY_PATH=$INSTALLMARTYPATH/lib
 ENV C_INCLUDE_PATH=$INSTALLMARTYPATH/include
 ENV CPATH=$INSTALLMARTYPATH/include
 
+# Explicitly adding the path of -lgfortran 13 to the library path
+ENV LD_LIBRARY_PATH=/usr/lib/gcc/x86_64-redhat-linux/13:$LD_LIBRARY_PATH
+ENV LIBRARY_PATH=/usr/lib/gcc/x86_64-redhat-linux/13:$LIBRARY_PATH
+
 CMD ["sleep", "infinity"]

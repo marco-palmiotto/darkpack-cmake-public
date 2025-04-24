@@ -27,6 +27,10 @@ RUN useradd ${username}
 
 USER ${username}
 
+ENV CC=gcc
+ENV CXX=g++
+ENV FC=gfortran
+
 WORKDIR /home/${username}
 
 # Installing MARTY

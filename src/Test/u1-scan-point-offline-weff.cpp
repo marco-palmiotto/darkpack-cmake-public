@@ -53,7 +53,6 @@ int main(int argc, char* argv[])
   }
 
   input.refresh();
-  BoltzmannSolver boltz(input);
   size_t n = 0;
 
   for (auto m_V = m_V_jumps.begin(), g_f = g_f_jumps.begin(); m_V != m_V_jumps.end() || g_f != g_f_jumps.end();
@@ -65,13 +64,13 @@ int main(int argc, char* argv[])
     input.m_chi_dm_1 = mchi_over_mv * input.m_V_3;
     input.m_chi_dm_2 = mchi_over_mv * input.m_V_3;
     input.refresh();
-    boltz.changeInput(input);
+    BoltzmannSolver boltz(input);
 
     std::cout << "m_V = " << *m_V << " g_f = " << *g_f << " 2*m_chi = " << 2. * input.m_chi_dm_1.get() << '\n';
 
     // Create a file named Weff_<value_of_mv>.dat
     std::ostringstream filename;
-    filename << "Weff_" << *m_V << ".dat";
+    filename << "out/scans/results/u1-theta23=0/Weff_" << *m_V << ".dat";
     std::ofstream outfile(filename.str());
     if (!outfile.is_open())
     {
@@ -106,20 +105,39 @@ int main(int argc, char* argv[])
     std::cout << "Weff table written to " << filename.str() << "\n";
     std::cout << '\n';
 
+    // Create a file named sigma_v_<value_of_mv>.dat
+    std::ostringstream sigma_v_filename;
+    sigma_v_filename << "out/scans/results/u1-theta23=0/sigma_v_" << *m_V << ".dat";
+    std::ofstream sigma_v_file(sigma_v_filename.str());
+    if (!sigma_v_file.is_open())
+    {
+      std::cerr << "Error: Could not open file " << sigma_v_filename.str() << " for writing.\n";
+      continue;
+    }
+
     boltz.setTfo();
     const real_t Tfo = boltz.getTfo();
-    const real_t T_in = 2. * Tfo;
+    const real_t T_in = 10. * Tfo;
     const real_t T_fin = 2.7;
     const real_t x_fin = 1. / T_fin;
 
     const unsigned int n_points = 1000;
     const real_t x_factor = std::pow(x_fin * T_in, 1. / n_points);
+    real_t x = 1. / T_in;
 
-    for (real_t x = 1. / T_in; x < x_fin; x *= x_factor)
+    for (unsigned int i(0); i < n_points; i++)
     {
+      x = std::pow(x_factor, i) / T_in;
       const real_t T = 1. / x;
       const real_t sigma_v = boltz.getAverageSigmav(T);
+      const real_t Y_eq = boltz.Yeq(T);
+      sigma_v_file << x * boltz.getMassLBSM() << " " << sigma_v << " " << Y_eq << "\n";
+      //Devo aggiungere numeratore e denominatore di sigmav
     }
+    sigma_v_file.close();
+    std::cout << "Sigma_v table written to " << sigma_v_filename.str() << "\n";
+    const real_t relic_density = boltz.relic_density();
+    std::cout << "Oh2=" << relic_density << " xfo=" << boltz.getMassLBSM() / Tfo << "\n";
   }
 
   return 0;

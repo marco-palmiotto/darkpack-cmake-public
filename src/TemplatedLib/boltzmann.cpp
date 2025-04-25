@@ -1,7 +1,11 @@
 #include "boltzmann.hpp"
 #include "macros.hpp"
 
-// #define DEBUG
+#define DEBUG
+#ifdef DEBUG
+#include <fstream>
+#endif
+
 template <typename T> static inline T SQUARE(const T x) { return x * x; }
 
 namespace __SPEC_LIB_NAME__
@@ -891,7 +895,7 @@ namespace __SPEC_LIB_NAME__
         return 0.;
 #ifdef DEBUG
       std::cout << "counter=" << counter << ", T=" << std::exp(x) << ", Yeq=" << Yeq(std::exp(x))
-                << ", Tfo=" << (this->Tfo).get() << ", Yphi=" << Yphi << ", dx=" << dx << ", s=" << rho_phi / Yphi
+                << ", Tfo=" << this->Tfo << ", Yphi=" << Yphi << ", dx=" << dx << ", s=" << rho_phi / Yphi
                 << '\n';
       //     fprintf(fptr, "%.4e\t%.4e\n", 1./T, Y);
       fYt << 1. / T << '\t' << Y << '\n';

@@ -29,7 +29,9 @@
 				"zeshuaro.vscode-python-poetry",
 				"ms-python.python",
 				"ms-toolsai.jupyter",
-				"github.vscode-github-actions"
+				"github.vscode-github-actions",
+				"GitHub.copilot-chat",
+				"GitHub.copilot"
 			]
 		}
 	},

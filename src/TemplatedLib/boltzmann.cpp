@@ -3,7 +3,8 @@
 
 #define DEBUG
 #ifdef DEBUG
-#include <fstream>
+  #include <fstream>
+  #include <iomanip>
 #endif
 
 template <typename T> static inline T SQUARE(const T x) { return x * x; }
@@ -28,7 +29,7 @@ namespace __SPEC_LIB_NAME__
     const real_t x = getMassLBSM() / T;
 
     // Adding BSM particles' contribution
-    for (auto part : corr::bsm_particles)
+    for (const auto& part : corr::bsm_particles)
     {
       Yeq += corr::part_hel_dof[part] * SQUARE(getMass(part)) * advmath::K2(x * getMass(part) / getMassLBSM());
     }
@@ -82,16 +83,12 @@ namespace __SPEC_LIB_NAME__
     return numerator / denominator;
   }
 
-  real_t BoltzmannSolver::dYeq_dT(const real_t& T) /* derivative of Yeq */
+  real_t BoltzmannSolver::dYeq_dT(const real_t& T)
   {
     return (Yeq(T * 1.001) - Yeq(T * 0.999)) / 0.002 / T;
   }
 
-
-  /*--------------------------------------------------------------*/
-
   void BoltzmannSolver::setTfo(real_t delta)
-  /* Get the freeze-out temperature */
   {
 #ifdef DEBUG
     std::cout << "Called setTfo\n";
@@ -106,7 +103,7 @@ namespace __SPEC_LIB_NAME__
 
     Tmax_local = this->Tmax;
 #ifdef DEBUG
-    std::cout << this->Tmax;
+    std::cout << " Tmax=" << this->Tmax << '\n';
 #endif
     Tmin = 1.e-13;
 
@@ -190,8 +187,13 @@ namespace __SPEC_LIB_NAME__
     if (compteur == 100 || T < 3.e-13 || T > 9.e3)
       this->Tfo = -3.;
     else
+    {
+#ifdef DEBUG
+      std::cout << "Setting Tmax = Tfo = " << this->Tfo << std::endl;
+#endif
       this->Tfo = this->Tmax = T;
-
+    }
+      
     if (phi_model.get() != 0)
     {
       this->rhot_phi0 = this->rhot_phi_Tmax;
@@ -205,10 +207,7 @@ namespace __SPEC_LIB_NAME__
     return;
   }
 
-  /*--------------------------------------------------------------*/
-
   real_t BoltzmannSolver::boltzright(const real_t& T, const real_t& sv, const real_t& Y, const real_t& Yphi)
-  /* Computes the right-handed term of the Boltzmann equation */
   {
     const real_t heffT = getheff(T);
     const real_t geffT = getgeff(T);
@@ -383,7 +382,7 @@ namespace __SPEC_LIB_NAME__
 
 #ifdef DEBUG
     if (this->full_comput == 0)
-      std::cout << this->Tfo << '\n';
+      std::cout << "Tfo=" << this->Tfo << '\n';
     //   FILE *sig,*phi0;
     //   sig=fopen("sigmav.out","w");
     std::ofstream fsig("sigmav.out"), fphi0;
@@ -449,12 +448,12 @@ namespace __SPEC_LIB_NAME__
         return 0.;
 
 #ifdef DEBUG
-      if (counter % 10000 == 0)
-        //       printf("T=%.5e    Y=%.5e  Yeq=%.5e  Yphi=%.5e
-        //       dx=%.3e\n",std::exp(x),Y,Yeq(std::exp(x)),Yphi,dx);
-        std::cout << "T=" << std::scientific << std::setprecision(5) << std::exp(x) << "  Y=" << Y
-                  << "  Yeq=" << Yeq(std::exp(x)) << "  Yphi=" << Yphi << "  dx=" << std::scientific
-                  << std::setprecision(3) << dx << std::endl;
+      // if (counter % 10000 == 0)
+      //       printf("T=%.5e    Y=%.5e  Yeq=%.5e  Yphi=%.5e
+      //       dx=%.3e\n",std::exp(x),Y,Yeq(std::exp(x)),Yphi,dx);
+      std::cout << "T=" << std::scientific << std::setprecision(5) << std::exp(x) << "  Y=" << Y
+                << "  Yeq=" << Yeq(std::exp(x)) << "  Yphi=" << Yphi << "  dx=" << std::scientific
+                << std::setprecision(3) << dx << std::endl;
 #endif
 
       if (this->full_comput == 0)
@@ -813,8 +812,9 @@ namespace __SPEC_LIB_NAME__
 #ifdef DEBUG
     std::cout << "rho_phi = " << rho_phi << '\n';
     if (this->full_comput == 0)
-      std::cout << this->Tfo;
-
+      std::cout << "T_fo=" << this->Tfo << '\n';
+ 
+    std::cout << "T_max=" << this->Tmax << '\n';
     //   FILE *sig,*phi0;
     //   sig=fopen("sigmav.out","w");
     //   if(this->phi_model !=0 ) phi0=fopen("rhophi.out","w");
@@ -859,11 +859,12 @@ namespace __SPEC_LIB_NAME__
     //   if(phi_model.get()==0) dx=(std::log(Tfin)-std::log(this->Tmax))*adapt_error*10.;
     //   else dx=(std::log(Tfin)-std::log(this->Tmax))*std::min(adapt_error,adapt_error_phi)*10.;
 
+    real_t YeqT = Yeq(T);
 #ifdef DEBUG
-    std::cout << "dx=" << dx << '\n';
+    std::cout << "dx=" << dx << " Y_eq=" << YeqT <<'\n';
 #endif
 
-    real_t Y = (this->full_comput) ? Yeq(T) : Yeq(T) * (1. + delta);
+    real_t Y = (this->full_comput) ? YeqT : YeqT * (1. + delta);
     real_t Yphi =
         (phi_model.get() == 1 && rho_phi != 0.) ? rho_phi / (2. * pi * pi / 45. * getheff(T) * std::pow(T, 3.)) : 0.;
     real_t logY = (Y == 0.) ? -1.e100 : std::log(Y);
@@ -879,6 +880,7 @@ namespace __SPEC_LIB_NAME__
 
     do
     {
+      constexpr const real_t Y_inf_limit(1.e-30);
       ++counter;
       if (this->full_comput == 0)
       {
@@ -891,12 +893,17 @@ namespace __SPEC_LIB_NAME__
           return -1.;
       }
 
-      if (Y < 1.e-30)
+      if (Y < Y_inf_limit)
+      {
+#ifdef DEBUG
+        std::cout << "Y < " << Y_inf_limit << ", returning 0.\n";
+#endif
         return 0.;
+      }
+        
 #ifdef DEBUG
       std::cout << "counter=" << counter << ", T=" << std::exp(x) << ", Yeq=" << Yeq(std::exp(x))
-                << ", Tfo=" << this->Tfo << ", Yphi=" << Yphi << ", dx=" << dx << ", s=" << rho_phi / Yphi
-                << '\n';
+                << ", Tfo=" << this->Tfo << ", Yphi=" << Yphi << ", dx=" << dx << ", s=" << rho_phi / Yphi << '\n';
       //     fprintf(fptr, "%.4e\t%.4e\n", 1./T, Y);
       fYt << 1. / T << '\t' << Y << '\n';
 #endif

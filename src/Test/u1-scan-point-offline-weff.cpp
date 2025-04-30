@@ -132,7 +132,7 @@ int main(int argc, char* argv[])
       const real_t sigma_v = boltz.getAverageSigmav(T);
       const real_t Y_eq = boltz.Yeq(T);
       sigma_v_file << x * boltz.getMassLBSM() << " " << sigma_v << " " << Y_eq << "\n";
-      //Devo aggiungere numeratore e denominatore di sigmav
+      // Devo aggiungere numeratore e denominatore di sigmav
     }
     sigma_v_file.close();
     std::cout << "Sigma_v table written to " << sigma_v_filename.str() << "\n";

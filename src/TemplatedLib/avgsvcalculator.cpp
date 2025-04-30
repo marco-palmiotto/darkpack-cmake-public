@@ -1095,7 +1095,8 @@ namespace __SPEC_LIB_NAME__
     }
     else
 #endif
-        if (!std::isnan(C0) && !std::isinf(C0))
+
+    if (!std::isnan(C0) && !std::isinf(C0))
       numerator += C0;
     else
       return -1.;
@@ -1126,7 +1127,8 @@ namespace __SPEC_LIB_NAME__
       }
       else
 #endif
-          if (!std::isnan(C) && !std::isinf(C))
+
+      if (!std::isnan(C) && !std::isinf(C))
         numerator += C;
       else
         return -1.;
@@ -1188,6 +1190,155 @@ namespace __SPEC_LIB_NAME__
     real_t result = numerator / denominator;
     return result;
   }
+
+  real_t AvgSvCalculator::getAverageSigmav_coan_hightemp_num(const real_t& T)
+  {
+
+    constexpr const real_t Tfreeze = 25.;
+    constexpr const real_t Beps = 1.e-6;
+    const real_t maxenergy = 2. * getMassLBSM() - Tfreeze * std::log(Beps);
+
+    if (g2_Wefftab.size() == 0)
+      tabulateValues(std::max(10. * getMassLBSM(), maxenergy), 600);
+
+#ifdef DEBUG_OUTPUT
+    std::string filename = static_cast<std::string>(OUTPATH) + static_cast<std::string>("sigmav_tab_full_new.dat");
+    FILE* ftabptr = fopen(filename.c_str(), "a");
+    if (ftabptr == nullptr)
+    {
+      printf("File sigmav_tab_full_new.dat is impossible to open for appending\n");
+      // std::cin.get();
+    }
+#endif
+
+    real_t numerator(0.);
+    const size_t n_max( pefftab.size() - 2);
+
+    const real_t num_z(2. * getMassLBSM());
+
+    real_t num_x1(sqrtStab[0]), num_x2(sqrtStab[1]);
+
+    const real_t denom(T);
+
+    real_t KA(advmath::K1exp_numdenom(num_x1, num_z, denom)), 
+           A(SQUARE(pefftab[0]) * g2_Wefftab[0] * KA),
+           KB(advmath::K1exp_numdenom(num_x2, num_z, denom)),
+           B(SQUARE(pefftab[1]) * g2_Wefftab[1] * KB),
+           C0(0.5 * (A + B) * (pefftab[1] - pefftab[0]));
+
+    real_t  C;
+    
+
+#ifdef DEBUG_OUTPUT
+    if (ftabptr != nullptr)
+      fprintf(ftabptr, "-2\t%.5e\t%d\t%.5e\t%.5e\t%.5e\t%.5e\t%.5e\t%.5e\t%.5e\t%.5e\n", T, 0, pefftab[0], sqrtStab[0],
+              A, KA, B, (A + B), (pefftab[0 + 1] - pefftab[0]), C0);
+    if (C0 != 0. && (!std::isnormal(C0) || !(C0 > 0.)))
+    {
+      std::string contributiontype = (C0 < 0.) ? "negative" : "non-positive";
+      std::cout << "Warning in the numerator of <sigmav>:\n";
+      std::cout << contributiontype << " contribution to <sigma v> for T = " << T << " GeV:" << std::endl;
+      std::cout << " A = " << A << " B = " << B << " C = " << C0 << std::endl;
+      numerator += 0.;
+    }
+    else
+#endif
+
+    if (!std::isnan(C0) && !std::isinf(C0))
+      numerator += C0;
+    else
+      return -1.;
+
+    for (size_t i = 1; i < n_max; i++)
+    {
+      KA = KB;
+      A = B;
+
+      num_x2 = sqrtStab[i + 1];
+
+      KB = advmath::K1exp_numdenom(num_x2, num_z, denom);
+
+      B = SQUARE(pefftab[i + 1]) * g2_Wefftab[i + 1] * KB;
+      C = 0.5 * (A + B) * (pefftab[i + 1] - pefftab[i]);
+// if(C/C0 < 1.0e-6) break;
+#ifdef DEBUG_OUTPUT
+      if (ftabptr != nullptr)
+        fprintf(ftabptr, "-2\t%.5e\t%ld\t%.5e\t%.5e\t%.5e\t%.5e\t%.5e\t%.5e\t%.5e\t%.5e\n", T, i, pefftab[i],
+                sqrtStab[i], A, KA, B, (A + B), (pefftab[i + 1] - pefftab[i]), C);
+      if ((C != 0.) && (!std::isnormal(C) || !(C > 0.)))
+      {
+        std::string contributiontype = (C < 0.) ? "negative" : "non-positive";
+        std::cout << "Warning in the numerator of <sigmav>:\n";
+        std::cout << contributiontype << " contribution to <sigma v> for T = " << T << " GeV:" << std::endl;
+        std::cout << " A = " << A << " B = " << B << " C = " << C << std::endl;
+        numerator += 0.;
+      }
+      else
+#endif
+
+      if (!std::isnan(C) && !std::isinf(C))
+        numerator += C;
+      else
+        return -1.;
+    }
+    // Now computing the denominator
+    // Note that we consider only g_i (i.e. the degrees of freedom of the particle i)
+    // and not g_i/g_1, since the numerator contains already g_1 ^2* Weff,
+    // and later in the square they compensate
+
+    for (auto part : corr::bsm_particles)
+    {
+      num_x2 = input.masses_vector[part];
+
+      C = 1.0 * corr::part_hel_dof[part] * SQUARE(input.masses_vector[part]) *
+          advmath::K2exp_numdenom(num_x2, num_z / 2., T);
+#ifdef DEBUG
+      if (!std::isnormal(C) || !(C > 0))
+      {
+        std::cout << "Warning in the denominator of <sigmav>: ";
+        std::cout << " C = " << C << std::endl;
+        std::cout << " part = " << corr::part_names[part];
+        std::cout << " dof  = " << corr::part_hel_dof[part];
+        std::cout << " mass = " << input.masses_vector[part];
+        std::cout << " arg1 = " << input.masses_vector[part] / T;
+        std::cout << " arg2 = " << getMassLBSM() / T;
+        std::cout << " K2exp(arg1,arg2) = " << advmath::K2exp(input.masses_vector[part] / T, getMassLBSM() / T)
+                  << std::endl;
+        ;
+      }
+#endif
+      if (std::isnan(C) || std::isinf(C))
+        return -1.;
+      // NOTE : this is not the denominator, but just the sum, that will be squared and normalised with the
+      // prefactor later on
+      denominator += C;
+    }
+
+
+#ifdef DEBUG_OUTPUT
+    fclose(ftabptr);
+    filename = static_cast<std::string>(OUTPATH) + static_cast<std::string>("sigmav_tab_new.dat");
+    FILE* fptr = fopen(filename.c_str(), "a");
+
+    if (fptr == nullptr)
+    {
+      printf("Impossible to open sigmav_tab_new.dat\n");
+      // std::cin.get();
+    }
+    else
+    {
+      fprintf(fptr, "%.5e\t%.5e\t%.5e\t%.5e\n", T, numerator, denominator, std::sqrt(2. * T / getMassLBSM()));
+      fclose(fptr);
+    }
+#endif
+
+    // Now getting the result
+    // The square root compensates the use of K1,2exp at the place of K1,2
+    denominator *= denominator * T * std::sqrt(2. * T / getMassLBSM());
+    real_t result = numerator / denominator;
+    return result;
+  }
+
 
   struct SecondArgument_t
   {

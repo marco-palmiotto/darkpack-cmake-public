@@ -83,10 +83,7 @@ namespace __SPEC_LIB_NAME__
     return numerator / denominator;
   }
 
-  real_t BoltzmannSolver::dYeq_dT(const real_t& T)
-  {
-    return (Yeq(T * 1.001) - Yeq(T * 0.999)) / 0.002 / T;
-  }
+  real_t BoltzmannSolver::dYeq_dT(const real_t& T) { return (Yeq(T * 1.001) - Yeq(T * 0.999)) / 0.002 / T; }
 
   void BoltzmannSolver::setTfo(real_t delta)
   {
@@ -193,7 +190,7 @@ namespace __SPEC_LIB_NAME__
 #endif
       this->Tfo = this->Tmax = T;
     }
-      
+
     if (phi_model.get() != 0)
     {
       this->rhot_phi0 = this->rhot_phi_Tmax;
@@ -813,7 +810,7 @@ namespace __SPEC_LIB_NAME__
     std::cout << "rho_phi = " << rho_phi << '\n';
     if (this->full_comput == 0)
       std::cout << "T_fo=" << this->Tfo << '\n';
- 
+
     std::cout << "T_max=" << this->Tmax << '\n';
     //   FILE *sig,*phi0;
     //   sig=fopen("sigmav.out","w");
@@ -861,7 +858,7 @@ namespace __SPEC_LIB_NAME__
 
     real_t YeqT = Yeq(T);
 #ifdef DEBUG
-    std::cout << "dx=" << dx << " Y_eq=" << YeqT <<'\n';
+    std::cout << "dx=" << dx << " Y_eq=" << YeqT << '\n';
 #endif
 
     real_t Y = (this->full_comput) ? YeqT : YeqT * (1. + delta);
@@ -900,7 +897,7 @@ namespace __SPEC_LIB_NAME__
 #endif
         return 0.;
       }
-        
+
 #ifdef DEBUG
       std::cout << "counter=" << counter << ", T=" << std::exp(x) << ", Yeq=" << Yeq(std::exp(x))
                 << ", Tfo=" << this->Tfo << ", Yphi=" << Yphi << ", dx=" << dx << ", s=" << rho_phi / Yphi << '\n';

@@ -225,10 +225,49 @@ public:
     // The following is the model-independent function
     // Supposed to work well at low temperatures as well
     // It relies on the following methods
+
+
+    /**
+     * @brief Computes \f$\langle \sigma v \rangle\f$ with an algorithm depending on the temperature.
+     *
+     * If the argument \f$T\f$ is greater than the threshold temperature \f$T_{lim}\f$, the function
+     * calls @ref getAverageSigmav_coan_hightemp "getAverageSigmav_coan_hightemp", otherwise it calls
+     * @ref getAverageSigmav_coan_lowtemp "getAverageSigmav_coan_lowtemp".
+     *
+     * @param T input temperature
+     * @return real_t the value of \f$\langle \sigma v \rangle\f$
+     */
     real_t getAverageSigmav_coan(const real_t& T);
+
+    /**
+     * @brief Computes \f$\langle \sigma v \rangle\f$ with the algoritm for high temperatures.
+     *
+     * The algorithm relies on the formula
+     *
+     * @param T input temperature
+     * @return real_t the value of \f$\langle \sigma v \rangle\f$
+     */
     real_t getAverageSigmav_coan_hightemp(const real_t& T);
+
+    /**
+     * @brief Computes \f$\langle \sigma v \rangle\f$ with the algoritm for low temperatures.
+     *
+     * The algorithm relies on the formula
+     *
+     * present in
+     *
+     * @param T input temperature
+     * @return real_t the value of \f$\langle \sigma v \rangle\f$
+     */
     real_t getAverageSigmav_coan_lowtemp(const real_t& T);
+
+
     real_t getAverageSigmav_coan_lowtemp_degenerate_mass(const real_t& T);
+
+    // Debug functions to get numerator and denominator of <sigma v>
+
+    real_t getAverageSigmav_coan_hightemp_num(const real_t& T);
+    real_t getAverageSigmav_coan_hightemp_den(const real_t& T);
 
 public:
     // Barebone interface function that we define here once for all

@@ -165,8 +165,11 @@ endif()
 
 # Add a custom target to run clang-format on all source files
 find_program(CLANG_FORMAT_BIN clang-format)
+find_program(CLANG_TIDY_BIN clang-tidy)
 ## Define a cache variable for enabling/disabling clang-format to modify files
 option(ENABLE_CLANG_FORMAT "Enable clang-format run" ON)
+## Define a cache variable for enabling/disabling clang-tidy to modify files
+option(ENABLE_CLANG_TIDY "Enable clang-tidy run" OFF)
 
 ## Define the patterns to exclude
 ### Adding general patterns
@@ -224,6 +227,17 @@ if(ENABLE_CLANG_FORMAT)
         COMMAND ${CLANG_FORMAT_BIN}
         -style=file
         -i
+        ${FILTERED_SOURCE_FILES}
+    )
+endif()
+
+if(ENABLE_CLANG_TIDY)
+    ## Create the tidy target
+    add_custom_target(tidy
+        COMMENT "Running clang-tidy to change files"
+        COMMAND ${CLANG_TIDY_BIN}
+        --checks=* 
+        --fix 
         ${FILTERED_SOURCE_FILES}
     )
 endif()

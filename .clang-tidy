@@ -1,0 +1,11 @@
+Checks: >
+  -modernize-use-default-member-init,
+  -modernize-use-equals-default,
+  -modernize-use-equals-delete,
+  -modernize-avoid-c-arrays,
+  -modernize-use-auto,
+  -modernize-use-nullptr,
+  -modernize-use-using
+WarningsAsErrors: '*'
+HeaderFilterRegex: '.*'
+FormatStyle: file

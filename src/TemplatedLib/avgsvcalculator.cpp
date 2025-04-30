@@ -1096,7 +1096,7 @@ namespace __SPEC_LIB_NAME__
     else
 #endif
 
-    if (!std::isnan(C0) && !std::isinf(C0))
+        if (!std::isnan(C0) && !std::isinf(C0))
       numerator += C0;
     else
       return -1.;
@@ -1128,7 +1128,7 @@ namespace __SPEC_LIB_NAME__
       else
 #endif
 
-      if (!std::isnan(C) && !std::isinf(C))
+          if (!std::isnan(C) && !std::isinf(C))
         numerator += C;
       else
         return -1.;
@@ -1212,7 +1212,7 @@ namespace __SPEC_LIB_NAME__
 #endif
 
     real_t numerator(0.);
-    const size_t n_max( pefftab.size() - 2);
+    const size_t n_max(pefftab.size() - 2);
 
     const real_t num_z(2. * getMassLBSM());
 
@@ -1220,14 +1220,12 @@ namespace __SPEC_LIB_NAME__
 
     const real_t denom(T);
 
-    real_t KA(advmath::K1exp_numdenom(num_x1, num_z, denom)), 
-           A(SQUARE(pefftab[0]) * g2_Wefftab[0] * KA),
-           KB(advmath::K1exp_numdenom(num_x2, num_z, denom)),
-           B(SQUARE(pefftab[1]) * g2_Wefftab[1] * KB),
-           C0(0.5 * (A + B) * (pefftab[1] - pefftab[0]));
+    real_t KA(advmath::K1exp_numdenom(num_x1, num_z, denom)), A(SQUARE(pefftab[0]) * g2_Wefftab[0] * KA),
+        KB(advmath::K1exp_numdenom(num_x2, num_z, denom)), B(SQUARE(pefftab[1]) * g2_Wefftab[1] * KB),
+        C0(0.5 * (A + B) * (pefftab[1] - pefftab[0]));
 
-    real_t  C;
-    
+    real_t C;
+
 
 #ifdef DEBUG_OUTPUT
     if (ftabptr != nullptr)
@@ -1244,7 +1242,7 @@ namespace __SPEC_LIB_NAME__
     else
 #endif
 
-    if (!std::isnan(C0) && !std::isinf(C0))
+        if (!std::isnan(C0) && !std::isinf(C0))
       numerator += C0;
     else
       return -1.;
@@ -1276,7 +1274,7 @@ namespace __SPEC_LIB_NAME__
       else
 #endif
 
-      if (!std::isnan(C) && !std::isinf(C))
+          if (!std::isnan(C) && !std::isinf(C))
         numerator += C;
       else
         return -1.;

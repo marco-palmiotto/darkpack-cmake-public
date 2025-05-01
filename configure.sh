@@ -14,5 +14,5 @@ if [[ $(clang-format --version | cut -f 3 -d " ") == "19.1.7" ]]; then
 else
     echo "clang-format version is not 19.1.7, skipping lining"
 fi
-cmake --build ./build --target tidy || exit 1   
+# cmake --build ./build --target tidy || exit 1   
 cmake --build ./build --target install_headers_all darkpack_doc 

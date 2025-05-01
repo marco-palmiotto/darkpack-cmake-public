@@ -229,6 +229,16 @@ if(ENABLE_CLANG_FORMAT)
         -i
         ${FILTERED_SOURCE_FILES}
     )
+
+    ## Create the format-check target
+    add_custom_target(format-check
+        COMMENT "Running clang-format to check code style compliance"
+        COMMAND ${CLANG_FORMAT_BIN}
+        -style=file
+        --dry-run
+        --Werror
+        ${FILTERED_SOURCE_FILES}
+    )
 endif()
 
 if(ENABLE_CLANG_TIDY)
@@ -242,12 +252,3 @@ if(ENABLE_CLANG_TIDY)
     )
 endif()
 
-## Create the format-check target
-add_custom_target(format-check
-    COMMENT "Running clang-format to check code style compliance"
-    COMMAND ${CLANG_FORMAT_BIN}
-    -style=file
-    --dry-run
-    --Werror
-    ${FILTERED_SOURCE_FILES}
-)

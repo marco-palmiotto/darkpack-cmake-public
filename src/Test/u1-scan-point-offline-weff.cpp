@@ -131,8 +131,14 @@ int main(int argc, char* argv[])
       const real_t T = 1. / x;
       const real_t sigma_v = boltz.getAverageSigmav(T);
       const real_t Y_eq = boltz.Yeq(T);
-      sigma_v_file << x * boltz.getMassLBSM() << " " << sigma_v << " " << Y_eq << "\n";
-      // Devo aggiungere numeratore e denominatore di sigmav
+      const real_t sigmavnum = boltz.getAverageSigmav_coan_hightemp_num(T);
+      const real_t sigmavden = boltz.getAverageSigmav_coan_hightemp_den(T);
+      sigma_v_file << x * boltz.getMassLBSM() << " " << sigma_v << " " << Y_eq << " " << sigmavnum << " " << sigmavden << "\n";
+      if( std::abs( (sigmavnum/sigmavden - sigma_v)/(sigmavnum/sigmavden + sigma_v) ) > 1.0e-3)
+      {
+        std::cerr << "Warning: sigmavnum/sigmavden = " << sigmavnum / sigmavden
+                  << " and sigma_v = " << sigma_v << " are not consistent\n";
+      }
     }
     sigma_v_file.close();
     std::cout << "Sigma_v table written to " << sigma_v_filename.str() << "\n";

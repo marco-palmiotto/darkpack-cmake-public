@@ -1279,17 +1279,26 @@ namespace __SPEC_LIB_NAME__
       else
         return -1.;
     }
+
+    return numerator;
+  }
+
+  real_t AvgSvCalculator::getAverageSigmav_coan_hightemp_den(const real_t& T)
+  {
     // Now computing the denominator
     // Note that we consider only g_i (i.e. the degrees of freedom of the particle i)
     // and not g_i/g_1, since the numerator contains already g_1 ^2* Weff,
     // and later in the square they compensate
 
+    const real_t num_z(2. * getMassLBSM());
+    real_t denominator(0.);
+
     for (auto part : corr::bsm_particles)
     {
-      num_x2 = input.masses_vector[part];
+      const real_t num_x2(input.masses_vector[part]);
 
-      C = 1.0 * corr::part_hel_dof[part] * SQUARE(input.masses_vector[part]) *
-          advmath::K2exp_numdenom(num_x2, num_z / 2., T);
+      const real_t C(1.0 * corr::part_hel_dof[part] * SQUARE(input.masses_vector[part]) *
+                     advmath::K2exp_numdenom(num_x2, num_z / 2., T));
 #ifdef DEBUG
       if (!std::isnormal(C) || !(C > 0))
       {
@@ -1333,8 +1342,7 @@ namespace __SPEC_LIB_NAME__
     // Now getting the result
     // The square root compensates the use of K1,2exp at the place of K1,2
     denominator *= denominator * T * std::sqrt(2. * T / getMassLBSM());
-    real_t result = numerator / denominator;
-    return result;
+    return denominator;
   }
 
 

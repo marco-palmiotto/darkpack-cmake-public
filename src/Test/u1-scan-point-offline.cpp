@@ -97,7 +97,7 @@ int main(int argc, char* argv[])
     input.refresh();
     asv.changeInput(input);
     std::cout << "m_V = " << *m_V << " g_f = " << *g_f << " 2*m_chi = " << 2. * input.m_chi_dm_1.get() << '\n';
-    std::vector<const Process2to2*> list_allowed(asv.get_contributing_processes());
+    std::vector<const Process2to2*> list_allowed(asv.compute_contributing_processes());
     if (n < list_allowed.size())
     {
       n = list_allowed.size();

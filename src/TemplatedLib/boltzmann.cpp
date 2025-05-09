@@ -90,8 +90,8 @@ namespace __SPEC_LIB_NAME__
 #ifdef DEBUG
     std::cout << "Called setTfo\n";
 #endif
-    if (this->full_comput)
-      return;
+    // if (this->full_comput)
+    //   return;
 
     real_t Tmin, Tmax_local, T, Y, Yphi, rho_phi, srad;
     real_t testTfo = -1.;

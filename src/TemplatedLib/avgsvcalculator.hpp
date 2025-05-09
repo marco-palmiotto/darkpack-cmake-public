@@ -135,7 +135,7 @@ public:
      * @brief Returns the list of processes that are allowed at zero momentum.
      *
      */
-    inline std::vector<const Process2to2*> get_contributing_processes() const
+    inline std::vector<const Process2to2*> compute_contributing_processes() const
     {
       std::vector<const Process2to2*> list_allowed;
 

@@ -254,6 +254,16 @@ public:
      */
     inline short int getDof() const { return combinFac; };
 
+    /**
+     * @brief Returns the minimum energy for producing the final state.
+     *
+     * @param input Param_t object containing numerical inputs.
+     * @return real_t The sum of the masses of the final state particles.
+     */
+    inline real_t compute_final_state_treshold(const Param_t& input) const
+    {
+      return input.masses_vector[p[2]] + input.masses_vector[p[3]];
+    };
 
     /**
      * @brief Prints the name of the process and its specifications to the given output stream.

@@ -39,13 +39,14 @@ int main(int argc, char* argv[])
 
   constexpr const double mchi_over_mv = 0.33;
 
-  std::vector<real_t> m_V_jumps = {10.5926, 10.7978 };
+  std::vector<real_t> m_V_jumps = {10.5926, 10.7978};
   std::vector<real_t> g_f_jumps = {0.0548977, 0.055293};
 
   const real_t slope_before_jump = (m_V_jumps[1] - m_V_jumps[0]) / (g_f_jumps[1] - g_f_jumps[0]);
   const std::vector<real_t> m_V_trial_vec({10.9, 10.91});
 
-  auto g_f_trial = [=](const real_t m_V_trial) { return g_f_jumps[1] + 1. / slope_before_jump * (m_V_trial - m_V_jumps[1]); };
+  auto g_f_trial = [=](const real_t m_V_trial)
+  { return g_f_jumps[1] + 1. / slope_before_jump * (m_V_trial - m_V_jumps[1]); };
 
   for (auto& elem : m_V_trial_vec)
   {
@@ -53,8 +54,8 @@ int main(int argc, char* argv[])
     g_f_jumps.push_back(g_f_trial(elem));
   }
 
-  m_V_jumps.push_back( 11.007);
-  g_f_jumps.push_back(0.0521988);   // Function and paramters' first definition
+  m_V_jumps.push_back(11.007);
+  g_f_jumps.push_back(0.0521988); // Function and paramters' first definition
   {
     const real_t m_V = 10.9;
     input.g_f = 0.1;
@@ -118,12 +119,13 @@ int main(int argc, char* argv[])
     std::cout << '\n';
 
     // Create a file named sigma_v_<value_of_mv>.dat
-    std::ostringstream sigma_v_filename;
-    sigma_v_filename << "out/scans/results/u1-theta23=0/sigma_v_" << m_V << ".dat";
-    std::ofstream sigma_v_file(sigma_v_filename.str());
+    filename.str("");
+    filename.clear();
+    filename << "out/scans/results/u1-theta23=0/sigma_v_" << m_V << ".dat";
+    std::ofstream sigma_v_file(filename.str());
     if (!sigma_v_file.is_open())
     {
-      std::cerr << "Error: Could not open file " << sigma_v_filename.str() << " for writing.\n";
+      std::cerr << "Error: Could not open file " << filename.str() << " for writing.\n";
       continue;
     }
 
@@ -137,7 +139,7 @@ int main(int argc, char* argv[])
     const real_t x_factor = std::pow(x_fin * T_in, 1. / n_points);
     std::array<real_t, n_points + 1> abscissae_sigmav;
 
-    for (auto i : std::views::iota(0u, n_points + 1))
+    for (auto i : std::views::iota(0u, n_points))
     {
       abscissae_sigmav[i] = std::pow(x_factor, i) / T_in;
     }
@@ -163,7 +165,7 @@ int main(int argc, char* argv[])
       }
     }
     sigma_v_file.close();
-    std::cout << "Sigma_v table written to " << sigma_v_filename.str() << "\n";
+    std::cout << "Sigma_v table written to " << filename.str() << "\n";
 
     std::cout << "Oh2=" << relic_density << " xfo=" << boltz.getMassLBSM() / Tfo << "\n";
 
@@ -207,17 +209,18 @@ int main(int argc, char* argv[])
         std::cout << "  - " << proc->getMname() << " (Threshold: " << proc->compute_final_state_treshold(input)
                   << ")\n";
       }
-      
-      std::shared_ptr< std::vector< Process2to2 > > group_ptr; 
-      
-      for( const Process2to2* elem : group )
+
+      std::shared_ptr<std::vector<Process2to2>> group_ptr;
+
+      for (const Process2to2* elem : group)
       {
-        if( group_ptr == nullptr )
-          group_ptr = std::make_shared< std::vector< Process2to2 > >();
-        group_ptr->push_back( *elem );
+        if (group_ptr == nullptr)
+          group_ptr = std::make_shared<std::vector<Process2to2>>();
+        group_ptr->push_back(*elem);
       }
 
-      AvgSvCalculator avgsv(input, group_ptr);
+      BoltzmannSolver avgsv(input, group_ptr);
+      avgsv.relic_density();
 
       // Compute the label for the group based on the threshold of the first process
       const real_t threshold_group = group.front()->compute_final_state_treshold(input);
@@ -226,13 +229,14 @@ int main(int argc, char* argv[])
       const std::string group_label = group_label_stream.str();
 
       // Create a file for the current group
-      std::ostringstream group_filename;
-      group_filename << "out/scans/results/u1-theta23=0/sigma_vg_" << m_V << "_group_" << group_label << ".dat";
-      std::ofstream group_file(group_filename.str());
+      filename.str("");
+      filename.clear();
+      filename << "out/scans/results/u1-theta23=0/sigma_vg_" << m_V << "_group_" << group_label << ".dat";
+      std::ofstream group_file(filename.str());
       if (!group_file.is_open())
       {
-          std::cerr << "Error: Could not open file " << group_filename.str() << " for writing.\n";
-          continue;
+        std::cerr << "Error: Could not open file " << filename.str() << " for writing.\n";
+        continue;
       }
 
       // Write the header for the file
@@ -242,18 +246,17 @@ int main(int argc, char* argv[])
       real_t sigmav_total = 0.0;
       for (const real_t& x : abscissae_sigmav)
       {
-          const real_t T = 1. / x;
-        
-          sigmav_total += avgsv.getAverageSigmav(T); 
+        const real_t T = 1. / x;
 
-          // Write x and sigmav_total to the file
-          group_file << x << " " << sigmav_total << "\n";
+        sigmav_total += avgsv.getAverageSigmav(T);
+
+        // Write x and sigmav_total to the file
+        group_file << x << " " << sigmav_total << "\n";
       }
 
       group_file.close();
-      std::cout << "Sigma_v table for group " << group_label << " written to " << group_filename.str() << "\n";
-
-      }
+      std::cout << "Sigma_v table for group " << group_label << " written to " << filename.str() << "\n";
+    }
   }
 
   return 0;

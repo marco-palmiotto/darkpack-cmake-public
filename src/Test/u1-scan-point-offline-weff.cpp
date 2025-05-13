@@ -219,8 +219,8 @@ int main(int argc, char* argv[])
         group_ptr->push_back(*elem);
       }
 
-      BoltzmannSolver avgsv(input, group_ptr);
-      avgsv.relic_density();
+      BoltzmannSolver boltzgroup(input, group_ptr);
+      boltzgroup.relic_density();
 
       // Compute the label for the group based on the threshold of the first process
       const real_t threshold_group = group.front()->compute_final_state_treshold(input);
@@ -248,7 +248,7 @@ int main(int argc, char* argv[])
       {
         const real_t T = 1. / x;
 
-        sigmav_total += avgsv.getAverageSigmav(T);
+        sigmav_total += boltzgroup.getAverageSigmav(T);
 
         // Write x and sigmav_total to the file
         group_file << x << " " << sigmav_total << "\n";
@@ -256,6 +256,33 @@ int main(int argc, char* argv[])
 
       group_file.close();
       std::cout << "Sigma_v table for group " << group_label << " written to " << filename.str() << "\n";
+      
+      // Create a file named Weff_<value_of_mv>.dat for the current group
+      filename.str("");
+      filename.clear();
+      filename << "out/scans/results/u1-theta23=0/Weff_g_" << m_V << "_group_" << group_label << ".dat";
+      outfile.open(filename.str());
+      if (!outfile.is_open())
+      {
+        std::cerr << "Error: Could not open file " << filename.str() << " for writing.\n";
+        continue;
+      }
+
+      // Write the header for the file
+      outfile << "# peff sqrts weff\n";
+
+      // Generate and write the peff, sqrts, and weff tables
+      for (size_t i = 0; i < boltzgroup.getWefftabsize(); ++i)
+      {
+        real_t peff, sqrts, weff;
+        boltzgroup.get_g2_WeffTabElement(i, peff, sqrts, weff);
+        outfile << peff << " " << sqrts << " " << weff << "\n";
+      }
+
+      outfile.close();
+      std::cout << "Weff table for group " << group_label << " written to " << filename.str() << "\n";;
+      std::cout << '\n';
+
     }
   }
 

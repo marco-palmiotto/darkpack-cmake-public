@@ -8,7 +8,7 @@
             "name": "(gdb) Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/src/main/u1-scan-point-offline.x",
+            "program": "${workspaceFolder}/build/src/Test/u1-scan-point-offline-weff.x",
             "args": ["${workspaceFolder}/src/models/u1.lha"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",

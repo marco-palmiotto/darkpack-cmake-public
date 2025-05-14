@@ -220,7 +220,7 @@ int main(int argc, char* argv[])
       }
 
       BoltzmannSolver boltzgroup(input, group_ptr);
-      boltzgroup.relic_density();
+      // boltzgroup.relic_density();
 
       // Compute the label for the group based on the threshold of the first process
       const real_t threshold_group = group.front()->compute_final_state_treshold(input);
@@ -243,20 +243,25 @@ int main(int argc, char* argv[])
       group_file << "# x sigmav\n";
 
       // Compute sigmav for each value in abscissae_sigmav
-      real_t sigmav_total = 0.0;
       for (const real_t& x : abscissae_sigmav)
       {
         const real_t T = 1. / x;
-
-        sigmav_total += boltzgroup.getAverageSigmav(T);
-
-        // Write x and sigmav_total to the file
-        group_file << x << " " << sigmav_total << "\n";
+        const real_t sigma_v = boltzgroup.getAverageSigmav(T);
+        const real_t Y_eq = boltzgroup.Yeq(T);
+        const real_t sigmavnum = boltzgroup.getAverageSigmav_coan_hightemp_num(T);
+        const real_t sigmavden = boltzgroup.getAverageSigmav_coan_hightemp_den(T);
+        group_file << x * boltzgroup.getMassLBSM() << " " << sigma_v << " " << Y_eq << " " << sigmavnum << " "
+                   << sigmavden << "\n";
+        if (std::abs((sigmavnum / sigmavden - sigma_v) / (sigmavnum / sigmavden + sigma_v)) > 1.0e-3)
+        {
+          std::cerr << "Warning: sigmavnum/sigmavden = " << sigmavnum / sigmavden << " and sigma_v = " << sigma_v
+                    << " are not consistent\n";
+        }
       }
 
       group_file.close();
       std::cout << "Sigma_v table for group " << group_label << " written to " << filename.str() << "\n";
-      
+
       // Create a file named Weff_<value_of_mv>.dat for the current group
       filename.str("");
       filename.clear();
@@ -280,9 +285,9 @@ int main(int argc, char* argv[])
       }
 
       outfile.close();
-      std::cout << "Weff table for group " << group_label << " written to " << filename.str() << "\n";;
+      std::cout << "Weff table for group " << group_label << " written to " << filename.str() << "\n";
+      ;
       std::cout << '\n';
-
     }
   }
 

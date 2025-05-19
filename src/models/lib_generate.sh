@@ -16,21 +16,23 @@ gcc_version=$(gcc --version | grep -oP '\d+\.\d+\.\d+' | head -n1 | cut -f 1 -d 
 echo You have installed $gcc_version
 
 # Define the minimum required GCC version
-required_version="12"
+required_version="14"
 
 echo The required version is $required_version
 
 # Compare the versions
 if [ "$gcc_version" -gt "$required_version" ]; then
-    # GCC version is greater than 12, export the variables
-    export CC=gcc-12
-    export CXX=g++-12
-    export FC=gfortran-12
+    # GCC version is greater than 14, export the variables
+    export CC=gcc-14
+    export CXX=g++-14
+    export FC=gfortran-14
 
     echo Environmental variables have been updated
 else
+    export CC=gcc
     export CXX=g++
-    echo Your system is good
+    export FC=gfortran
+    echo Running with the default compiler
 fi
 
 # This script generates the numerical library named

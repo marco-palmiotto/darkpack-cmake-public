@@ -15,11 +15,8 @@ do
 
         podman build -t $name_output:latest -f $filename
 
-        if [ $suffix == "deploy" -o $suffix == "scan" ]
-        then
-            podman tag localhost/${name_output} docker.io/marcopalmiotto/darkpack-$suffix:$distro
-            podman push docker.io/marcopalmiotto/darkpack-$suffix:$distro &
-        fi
+        podman tag localhost/${name_output} docker.io/marcopalmiotto/darkpack-$suffix:$distro
+        podman push docker.io/marcopalmiotto/darkpack-$suffix:$distro &
     done
 done
 

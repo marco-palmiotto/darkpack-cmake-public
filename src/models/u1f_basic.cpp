@@ -11,7 +11,7 @@ using namespace csl;
 #include "marty/ufo/electriccharge.h"
 
 #define LIBNAME         "u1f2to2" // Name of the output library
-#define MAXNUMPROCESSES 5000      // Max number of processes to be stored in a Processes variable
+#define MAXNUMPROCESSES 10000      // Max number of processes to be stored in a Processes variable
 
 #define CORRESPONDANCE // Defining this variable the creation of correspondance.h is enabled
 #define SQUAREDAMP     // Defining this variable squared amplitudes are calculated and added to the
@@ -101,7 +101,7 @@ int main()
 
   std::cout << "Separating SM and BSM particles" << std::endl;
   std::vector<Particle> psm;
-  std::vector<Particle> pbsm({my_model.getParticle("chi_dm_1"), my_model.getParticle("chi_dm_2")});
+  std::vector<Particle> pbsm({my_model.getParticle("chi_dm")});
   for (size_t i = 0; i != part.size(); i++)
   {
     bool istoadd = true;
@@ -168,7 +168,15 @@ int main()
 
   std::cout << "Building the list of SM leptons\n";
 
-  std::array<Particle, 2> bsm_fields({my_model.getParticle("chi_dm_1"), my_model.getParticle("chi_dm_2")});
+  std::array<Particle, 2> bsm_fields({my_model.getParticle("chi_dm")});
+  std::array<Particle, 6> out_fields({
+      my_model.getParticle("e"),
+      my_model.getParticle("mu"),
+      my_model.getParticle("tau"),
+      my_model.getParticle("nu_e"),
+      my_model.getParticle("nu_mu"),
+      my_model.getParticle("nu_tau")
+  });
 
   for (size_t i1 = 0; i1 < bsm_fields.size(); i1++)
   {
@@ -180,15 +188,15 @@ int main()
         for (mty::Insertion state2 :
              std::array<mty::Insertion, 2>({Incoming(bsm_fields[i2]), Incoming(AntiPart(bsm_fields[i2]))}))
         {
-          for (size_t j1 = 0; j1 < psm.size(); j1++)
+          for (size_t j1 = 0; j1 < out_fields.size(); j1++)
           {
             for (mty::Insertion state3 :
-                 std::array<mty::Insertion, 2>({Outgoing(psm[j1]), Outgoing(AntiPart(psm[j1]))}))
+                 std::array<mty::Insertion, 2>({Outgoing(out_fields[j1]), Outgoing(AntiPart(out_fields[j1]))}))
             {
-              for (size_t j2 = j1; j2 < psm.size(); j2++)
+              for (size_t j2 = j1; j2 < out_fields.size(); j2++)
               {
                 for (mty::Insertion state4 :
-                     std::array<mty::Insertion, 2>({Outgoing(psm[j2]), Outgoing(AntiPart(psm[j2]))}))
+                     std::array<mty::Insertion, 2>({Outgoing(out_fields[j2]), Outgoing(AntiPart(out_fields[j2]))}))
                 {
                   Process2to2ToCompute proc_c;
 

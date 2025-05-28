@@ -62,7 +62,11 @@ USER ${username}
 RUN pipx ensurepath && \
     pipx install poetry
 
-USER ${username}
+USER root
+RUN dnf install valgrind \
+                perf \
+                -y && \
+    dnf clean all
 
 # Installs maquao (for profiling/development)
 # RUN cd /usr/bin && wget https://maqao.org/maqao_archive/maqao.intel64.2.17.0.tar.xz &&	\
@@ -75,5 +79,7 @@ USER ${username}
 #     ./install.sh /usr/ && \
 #     cd .. && \
 #     rm -fr MicroBenchmark
+
+USER ${username}
 
 CMD ["sleep", "infinity"]

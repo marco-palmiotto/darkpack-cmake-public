@@ -4,8 +4,9 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+
         {
-            "name": "(gdb) Launch",
+            "name": "(gdb) Launch-darkpack",
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/build/src/Test/u1-scan-point-offline-weff.x",
@@ -28,6 +29,30 @@
             "internalConsoleOptions": "openOnSessionStart",
             "logging": { "engineLogging": false },
             "debugServerPath": ""
+        },
+        {
+            "name": "(gdb) Launch-marty",
+            "type": "cppdbg",
+            "request": "lib_generate",
+            "program": "${workspaceFolder}/src/models/u1f_basic.x",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+            "preLaunchTask": "lib_generate", // You need to define this task in tasks.json
+            "miDebuggerPath": "/usr/bin/gdb",
+            "targetArchitecture": "x86_64",
+            "internalConsoleOptions": "openOnSessionStart",
+            "logging": { "engineLogging": false }
         }
     ]
 }

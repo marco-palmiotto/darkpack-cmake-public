@@ -29,6 +29,21 @@
                 "$gcc"
             ],
             "detail": "Build the project using the chosen build system"
+        },
+        {
+            "label": "PWD",
+            "type": "shell",
+            "command": "pwd",
+            "args": [],
+            "problemMatcher": [],
+            "detail": "Print the current working directory"
+        },
+        {
+            "label": "lib_generate",
+            "type": "process",
+            "dependsOn": "PWD",
+            "command": ".vscode/debug_lib_generate.sh",
+            "args": ["u1f_basic2to2", "u1f_basic"]
         }
     ]
 }

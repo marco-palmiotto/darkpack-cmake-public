@@ -133,31 +133,32 @@ int main(int argc, char* argv[])
     const real_t Tfo = boltz.getTfo();
     const real_t T_in = 10. * Tfo;
     const real_t T_fin = 2.7;
-    const real_t x_fin = 1. / T_fin;
+    const real_t inverse_T_fin = 1. / T_fin;
 
     constexpr const unsigned int n_points = 1000;
-    const real_t x_factor = std::pow(x_fin * T_in, 1. / n_points);
-    std::array<real_t, n_points + 1> abscissae_sigmav;
+    const real_t inverse_T_factor = std::pow(inverse_T_fin * T_in, 1. / n_points);
+    std::array<real_t, n_points + 1> inverse_T_sigmav;
 
     for (auto i : std::views::iota(0u, n_points))
     {
-      abscissae_sigmav[i] = std::pow(x_factor, i) / T_in;
+      inverse_T_sigmav[i] = std::pow(inverse_T_factor, i) / T_in;
     }
 
     // const auto abscissae_view = std::ranges::iota_view(0u, n_points);
 
     // std::transform(std::execution::par, abscissae_view.begin(), abscissae_view.end(), abscissae_sigmav.begin(),
-    //                [&](const auto i) { return std::pow(x_factor, i) / T_in; });
+    //                [&](const auto i) { return std::pow(inverse_T_factor, i) / T_in; });
 
-    for (const real_t& x : abscissae_sigmav)
+    sigma_v_file << "# x sigmav Y_eq sigmavnum sigmavden\n" << std::scientific << std::setprecision(4);
+    for (const real_t& inverse_T : inverse_T_sigmav)
     {
-      const real_t T = 1. / x;
+      const real_t T = 1. / inverse_T;
       const real_t sigma_v = boltz.getAverageSigmav(T);
       const real_t Y_eq = boltz.Yeq(T);
       const real_t sigmavnum = boltz.getAverageSigmav_coan_hightemp_num(T);
       const real_t sigmavden = boltz.getAverageSigmav_coan_hightemp_den(T);
-      sigma_v_file << x * boltz.getMassLBSM() << " " << sigma_v << " " << Y_eq << " " << sigmavnum << " " << sigmavden
-                   << "\n";
+      sigma_v_file << inverse_T * boltz.getMassLBSM() << " " << sigma_v << " " << Y_eq << " " << sigmavnum << " "
+                   << sigmavden << "\n";
       if (std::abs((sigmavnum / sigmavden - sigma_v) / (sigmavnum / sigmavden + sigma_v)) > 1.0e-3)
       {
         std::cerr << "Warning: sigmavnum/sigmavden = " << sigmavnum / sigmavden << " and sigma_v = " << sigma_v
@@ -200,30 +201,23 @@ int main(int argc, char* argv[])
     }
 
     // Output the grouped processes
-    unsigned short int group_index = 1;
-    for (const auto& group : grouped_processes)
+    unsigned short int group_index(1u);
+    for (const auto& group_of_processes : grouped_processes)
     {
+      std::shared_ptr<std::vector<Process2to2>> group_ptr(std::make_shared<std::vector<Process2to2>>());
       std::cout << "Group " << group_index++ << ":\n";
-      for (const Process2to2* proc : group)
+      for (const Process2to2* proc : group_of_processes)
       {
         std::cout << "  - " << proc->getMname() << " (Threshold: " << proc->compute_final_state_treshold(input)
                   << ")\n";
-      }
-
-      std::shared_ptr<std::vector<Process2to2>> group_ptr;
-
-      for (const Process2to2* elem : group)
-      {
-        if (group_ptr == nullptr)
-          group_ptr = std::make_shared<std::vector<Process2to2>>();
-        group_ptr->push_back(*elem);
+        group_ptr->push_back(*proc);
       }
 
       BoltzmannSolver boltzgroup(input, group_ptr);
-      // boltzgroup.relic_density();
+      boltzgroup.relic_density();
 
       // Compute the label for the group based on the threshold of the first process
-      const real_t threshold_group = group.front()->compute_final_state_treshold(input);
+      const real_t threshold_group = group_of_processes.front()->compute_final_state_treshold(input);
       std::ostringstream group_label_stream;
       group_label_stream << std::fixed << std::setprecision(3) << threshold_group;
       const std::string group_label = group_label_stream.str();
@@ -240,17 +234,17 @@ int main(int argc, char* argv[])
       }
 
       // Write the header for the file
-      group_file << "# x sigmav\n";
+      group_file << "# x sigmav\n" << std::scientific << std::setprecision(4);
 
-      // Compute sigmav for each value in abscissae_sigmav
-      for (const real_t& x : abscissae_sigmav)
+      // Compute sigmav for each value in inverse_T_sigmav
+      for (const real_t& inverse_T : inverse_T_sigmav)
       {
-        const real_t T = 1. / x;
+        const real_t T = 1. / inverse_T;
         const real_t sigma_v = boltzgroup.getAverageSigmav(T);
         const real_t Y_eq = boltzgroup.Yeq(T);
         const real_t sigmavnum = boltzgroup.getAverageSigmav_coan_hightemp_num(T);
         const real_t sigmavden = boltzgroup.getAverageSigmav_coan_hightemp_den(T);
-        group_file << x * boltzgroup.getMassLBSM() << " " << sigma_v << " " << Y_eq << " " << sigmavnum << " "
+        group_file << inverse_T * boltzgroup.getMassLBSM() << " " << sigma_v << " " << Y_eq << " " << sigmavnum << " "
                    << sigmavden << "\n";
         if (std::abs((sigmavnum / sigmavden - sigma_v) / (sigmavnum / sigmavden + sigma_v)) > 1.0e-3)
         {

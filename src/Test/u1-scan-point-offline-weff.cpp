@@ -43,7 +43,8 @@ int main(int argc, char* argv[])
   std::vector<real_t> g_f_jumps = {0.0548977, 0.055293};
 
   const real_t slope_before_jump = (m_V_jumps[1] - m_V_jumps[0]) / (g_f_jumps[1] - g_f_jumps[0]);
-  const std::vector<real_t> m_V_trial_vec({10.9, 10.91});
+  const std::vector<real_t> m_V_trial_vec(
+      {10.9, 10.91, 10.92, 10.93, 10.94, 10.95, 10.96, 10.97, 10.98, 10.99, 11.0, 11.01});
 
   auto g_f_trial = [=](const real_t m_V_trial)
   { return g_f_jumps[1] + 1. / slope_before_jump * (m_V_trial - m_V_jumps[1]); };
@@ -54,8 +55,10 @@ int main(int argc, char* argv[])
     g_f_jumps.push_back(g_f_trial(elem));
   }
 
-  m_V_jumps.push_back(11.007);
-  g_f_jumps.push_back(0.0521988); // Function and paramters' first definition
+  // m_V_jumps.push_back(11.007);
+  // g_f_jumps.push_back(0.0521988); // Function and paramters' first definition
+  // m_V_jumps.push_back(11.2202);
+  // g_f_jumps.push_back(0.0525978);
   {
     const real_t m_V = 10.9;
     input.g_f = 0.1;
@@ -77,14 +80,69 @@ int main(int argc, char* argv[])
     input.m_chi_dm_2 = mchi_over_mv * input.m_V_3;
     input.refresh();
     BoltzmannSolver boltz(input);
-    // boltz.full_comput = true;
 
-    std::cout << "m_V = " << m_V << " g_f = " << g_f << " 2*m_chi = " << 2. * input.m_chi_dm_1.get() << '\n';
-    const real_t relic_density = boltz.relic_density();
+    std::cout << "\nThe parameters are:\n"
+              << "m_V = " << m_V << " g_f = " << g_f << " 2*m_chi = " << 2. * input.m_chi_dm_1.get() << '\n';
+
     // Create a file named Weff_<value_of_mv>.dat
     std::ostringstream filename;
+    std::ofstream outfile;
+
+    // Create a file named sigma_v_<value_of_mv>.dat
+    filename.str("");
+    filename.clear();
+    filename << "out/scans/results/u1-theta23=0/sigma_v_" << m_V << ".dat";
+    std::ofstream sigma_v_file(filename.str());
+    if (!sigma_v_file.is_open())
+    {
+      std::cerr << "Error: Could not open file " << filename.str() << " for writing.\n";
+      continue;
+    }
+
+    std::cout << "Generating and writing the sigma_v table for the totality of the processes\n";
+    boltz.setTfo();
+    const real_t Tfo = boltz.getTfo();
+    constexpr const real_t x_in = 50., x_fin = 0.1;
+    // const real_t T_in = 10. * Tfo;
+    // const real_t T_fin = 2.7;
+    // const real_t inverse_T_fin = 1. / T_fin;
+
+    constexpr const unsigned int n_points = 1000;
+    const real_t mult_factor = std::pow(x_fin / x_in, 1. / n_points);
+    std::array<real_t, n_points + 1> x_values;
+
+    for (auto i : std::views::iota(0u, n_points))
+    {
+      x_values[i] = std::pow(mult_factor, i) * x_in;
+    }
+
+    // const auto abscissae_view = std::ranges::iota_view(0u, n_points);
+
+    // std::transform(std::execution::par, abscissae_view.begin(), abscissae_view.end(), abscissae_sigmav.begin(),
+    //                [&](const auto i) { return std::pow(mult_factor, i) / T_in; });
+
+    sigma_v_file << "# x sigmav Y_eq sigmavnum sigmavden\n" << std::scientific << std::setprecision(4);
+    for (const real_t& x : x_values)
+    {
+      const real_t T = 1. / x * input.getLightestBSMmass();
+      const real_t sigma_v = boltz.getAverageSigmav(T);
+      const real_t Y_eq = boltz.Yeq(T);
+      const real_t sigmavnum = boltz.getAverageSigmav_coan_hightemp_num(T);
+      const real_t sigmavden = boltz.getAverageSigmav_coan_hightemp_den(T);
+      sigma_v_file << x << " " << sigma_v << " " << Y_eq << " " << sigmavnum << " " << sigmavden << "\n";
+      if (std::abs((sigmavnum / sigmavden - sigma_v) / (sigmavnum / sigmavden + sigma_v)) > 1.0e-3)
+      {
+        std::cerr << "Warning: sigmavnum/sigmavden = " << sigmavnum / sigmavden << " and sigma_v = " << sigma_v
+                  << " are not consistent\n";
+      }
+    }
+    sigma_v_file.close();
+    std::cout << "Sigma_v table written to " << filename.str() << "\n";
+
+    filename.str("");
+    filename.clear();
     filename << "out/scans/results/u1-theta23=0/Weff_" << m_V << ".dat";
-    std::ofstream outfile(filename.str());
+    outfile.open(filename.str());
     if (!outfile.is_open())
     {
       std::cerr << "Error: Could not open file " << filename.str() << " for writing.\n";
@@ -106,7 +164,7 @@ int main(int argc, char* argv[])
       }
     }
 
-    // Generate and write the peff, sqrts, and weff tables
+    std::cout << "Generating and writing the peff, sqrts, and weff tables for the totality of the processes\n";
     for (size_t i = 0; i < boltz.getWefftabsize(); ++i)
     {
       real_t peff, sqrts, weff;
@@ -118,58 +176,38 @@ int main(int argc, char* argv[])
     std::cout << "Weff table written to " << filename.str() << "\n";
     std::cout << '\n';
 
-    // Create a file named sigma_v_<value_of_mv>.dat
+    boltz.full_comput = true;
+    const real_t relic_density = boltz.relic_density();
+
+    std::cout << "The relic density computed with the full algorithm is " << relic_density << '\n';
+
+    boltz.full_comput = false;
+    const real_t relic_density_no_full = boltz.relic_density();
+
+    std::cout << "The relic density computed with the non-full algorithm is " << relic_density_no_full << '\n';
+
+
+    std::cout << "Oh2 (full)=" << relic_density << " Oh2 (no full)=" << relic_density_no_full
+              << " xfo=" << boltz.getMassLBSM() / Tfo << "\n";
+
+    // Create a file named Oh2_xfo_<value_of_mv>.dat
     filename.str("");
     filename.clear();
-    filename << "out/scans/results/u1-theta23=0/sigma_v_" << m_V << ".dat";
-    std::ofstream sigma_v_file(filename.str());
-    if (!sigma_v_file.is_open())
+    filename << "out/scans/results/u1-theta23=0/Oh2_xfo_" << m_V << ".dat";
+    outfile.open(filename.str());
+    if (outfile.is_open())
     {
+      outfile << std::scientific << std::setprecision(4) << relic_density << " " << relic_density_no_full << " "
+              << boltz.getMassLBSM() / Tfo << "\n";
+      outfile.close();
+      std::cout << "Oh2_xfo written to " << filename.str() << "\n";
+    }
+    else
       std::cerr << "Error: Could not open file " << filename.str() << " for writing.\n";
-      continue;
-    }
 
-    boltz.setTfo();
-    const real_t Tfo = boltz.getTfo();
-    const real_t T_in = 10. * Tfo;
-    const real_t T_fin = 2.7;
-    const real_t inverse_T_fin = 1. / T_fin;
+    // return 0;
 
-    constexpr const unsigned int n_points = 1000;
-    const real_t inverse_T_factor = std::pow(inverse_T_fin * T_in, 1. / n_points);
-    std::array<real_t, n_points + 1> inverse_T_sigmav;
-
-    for (auto i : std::views::iota(0u, n_points))
-    {
-      inverse_T_sigmav[i] = std::pow(inverse_T_factor, i) / T_in;
-    }
-
-    // const auto abscissae_view = std::ranges::iota_view(0u, n_points);
-
-    // std::transform(std::execution::par, abscissae_view.begin(), abscissae_view.end(), abscissae_sigmav.begin(),
-    //                [&](const auto i) { return std::pow(inverse_T_factor, i) / T_in; });
-
-    sigma_v_file << "# x sigmav Y_eq sigmavnum sigmavden\n" << std::scientific << std::setprecision(4);
-    for (const real_t& inverse_T : inverse_T_sigmav)
-    {
-      const real_t T = 1. / inverse_T;
-      const real_t sigma_v = boltz.getAverageSigmav(T);
-      const real_t Y_eq = boltz.Yeq(T);
-      const real_t sigmavnum = boltz.getAverageSigmav_coan_hightemp_num(T);
-      const real_t sigmavden = boltz.getAverageSigmav_coan_hightemp_den(T);
-      sigma_v_file << inverse_T * boltz.getMassLBSM() << " " << sigma_v << " " << Y_eq << " " << sigmavnum << " "
-                   << sigmavden << "\n";
-      if (std::abs((sigmavnum / sigmavden - sigma_v) / (sigmavnum / sigmavden + sigma_v)) > 1.0e-3)
-      {
-        std::cerr << "Warning: sigmavnum/sigmavden = " << sigmavnum / sigmavden << " and sigma_v = " << sigma_v
-                  << " are not consistent\n";
-      }
-    }
-    sigma_v_file.close();
-    std::cout << "Sigma_v table written to " << filename.str() << "\n";
-
-    std::cout << "Oh2=" << relic_density << " xfo=" << boltz.getMassLBSM() / Tfo << "\n";
-
+    std::cout << "Working on the processes grouped by final state threshold...\n";
     std::vector<std::vector<const Process2to2*>> grouped_processes;
     if (!list_allowed.empty())
     {
@@ -237,15 +275,14 @@ int main(int argc, char* argv[])
       group_file << "# x sigmav\n" << std::scientific << std::setprecision(4);
 
       // Compute sigmav for each value in inverse_T_sigmav
-      for (const real_t& inverse_T : inverse_T_sigmav)
+      for (const real_t& x : x_values)
       {
-        const real_t T = 1. / inverse_T;
+        const real_t T = 1. / x * input.getLightestBSMmass();
         const real_t sigma_v = boltzgroup.getAverageSigmav(T);
         const real_t Y_eq = boltzgroup.Yeq(T);
         const real_t sigmavnum = boltzgroup.getAverageSigmav_coan_hightemp_num(T);
         const real_t sigmavden = boltzgroup.getAverageSigmav_coan_hightemp_den(T);
-        group_file << inverse_T * boltzgroup.getMassLBSM() << " " << sigma_v << " " << Y_eq << " " << sigmavnum << " "
-                   << sigmavden << "\n";
+        group_file << x << " " << sigma_v << " " << Y_eq << " " << sigmavnum << " " << sigmavden << "\n";
         if (std::abs((sigmavnum / sigmavden - sigma_v) / (sigmavnum / sigmavden + sigma_v)) > 1.0e-3)
         {
           std::cerr << "Warning: sigmavnum/sigmavden = " << sigmavnum / sigmavden << " and sigma_v = " << sigma_v

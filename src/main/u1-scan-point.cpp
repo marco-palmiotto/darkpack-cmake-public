@@ -92,6 +92,7 @@ int main(int argc, char* argv[])
   input.m_chi_dm_2 = mchi_over_mv * m_V;
   input.refresh();
   BoltzmannSolver boltz(input);
+  boltz.full_comput = true; // We want to compute the relic density with the full algorithm
 
   auto function_to_minimize = [&](const double* parameters, [[maybe_unused]] const int size_array = 2)
   {

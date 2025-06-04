@@ -59,10 +59,14 @@ int main(int argc, char* argv[])
   std::ofstream outfile{argv[read_args]};
   if (!outfile)
   {
-    std::cerr << "Impossible to open " << argv[read_args] << '\n';
-    return 1;
+    std::cout << "Impossible to open " << argv[read_args] << '\n';
+  }
+  else
+  {
+    outfile << "# m_phi/m_V  m_chi/m_V m_V  g_f   pull-Oh2   EDM  exit_code \nRESULT=";
   }
   std::cout << "Output file: " << argv[read_args++] << '\n';
+
 
   char* end;
 
@@ -138,9 +142,12 @@ int main(int argc, char* argv[])
   std::cout << m_phi_over_mv << '\t' << mchi_over_mv << '\t' << input.m_V.get() << '\t' << bestparameters_dvec[0]
             << '\t' << fmin << '\t' << edm << '\t' << return_val << '\n';
 
-  outfile << "# m_phi/m_V  m_chi/m_V m_V  g_f   pull-Oh2   EDM  exit_code \n";
-  outfile << m_phi_over_mv << '\t' << mchi_over_mv << '\t' << input.m_V.get() << '\t' << bestparameters_dvec[0] << '\t'
-          << fmin << '\t' << edm << '\t' << return_val << '\n';
+  if (outfile)
+  {
+    outfile << m_phi_over_mv << '\t' << mchi_over_mv << '\t' << input.m_V.get() << '\t' << bestparameters_dvec[0]
+            << '\t' << fmin << '\t' << edm << '\t' << return_val << '\n';
+  }
 
-  return return_val;
+
+  return 0;
 }

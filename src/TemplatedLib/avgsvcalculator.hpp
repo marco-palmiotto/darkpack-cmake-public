@@ -96,7 +96,6 @@ protected:
     std::vector<real_t> TaylorCoeffSVT; // Taylor coefficients of \f$\langle\sigma v\rangle\f$ (T) at low T
     bool wastherenosplitting, werealldeltaxinull;
 
-
     bool runningenabled;
 
     void sort_bsm_spectrum();

@@ -1,7 +1,7 @@
 #include "boltzmann.hpp"
 #include "macros.hpp"
 
-#define DEBUG
+// #define DEBUG
 #ifdef DEBUG
   #include <fstream>
   #include <iomanip>
@@ -370,7 +370,8 @@ namespace __SPEC_LIB_NAME__
     // Relicmass assignment
     constexpr const real_t Tfin = 2.3482260e-13;
     real_t delta = 1.5;
-    setTfo(delta);
+    if (Tfo <= 0.)
+      setTfo(delta);
 
     if (this->Tmax < Tfin)
       return -1.;
@@ -800,7 +801,8 @@ namespace __SPEC_LIB_NAME__
     constexpr const real_t Tfin = 2.3482260e-13;
 
     real_t delta = 1.5;
-    setTfo(delta);
+    if (Tfo <= 0.)
+      setTfo(delta);
 
     if (this->Tmax < Tfin)
       return -1.;

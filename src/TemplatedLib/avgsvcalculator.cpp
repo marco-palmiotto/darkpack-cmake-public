@@ -1,4 +1,5 @@
 #include "avgsvcalculator.hpp"
+
 #define DEFAULT_T_LIMIT (1.0e-5 * input.getLightestBSMmass())
 
 template <typename T> static inline T SQUARE(const T x) { return x * x; }
@@ -25,7 +26,7 @@ namespace __SPEC_LIB_NAME__
 #ifdef DEBUG
     size_t counter = 0; // Defining a counter for the number of processes
 #endif
-    for (auto p : *vp)
+    for (const auto& p : *vp)
     {
       if (cut && p.getMass(1, input) + p.getMass(2, input) > 4 * input.getLightestBSMmass())
         continue; // Ending cuts on Weff
@@ -204,7 +205,7 @@ namespace __SPEC_LIB_NAME__
     setLimitingValues();
 
     // Allocating g2_Wefftab if necessary
-    if (g2_Wefftab.size() == 0)
+    if (g2_Wefftab.empty())
     {
       constexpr const real_t Tfreeze = 25.;
       constexpr const real_t Beps = 1.e-6;
@@ -397,7 +398,7 @@ namespace __SPEC_LIB_NAME__
                                            // IDEA: Instantiating a static array of size 100 and reusing it?
     vres.reserve(p_ptr->size());
 
-    for (auto proc : *p_ptr)
+    for (auto& proc : *p_ptr)
     {
       if (Weffcuts && proc.getMass(1, input) + proc.getMass(2, input) > 4 * getMassLBSM())
         continue;
@@ -516,8 +517,17 @@ namespace __SPEC_LIB_NAME__
     /* Computes a table of Weff*gDM^2 for different values of sqrtS */
 
 #ifdef DEBUG
+    std::cout << "Entering AvgSvCalculator::tabulateValues\n";
     std::cout << "Resetting vectors\n";
 #endif
+
+    if (!sqrtStab.empty() || !pefftab.empty() || !g2_Wefftab.empty())
+    {
+      std::cout << "[WARNING] Vectors are not empty\n";
+      // std::cin.get();
+      // return;
+    }
+
     sqrtStab.clear();
     pefftab.clear();
     g2_Wefftab.clear();
@@ -853,7 +863,7 @@ namespace __SPEC_LIB_NAME__
     real_t result = 0.;
 
     // Allocating g2_Wefftab if necessary
-    if (g2_Wefftab.size() == 0)
+    if (g2_Wefftab.empty())
     {
       constexpr const real_t Tfreeze = 25.;
       constexpr const real_t Beps = 1.e-6;
@@ -910,7 +920,7 @@ namespace __SPEC_LIB_NAME__
     constexpr const real_t Beps = 1.e-6;
     const real_t maxenergy = 2. * getMassLBSM() - Tfreeze * std::log(Beps);
 
-    if (g2_Wefftab.size() == 0)
+    if (g2_Wefftab.empty())
       tabulateValues(std::max(10. * getMassLBSM(), maxenergy), 600);
 
     const real_t T1 = 1.0e-4 * getMassLBSM();
@@ -1052,7 +1062,7 @@ namespace __SPEC_LIB_NAME__
     constexpr const real_t Beps = 1.e-6;
     const real_t maxenergy = 2. * getMassLBSM() - Tfreeze * std::log(Beps);
 
-    if (g2_Wefftab.size() == 0)
+    if (g2_Wefftab.empty())
       tabulateValues(std::max(10. * getMassLBSM(), maxenergy), 600);
 
 #ifdef DEBUG_OUTPUT
@@ -1198,7 +1208,7 @@ namespace __SPEC_LIB_NAME__
     constexpr const real_t Beps = 1.e-6;
     const real_t maxenergy = 2. * getMassLBSM() - Tfreeze * std::log(Beps);
 
-    if (g2_Wefftab.size() == 0)
+    if (g2_Wefftab.empty())
       tabulateValues(std::max(10. * getMassLBSM(), maxenergy), 600);
 
 #ifdef DEBUG_OUTPUT

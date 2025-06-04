@@ -89,6 +89,7 @@ public:
       AvgSvCalculator::changeInput(other);
       Relicparam_t::init(other.getLightestBSMmass(), model_eff);
       reset_prevs();
+      Tfo = 0.;
       return 0;
     };
 
@@ -153,7 +154,14 @@ public:
      *
      * @return real_t
      */
-    real_t getTfo() const { return Tfo; };
+    real_t getTfo()
+    {
+      if (Tfo <= 0.)
+      {
+        setTfo(); // If Tfo is not set, compute it
+      }
+      return Tfo;
+    };
 
     real_t boltzright_phi(const real_t& T, const real_t& Y, const real_t& Yphi);
 

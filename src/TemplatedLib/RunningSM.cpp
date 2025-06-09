@@ -2,6 +2,9 @@
 // Needed for TestRunning masses
 #include <fstream>
 #include <iomanip>
+
+#define NO_RUN
+
 namespace __SPEC_LIB_NAME__
 {
 
@@ -1456,6 +1459,7 @@ namespace __SPEC_LIB_NAME__
 #ifdef DEBUG
     std::cout << "Entering HandleParamRunning\n";
 #endif
+
     // Checking if top quark is massive: if it is not, the user is not interested
     // in the running, so we take g_strong at the mass of the Z
     if (!(mass_top_pole > 0.))
@@ -1477,6 +1481,10 @@ namespace __SPEC_LIB_NAME__
       input.g_s = std::sqrt(4 * M_PI * input.alpha_str_Mz);
       return;
     }
+
+#ifdef NO_RUN
+    return;
+#endif
 
     // Handling running
 // Factor needed for the trilinear couplings renormalisation in the MSSM

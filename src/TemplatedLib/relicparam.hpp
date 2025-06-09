@@ -507,7 +507,6 @@ public:
      *
      * @param T The temperature
      * @return real_t the total dark entropy \f$s_D(T)\f$
-     * @note There might be a bug in the integral, and we need to check the formula for the combination.
      */
     real_t dark_entropy(const real_t& T);
 
@@ -537,7 +536,6 @@ public:
      * @return The value of \f$Σ_D\f$ at the given temperature.
      * @see SuperIso Relic Manual: https://arxiv.org/abs/1811.12736
      * @see SuperIso Relic 4 Manual: https://arxiv.org/abs/1806.11489
-     * @note Need to check the result of point 1.
      */
     real_t dark_entropy_Sigmad(const real_t& T);
 

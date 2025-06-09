@@ -1483,8 +1483,8 @@ namespace __SPEC_LIB_NAME__
     }
 
 #ifdef NO_RUN
-    input.m_b= mb_mb;
-    input.m_t= mass_top_pole;
+    input.m_b = mb_mb;
+    input.m_t = mass_top_pole;
     input.g_s = std::sqrt(4 * M_PI * input.alpha_str_Mz);
     return;
 #endif

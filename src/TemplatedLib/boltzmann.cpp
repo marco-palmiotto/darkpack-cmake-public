@@ -87,7 +87,7 @@ namespace __SPEC_LIB_NAME__
 
   void BoltzmannSolver::setTfo(real_t delta)
   {
-#ifdef DEBUG 
+#ifdef DEBUG
     std::cout << "Called setTfo\n";
 #endif
     // if (this->full_comput)

@@ -3,7 +3,7 @@
 #include <fstream>
 #include <iomanip>
 
-#define NO_RUN
+// #define NO_RUN
 
 namespace __SPEC_LIB_NAME__
 {

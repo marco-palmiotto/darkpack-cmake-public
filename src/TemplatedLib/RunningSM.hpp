@@ -170,9 +170,9 @@ public:
 
     ~RunningSM()
     {
-  #ifdef DEBUG
+#ifdef DEBUG
       std::cout << "Called ~RunningSM\n";
-  #endif
+#endif
     };
 
     /**

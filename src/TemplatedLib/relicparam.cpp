@@ -636,8 +636,6 @@ namespace __SPEC_LIB_NAME__
     return;
   }
 
-  /*--------------------------------------------------------------*/
-
   void Relicparam_t::Init_scalarfield(const real_t& rhotilde_phi_Tmax, const real_t& Tmax_local,
                                       const real_t& T_RH_local, const real_t& eta_phi_local, const real_t& n_phi_local)
   {
@@ -670,11 +668,6 @@ namespace __SPEC_LIB_NAME__
 
   void Relicparam_t::Init_dark_density_table(real_t table[2][NTABMAX], const size_t nlines)
   {
-    /*
-      Resets all the parameters to be the ones of the standard cosmological model,
-      and copies the table in input as of pairs (Temperature, rho_D)
-      in the table_rhoPD data member.
-    */
     assert(nlines < NTABMAX);
     Init_dark_density(0., 0., 0.);
     Init_dark_density2(0., 0., 0.);
@@ -696,9 +689,6 @@ namespace __SPEC_LIB_NAME__
     return;
   }
 
-
-  /*--------------------------------------------------------------*/
-
   void Relicparam_t::Init_neutron_decay(const real_t& tau, const real_t& tau_err, const real_t& fierz_local,
                                         const real_t& m_chi_local, const real_t& B_chi_local)
   {
@@ -718,18 +708,8 @@ namespace __SPEC_LIB_NAME__
     this->beta_samples = 1000; // if we are gonna simulate beta decay, we're gonna simulate it.
   }
 
-
-  /*--------------------------------------------------------------*/
-
   real_t Relicparam_t::dark_density(const real_t& T)
   {
-    /*
-      This function computes the dark density in a modified cosmological scenario,
-      which is not the decaying scalar field scenario.
-      If the scenario is the standard cosmological model, or the decaying scalar
-      field, this function returns 0.
-    */
-
     if (phi_model.get() != 0)
       return 0.;
 
@@ -855,8 +835,6 @@ namespace __SPEC_LIB_NAME__
 
     return (ddark_density_dT - dentropy_dT / entropy * dark_density(T)) * entropy / dentropy_dT;
   }
-
-  /*--------------------------------------------------------------*/
 
   real_t Relicparam_t::sigma_entropy(const real_t& T)
   {
@@ -1098,13 +1076,9 @@ namespace __SPEC_LIB_NAME__
     }
   }
 
-  /*--------------------------------------------------------------*/
 
   real_t Relicparam_t::entropy_Sigmarad(const real_t& T)
   {
-    // Returns the value of \Sigma_rad, as defined in Eq. (A11) of
-    // [Manual SuperIso Relic 4], corresponding to the scenario of
-    // "standard entropy injection"
     if ((this->phi_model).get() != 0)
       return 0.; // this->Gamma_phi*this->rho_phi/T;
 
@@ -1119,7 +1093,6 @@ namespace __SPEC_LIB_NAME__
     return this->Sigmarad0 * Sigma_photon_1MeV * std::pow(T / T_BBN, this->nSigmarad);
   }
 
-  /*--------------------------------------------------------------*/
 
   real_t Relicparam_t::nonthermal(const real_t& T)
   {
@@ -1132,10 +1105,8 @@ namespace __SPEC_LIB_NAME__
     return this->nt0 * 1.e-50 * std::pow(T / T_BBN, this->nnt);
   }
 
-  /*--------------------------------------------------------------*/
 
   real_t Relicparam_t::neutdens(const real_t& Tnu)
-  /* Computes the neutrino density, including any effects from a neutrino degeneracy */
   {
     if ((this->xinu1 == 0.) && (this->xinu2 == 0.) && (this->xinu3 == 0.))
     {
@@ -1203,7 +1174,6 @@ namespace __SPEC_LIB_NAME__
     return rho;
   }
 
-  /*--------------------------------------------------------------*/
 
   real_t Relicparam_t::neutdens_deriv(const real_t& Tnu)
   /* Computes the temperature (Tnu) derivative of the neutrino energy density */
@@ -1270,10 +1240,8 @@ namespace __SPEC_LIB_NAME__
     return drho;
   }
 
-  /*--------------------------------------------------------------*/
 
   real_t neutN(const real_t& T)
-  /* Computes the round N(z) function of the neutrinos - Pisanti et al., 0705.0290, eq. (A24) */
   {
     const real_t z = m_e / T;
 

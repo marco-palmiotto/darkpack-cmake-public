@@ -35,7 +35,6 @@ using namespace csl;
 using Process = std::vector<Insertion>;
 using Processes = std::vector<Process>;
 
-
 bool setShow = false;
 
 #include "src/processName.cpp"
@@ -146,8 +145,8 @@ void ScalarModel::getToLowEnergyLagrangian()
   printdebug("Calling addDMcandidates");
   // The fields have no EW charge, so they can be added
   // after the EW-SSB
-  // It is conveniente to add the potential terms before
-  // breaking the flavor symmetry, since they're
+  // Adding the potential terms before breaking the flavor
+  // symmetry is convenient , since they're
   // symmetric under flavor
   // We do both things with the same method now
   addDMcandidates();
@@ -184,8 +183,6 @@ int main()
   ScalarModel scalar;
   std::cout << scalar;
 
-  //   std::cin.get();
-
   std::cout << "\nSuppressing verbose output during the calculation of the amplitudes\n";
   mty::option::verboseAmplitude = false;
   std::cout << "\nChoosing not to call gafed to show Feynman diagrams during the computation\n";
@@ -193,10 +190,12 @@ int main()
   setShow = false;
   std::cout << "Creating the library\n";
   mty::Library lib(LIBNAME);
-  // #ifdef MARTYPATH
-  //   std::cout << "Importing LHA module from MARTY's source code path\n";
-  //   lib.importLHAModule(MARTYPATH);
-  // #endif
+  /*
+  #ifdef MARTYPATH
+    std::cout << "Importing LHA module from MARTY's source code path\n";
+    lib.importLHAModule(MARTYPATH);
+  #endif
+  */
   std::cout << "Adding the flag for using posix threads in the C++ files in the library\n";
   lib.addLibrary("-lpthread");
 
@@ -267,7 +266,6 @@ int main()
   scalar.getParticle("t")->setWidth(Gamma_top);
   scalar.getParticle("phi")->setWidth(Gamma_phi);
 
-
   std::cout << "\nGetting electric charges: (Feynman rules are needed at this purpose)\n";
   std::vector<double> electric_charges;
   for (const auto& particle : part)
@@ -296,13 +294,14 @@ int main()
     std::cout << particle->getName() << " has dof: " << particle->getNDegreesOfFreedom() << std::endl;
   }
 
-
-
   std::vector<Process2to2ToCompute> list_of_processes;
 
-  // Our list is formed by all the processes of the kind Chibar Chi -> Fbar F
-  // where F is a SM fermion
-
+  /*
+  Our list is formed by all the processes of the kind Chibar Chi -> Fbar F
+  where F is a SM fermion, so we need to build the list of SM fermions.
+  NOTE: we could already use psm, but all the other amplitudes will
+        be null, and therefore not be present in the library.
+  */
   std::cout << "Building the list of SM fermions\n";
 
   std::vector<Particle> smfermions;

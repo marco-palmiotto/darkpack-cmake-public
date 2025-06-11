@@ -122,8 +122,8 @@ double Weff_pred_fromM2(Param_t& input, const double Ecm)
 {
   run.HandleParamRunning(input, Ecm);
 
-  std::cout << "\nIn Weff_pred_fromM2, " << input.masses_vector[corr::c] << " " << input.m_c << " " << input.m_c_m_c
-            << "\n";
+  // std::cout << "\nIn Weff_pred_fromM2, " << input.masses_vector[corr::c] << " " << input.m_c << " " << input.m_c_m_c
+  //           << "\n";
 
   double sum = 0.;
 
@@ -141,7 +141,7 @@ double Weff_pred_fromM2(Param_t& input, const double Ecm)
     {
       double contrib = dW_dcos_pred(input, Ecm, part_color[i], part_gf[i], input.masses_vector[part[i]]);
       sum += contrib;
-      std::cout << "For " << singleproc.getName() << " dW/dcos(" << Ecm << ")= " << contrib << '\n';
+      // std::cout << "For " << singleproc.getName() << " dW/dcos(" << Ecm << ")= " << contrib << '\n';
       counter++;
     }
   }
@@ -225,16 +225,11 @@ int main(int argc, char** argv)
   avgsvcalc.setWeffcuts(false);
   std::cout << "AvgSvCalculator object instantiated\n";
 
-  avgsvcalc.print_procs(std::cout, true);
-
-  return 0.;
-
-  double T = 0.01 * input.m_chi;
-
   // Computing single 2 to 2 sum of M^2
   double sqrts = 10. * input.m_chi;
-  double costheta = 0.5;
-  const std::array<int, 9> part({corr::u, corr::c, corr::t, corr::d, corr::s, corr::b, corr::e, corr::mu, corr::tau}),
+  constexpr double costheta = 0.5;
+  constexpr const std::array<int, 9> part(
+      {corr::u, corr::c, corr::t, corr::d, corr::s, corr::b, corr::e, corr::mu, corr::tau}),
       part_color({3, 3, 3, 3, 3, 3, 1, 1, 1});
   const std::array<double, 9> part_gf(
       {input.g_u, input.g_u, input.g_u, input.g_d, input.g_d, input.g_d, input.g_l, input.g_l, input.g_l});
@@ -243,52 +238,57 @@ int main(int argc, char** argv)
   for (auto i = 0; i < 9; i++)
   {
     Process2to2 singleproc({corr::chi, corr::chi, part[i], part[i]}, {false, true, false, true});
-    if (singleproc.checkExistance())
-    {
-      std::cout << '\n' << singleproc;
-      run.HandleParamRunning(input, sqrts);
-      Param_t input_m = input;
-      singleproc.setRunningData(&run);
-      singleproc.setRunningExternal();
-      double marty = singleproc.getSumSquaredAmpl(input_m, sqrts, costheta);
-      double pred = sum_Squaredampl_pred(input, sqrts, part_color[i], part_gf[i], input.masses_vector[part[i]]);
+    if (!singleproc.checkExistance())
+      continue;
 
-      double martydweff = singleproc.get_g2_dweff_dcos(input_m, sqrts, 0.5) / sq(corr::part_hel_dof[corr::chi]);
-      double predweff = dW_dcos_pred(input, sqrts, part_color[i], part_gf[i], input.masses_vector[part[i]]);
+    std::cout << '\n' << singleproc;
+    run.HandleParamRunning(input, sqrts);
+    Param_t input_m(input); //<- Copy of the input to pass to the Process2to2 instance
 
-      double dweffdcoscontrib = singleproc.getDiffW12Contrib(input_m, sqrts, 0.5);
-      double WeffContrib = singleproc.getTotalW12Contrib(input_m, sqrts);
+    // Optimisation for the running
+    singleproc.setRunningData(&run);
+    singleproc.setRunningExternal();
 
-      // Print the header row
-      std::cout << std::setw(width_field) << ".getSumSquaredAmpl" << '\t' << std::setw(width_field)
-                << "sum_Squaredampl_pred" << '\t' << std::setw(width_field) << "1/2" << '\t' << std::setw(width_field)
-                << ".get_g2_dweff_dcos/g2" << '\t' << std::setw(width_field) << "dW_dcos_pred" << '\t'
-                << std::setw(width_field) << "4/5" << '\t' << std::setw(width_field) << ".getDiffW12Contrib" << '\t'
-                << std::setw(width_field) << ".getTotalW12Contrib" << '\n';
-      std::cout << std::setw(width_field) << marty << '\t' << std::setw(width_field) << pred << '\t'
-                << std::setw(width_field) << marty / pred << '\t' << std::setw(width_field) << martydweff << '\t'
-                << std::setw(width_field) << predweff << '\t' << std::setw(width_field) << martydweff / predweff << '\t'
-                << std::setw(width_field) << dweffdcoscontrib << '\t' << std::setw(width_field) << WeffContrib << '\n';
-    }
+    const double marty = singleproc.getSumSquaredAmpl(input_m, sqrts, costheta); //<- Prediction from MARTY
+    const double pred = sum_Squaredampl_pred(input, sqrts, part_color[i], part_gf[i],
+                                             input.masses_vector[part[i]]); //<- Prediction from the formula
+
+    const double martydweff = singleproc.get_g2_dweff_dcos(input_m, sqrts, 0.5) /
+                              sq(corr::part_hel_dof[corr::chi]); //<- Prediction from DarkPACK
+    const double predweff = dW_dcos_pred(input, sqrts, part_color[i], part_gf[i],
+                                         input.masses_vector[part[i]]); //<- Prediction from the formula
+
+    // double dweffdcoscontrib = singleproc.getDiffW12Contrib(input_m, sqrts, 0.5);
+    // double WeffContrib = singleproc.getTotalW12Contrib(input_m, sqrts);
+
+    // Print the header row
+    std::cout << std::setw(width_field) << ".getSumSquaredAmpl" << '\t' << std::setw(width_field)
+              << "sum_Squaredampl_pred" << '\t' << std::setw(width_field) << "ratio" << '\t' << std::setw(width_field)
+              << ".get_g2_dweff_dcos/g2" << '\t' << std::setw(width_field) << "dW_dcos_pred" << '\t'
+              << std::setw(width_field) << "ratio" << '\n';
+    std::cout << std::setw(width_field) << marty << '\t' << std::setw(width_field) << pred << '\t'
+              << std::setw(width_field) << marty / pred << '\t' << std::setw(width_field) << martydweff << '\t'
+              << std::setw(width_field) << predweff << '\t' << std::setw(width_field) << martydweff / predweff << '\n';
   }
 
   run.HandleParamRunning(input, sqrts);
-  std::cout << "dWeff/dcos = " << avgsvcalc.getdWeff_dcos(sqrts, 0.) << std::endl; // With no multithreading
-  std::cout << "2 x dWeff/dcos = " << 2. * avgsvcalc.getdWeff_dcos(sqrts, 0.) << std::endl;
-  std::cout << "Weff (num. integral) = " << avgsvcalc.getWeff(sqrts) << std::endl; // Uses multithreading
 
+  const double weff_from_darkpack =
+      avgsvcalc.getWeff(sqrts); //<- Weff computed by DarkPACK, using the numerical integration
+  std::cout << "Weff (num. integral) = " << weff_from_darkpack << std::endl; // Uses multithreading
 
-  std::cout << "Input for formula is\n" << input;
+  const double weff_formula_by_hand = Weff_formula(input, sqrts);
+  std::cout << "From formula = " << weff_formula_by_hand << std::endl;
+  const double weff_with_kinematics_by_hand = Weff_pred_fromM2(input, sqrts);
+  std::cout << "From formula M2= " << weff_with_kinematics_by_hand << std::endl;
 
-  std::cout << "From formula = " << Weff_formula(input, sqrts) << std::endl;
-  double temp = Weff_pred_fromM2(input, sqrts);
-  std::cout << "From formula M2= " << temp << std::endl;
+  std::cout << "Ratio Weff/formula  = " << weff_from_darkpack / weff_formula_by_hand << std::endl;
 
-  std::cout << "Ratio Weff/formula  = " << avgsvcalc.getWeff(sqrts) / Weff_formula(input, sqrts) << std::endl;
-
-
+  return 0;
   //     std::cout << "\nWeff_1234 = " << allproc.getWeff_fromW12(sqrts) << std::endl;
 
+  // Defining a low temperature
+  double T = 0.01 * input.m_chi;
   double sigmav = avgsvcalc.getAverageSigmav(T);
   std::cout << " - <sigma v>( " << T << " ) = " << sigmav
             << " GeV^-2 = " << units_conversion::GeVm2_to_cm3_over_s * sigmav << " cm^3/s\n\n";
@@ -431,7 +431,7 @@ int main(int argc, char** argv)
     sigmavpred += sigmav_pred(T, 3, count_part, input.g_d, input);
   for (auto count_part : {corr::u, corr::c, corr::t})
     sigmavpred += sigmav_pred(T, 3, count_part, input.g_u, input);
-  ;
+
 
   std::cout << "Taylor_pred_1 =  " << sigmavpred * input.getLightestBSMmass() << '\n'
             << "Ratio ourTaylor/FormulaTaylor  = "

@@ -19,7 +19,7 @@ class U1f_Model : public virtual mty::SM_Model
   void initFermions();
   void initScalars();
   void initYukawas();
-  void toFlavorCartan();// Should be useless in U(1)
+  void toFlavorCartan(); // Should be useless in U(1)
   void initFlavorCouplings();
   void expandFlavorVev();
   void adjust();
@@ -89,15 +89,15 @@ void U1f_Model::getToLowEnergyLagrangian()
   SM_Model::flavorSymmetryBreaking();
 }
 
-void U1f_Model::initGauge() //Modified to have U(1) instead of SU(2)
+void U1f_Model::initGauge() // Modified to have U(1) instead of SU(2)
 {
 #ifdef DEBUG
   std::cout << "[DEBUG] Entering U1f_Model::initGauge" << std::endl;
 #endif
   addGaugedGroup(mty::group::Type::U1, "f", 1, csl::constant_s("g_f"));
-  addFlavorGroup("su", 3);// SU(3) because we have 3 generations of fermions
+  addFlavorGroup("su", 3); // SU(3) because we have 3 generations of fermions
   SM_Model::initGauge();
-  renameParticle("A_f", "V_3");// We call "V" the U(1) gauge boson
+  renameParticle("A_f", "V_3"); // We call "V" the U(1) gauge boson
 }
 
 void U1f_Model::initFermions()
@@ -150,10 +150,10 @@ void U1f_Model::initScalars()
   phi->setGroupRep("f", 1);
   addParticle(phi);
 
-// #ifdef DEBUG
-//   std::cout << "[DEBUG] Generating index for Phi" << std::endl;
-// #endif
-//   csl::Index I = generateIndex("f", phi);
+  // #ifdef DEBUG
+  //   std::cout << "[DEBUG] Generating index for Phi" << std::endl;
+  // #endif
+  //   csl::Index I = generateIndex("f", phi);
 
 #ifdef DEBUG
   std::cout << "[DEBUG] Building phiSquared expression" << std::endl;
@@ -313,14 +313,16 @@ void U1f_Model::initFlavorCouplings()
 
   // // Coupling between Vpm and L
   // addLagrangianTerm(
-  //     -g * V(+mu) * csl::GetComplexConjugate(L({I, i, al})) * Q_L({I, J}) * gamma({mu, al, be}) * L({J, i, be}), true);
+  //     -g * V(+mu) * csl::GetComplexConjugate(L({I, i, al})) * Q_L({I, J}) * gamma({mu, al, be}) * L({J, i, be}),
+  //     true);
 
   // Coupling between V3 and L
   addLagrangianTerm(-g * V_3(+mu) * csl::GetComplexConjugate(L({I, i, al})) * Q_3_L({I, J}) * gamma({mu, al, be}) *
                     L({J, i, be}));
 
   // // Coupling between Vpm and E
-  // addLagrangianTerm(-g * V(+mu) * csl::GetComplexConjugate(E({I, al})) * Q_R({I, J}) * gamma({mu, al, be}) * E({J, be}),
+  // addLagrangianTerm(-g * V(+mu) * csl::GetComplexConjugate(E({I, al})) * Q_R({I, J}) * gamma({mu, al, be}) * E({J,
+  // be}),
   //                   true);
 
   // Coupling between V3 and E

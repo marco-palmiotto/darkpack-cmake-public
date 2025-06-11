@@ -11,7 +11,7 @@ using namespace csl;
 #include "marty/ufo/electriccharge.h"
 
 #define LIBNAME         "u1f2to2" // Name of the output library
-#define MAXNUMPROCESSES 10000      // Max number of processes to be stored in a Processes variable
+#define MAXNUMPROCESSES 10000     // Max number of processes to be stored in a Processes variable
 
 #define CORRESPONDANCE // Defining this variable the creation of correspondance.h is enabled
 #define SQUAREDAMP     // Defining this variable squared amplitudes are calculated and added to the
@@ -169,14 +169,9 @@ int main()
   std::cout << "Building the list of SM leptons\n";
 
   std::array<Particle, 2> bsm_fields({my_model.getParticle("chi_dm")});
-  std::array<Particle, 6> out_fields({
-      my_model.getParticle("e"),
-      my_model.getParticle("mu"),
-      my_model.getParticle("tau"),
-      my_model.getParticle("nu_e"),
-      my_model.getParticle("nu_mu"),
-      my_model.getParticle("nu_tau")
-  });
+  std::array<Particle, 6> out_fields({my_model.getParticle("e"), my_model.getParticle("mu"),
+                                      my_model.getParticle("tau"), my_model.getParticle("nu_e"),
+                                      my_model.getParticle("nu_mu"), my_model.getParticle("nu_tau")});
 
   for (size_t i1 = 0; i1 < bsm_fields.size(); i1++)
   {

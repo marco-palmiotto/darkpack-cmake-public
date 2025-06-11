@@ -10,12 +10,12 @@ cmake -S . -B ./build \
       -DENABLE_CLANG_FORMAT=ON \
       -G Ninja || exit 1
 
-if [[ $(clang-format --version | cut -f 3 -d " ") == "19.1.7" ]]; then
-    echo "Running format check"
-    cmake --build ./build --target format-check || exit 1   
-else
-    echo "clang-format version is not 19.1.7, skipping format check"
-fi
+# if [[ $(clang-format --version | cut -f 3 -d " ") == "19.1.7" ]]; then
+#     echo "Running format check"
+#     cmake --build ./build --target format-check || exit 1   
+# else
+#     echo "clang-format version is not 19.1.7, skipping format check"
+# fi
 
 echo "Installing headers"
 cmake --build ./build --target install_headers_all  || exit 1

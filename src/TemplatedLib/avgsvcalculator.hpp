@@ -120,8 +120,23 @@ public:
     bool operator==(const AvgSvCalculator&) const;
     bool operator!=(const AvgSvCalculator& other) const { return !(*this == other); };
 
+    /**
+     * @brief Prints the list of processes and their properties.
+     * @param out The output stream to print to (default is std::cout).
+     * @param verbose If true, prints additional information.
+     */
     void print_procs(std::ostream& out = std::cout, const bool verbose = false) const;
+
+    /**
+     * @brief Prints the g2_Weff table.
+     * @param out The output stream to print to (default is std::cout).
+     */
     void print_g2_wefftable(std::ostream& out = std::cout) const;
+
+    /**
+     * @brief Prints the Taylor coefficients for the \f$\langle σ  v\rangle\f$ calculation.
+     * @param out The output stream to print to (default is std::cout).
+     */
     void print_coefficients(std::ostream& out = std::cout) const;
     virtual void print(std::ostream& out = std::cout) const
     {

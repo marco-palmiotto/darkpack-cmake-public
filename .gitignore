@@ -12,6 +12,9 @@ cmake-build-debug*/
 /*/config.hpp
 /**/config.hpp
 
+/*/configured
+/**/configured
+
 .containers/*/*.tar
 .containers/*.tar
 

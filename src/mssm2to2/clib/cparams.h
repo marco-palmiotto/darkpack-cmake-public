@@ -1,0 +1,171 @@
+#ifndef CSL_LIB_CPARAM_H_INCLUDED
+#define CSL_LIB_CPARAM_H_INCLUDED
+
+#include "ccommon.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+typedef struct cparam_s {
+
+    creal_t pi;
+    creal_t A_b;
+    creal_t A_t;
+    creal_t g_s;
+    creal_t M_eL;
+    creal_t M_eR;
+    creal_t V_cb;
+    creal_t V_ud;
+    creal_t V_us;
+    creal_t beta;
+    creal_t e_em;
+    creal_t mu_h;
+    creal_t s_12;
+    creal_t s_13;
+    creal_t s_14;
+    creal_t s_23;
+    creal_t s_24;
+    creal_t s_34;
+    creal_t A_tau;
+    creal_t M_q1L;
+    creal_t M_q3L;
+    creal_t M_qbR;
+    creal_t M_qdR;
+    creal_t M_quR;
+    creal_t alpha;
+    creal_t M_tauL;
+    creal_t Gamma_W;
+    creal_t Gamma_Z;
+    creal_t Gamma_h;
+    creal_t theta_W;
+    creal_t Gamma_A0;
+    creal_t Gamma_H0;
+    creal_t Gamma_Hp;
+    creal_t Gamma_b1;
+    creal_t Gamma_b2;
+    creal_t Gamma_c1;
+    creal_t Gamma_c2;
+    creal_t Gamma_cl;
+    creal_t Gamma_cr;
+    creal_t Gamma_dl;
+    creal_t Gamma_dr;
+    creal_t Gamma_el;
+    creal_t Gamma_er;
+    creal_t Gamma_ml;
+    creal_t Gamma_mr;
+    creal_t Gamma_o1;
+    creal_t Gamma_o2;
+    creal_t Gamma_o3;
+    creal_t Gamma_o4;
+    creal_t Gamma_sl;
+    creal_t Gamma_sr;
+    creal_t Gamma_t1;
+    creal_t Gamma_t2;
+    creal_t Gamma_ul;
+    creal_t Gamma_ur;
+    creal_t V_ub_mod;
+    creal_t reg_prop;
+    creal_t Gamma_top;
+    creal_t Gamma_nuel;
+    creal_t Gamma_numl;
+    creal_t Gamma_tau1;
+    creal_t Gamma_tau2;
+    creal_t delta_wolf;
+    creal_t Gamma_nutaul;
+    ccomplex_t M_1;
+    ccomplex_t M_2;
+    ccomplex_t V_cd;
+    ccomplex_t V_cs;
+    ccomplex_t V_tb;
+    ccomplex_t V_td;
+    ccomplex_t V_ts;
+    ccomplex_t M_qtR;
+    ccomplex_t M_tauR;
+
+    creal_t m_W;
+    creal_t m_Z;
+    creal_t m_b;
+    creal_t m_c;
+    creal_t m_d;
+    creal_t m_e;
+    creal_t m_h;
+    creal_t m_s;
+    creal_t m_t;
+    creal_t m_u;
+    creal_t m_A0;
+    creal_t m_H0;
+    creal_t m_Hp;
+    creal_t m_mu;
+    creal_t m_sG;
+    creal_t m_C_1;
+    creal_t m_C_2;
+    creal_t m_N_1;
+    creal_t m_N_2;
+    creal_t m_N_3;
+    creal_t m_N_4;
+    creal_t m_tau;
+    creal_t m_sb_1;
+    creal_t m_sb_2;
+    creal_t m_sc_L;
+    creal_t m_sc_R;
+    creal_t m_sd_L;
+    creal_t m_sd_R;
+    creal_t m_se_L;
+    creal_t m_se_R;
+    creal_t m_ss_L;
+    creal_t m_ss_R;
+    creal_t m_st_1;
+    creal_t m_st_2;
+    creal_t m_su_L;
+    creal_t m_su_R;
+    creal_t m_smu_L;
+    creal_t m_smu_R;
+    creal_t m_snu_e;
+    creal_t m_snu_mu;
+    creal_t m_stau_1;
+    creal_t m_stau_2;
+    creal_t m_snu_tau;
+    ccomplex_t N_B1;
+    ccomplex_t N_B2;
+    ccomplex_t N_B3;
+    ccomplex_t N_B4;
+    ccomplex_t N_W1;
+    ccomplex_t N_W2;
+    ccomplex_t N_W3;
+    ccomplex_t N_W4;
+    ccomplex_t N_d1;
+    ccomplex_t N_d2;
+    ccomplex_t N_d3;
+    ccomplex_t N_d4;
+    ccomplex_t N_u1;
+    ccomplex_t N_u2;
+    ccomplex_t N_u3;
+    ccomplex_t N_u4;
+    ccomplex_t U_d1;
+    ccomplex_t U_d2;
+    ccomplex_t V_u1;
+    ccomplex_t V_u2;
+    ccomplex_t U_Wm1;
+    ccomplex_t U_Wm2;
+    ccomplex_t V_Wp1;
+    ccomplex_t V_Wp2;
+    ccomplex_t U_sb_00;
+    ccomplex_t U_sb_01;
+    ccomplex_t U_sb_10;
+    ccomplex_t U_sb_11;
+    ccomplex_t U_st_00;
+    ccomplex_t U_st_01;
+    ccomplex_t U_st_10;
+    ccomplex_t U_st_11;
+    ccomplex_t U_stau_00;
+    ccomplex_t U_stau_01;
+    ccomplex_t U_stau_10;
+    ccomplex_t U_stau_11;
+} cparam_t;
+#ifdef __cplusplus
+} // extern "C" block
+#endif
+
+
+#endif

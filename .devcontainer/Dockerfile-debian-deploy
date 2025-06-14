@@ -1,0 +1,54 @@
+FROM mcr.microsoft.com/devcontainers/cpp:1-debian-12
+
+ARG username=vscode
+
+# Installing packages for MARTY's dependencies
+RUN apt-get update && \
+    export DEBIAN_FRONTEND=noninteractive && \
+    apt-get -y install --no-install-recommends \
+        libgsl-dev \
+        libgslcblas0 \
+        texlive \
+        texlive-luatex \
+        dvipng \
+        coreutils \
+        imagemagick \
+        qtbase5-dev \
+        qtchooser \
+        qt5-qmake \
+        qtbase5-dev-tools \
+        ninja-build \
+        cmake \
+        g++ \
+        gcc \
+        gfortran \
+        git \
+        clang-format && \
+    apt-get clean
+
+USER ${username}
+
+WORKDIR /home/${username}
+
+ENV CC=gcc
+ENV CXX=g++
+ENV FC=gfortran
+
+RUN git clone https://github.com/docbrown1955/marty-public.git && \
+    cd marty-public && \
+    git checkout master && \
+    mkdir bin include lib build 
+
+RUN cd /home/${username}/marty-public/build && \
+    cmake .. -DCMAKE_INSTALL_PREFIX=.install -G Ninja && \
+    cmake --build . && \
+    cmake --install .
+
+ENV INSTALLMARTYPATH="/home/${username}/marty-public/build/.install"
+ENV PATH=$INSTALLMARTYPATH/bin:$PATH
+ENV LD_LIBRARY_PATH=$INSTALLMARTYPATH/lib
+ENV LIBRARY_PATH=$INSTALLMARTYPATH/lib
+ENV C_INCLUDE_PATH=$INSTALLMARTYPATH/include
+ENV CPATH=$INSTALLMARTYPATH/include
+
+CMD ["sleep", "infinity"]

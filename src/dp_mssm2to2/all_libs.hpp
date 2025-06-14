@@ -1,0 +1,16 @@
+#pragma once
+
+#include "RunningSM.hpp"
+#include "advmath.hpp"
+#include "avgsvcalculator.hpp"
+#include "boltzmann.hpp"
+#include "compare.hpp"
+#include "config.hpp"
+#include "correspondance.hpp"
+#include "getSname.hpp"
+#include "input_manip.hpp"
+#include "leshouches.h"
+#include "leshouchesfrommarty.hpp"
+#include "leshouchesfromsuperiso.hpp"
+#include "params_new.hpp"
+#include "process.hpp"

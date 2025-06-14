@@ -1,0 +1,12 @@
+# Dependencies in Ubuntu 20.04
+
+pkg-config git coreutils build-essential libgsl-dev libgslcblas0  qt5-default qtcreator dvipng libeigen3-dev
+
+# in Ubuntu 22.04
+
+pkg-config git \
+coreutils build-essential \
+libgsl-dev libgslcblas0  qtcreator dvipng qtbase5-dev \
+qtchooser qt5-qmake qtbase5-dev-tools \
+libeigen3-dev texlive texlive-luatex dvipng imagemagick \
+cmake ninja-build 

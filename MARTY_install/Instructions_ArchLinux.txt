@@ -1,0 +1,9 @@
+# Install the following packages with pacman:
+
+gcc12 gcc12-fortran gsl qt5-base
+
+# export those variables before running cmake:
+
+export CC=gcc-12
+export CXX=g++-12
+export FC=gfortran-12

@@ -1,0 +1,7 @@
+Checks: >
+  -modernize-use-default-member-init,
+  -modernize-avoid-c-arrays,
+  -modernize-use-nullptr,
+WarningsAsErrors: '*'
+HeaderFilterRegex: '.*'
+FormatStyle: file

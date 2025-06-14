@@ -1,0 +1,43 @@
+name: GitHub Actions Demo
+run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
+on: [push]
+jobs:
+  Explore-GitHub-Actions:
+    runs-on: Linux
+    steps:
+      - run: echo "🎉 The job was automatically triggered by a ${{ github.event_name }} event."
+      - run: echo "🐧 This job is now running on a ${{ runner.os }} server hosted by GitHub!"
+      - run: echo "🔎 The name of your branch is ${{ github.ref }} and your repository is ${{ github.repository }}."
+      - name: Check out repository code
+        uses: actions/checkout@v4
+      - run: echo "💡 The ${{ github.repository }} repository has been cloned to the runner."
+      - run: echo "🖥️ The workflow is now ready to test your code on the runner."
+      - name: List files in the repository
+        run: |
+          ls ${{ github.workspace }}
+      - run: echo "🍏 This job's status is ${{ job.status }}."
+  Podman-test:
+    runs-on: Linux
+    strategy:
+      matrix:
+        distro: ['fedora36', 'debian']
+    steps:
+      - name: Clean workspace
+        run: if [ -d workspace ] ; then rm -rf workspace ; fi && mkdir workspace && cd workspace
+
+      - name: Check out repository code
+        uses: actions/checkout@v4
+
+      - name: List files in the workspace
+        run: ls -la ${GITHUB_WORKSPACE}
+  
+      - name: Set permissions on workspace
+        run: |
+          chown -R $(id -u):$(id -g) ${GITHUB_WORKSPACE}
+          chmod -R 755 ${GITHUB_WORKSPACE}
+
+      - name: Pull image
+        run: podman pull docker.io/marcopalmiotto/darkpack-deploy:${{ matrix.distro }}
+
+      - name: Test on podman container
+        run: podman run --rm --userns=keep-id --mount type=bind,src=${GITHUB_WORKSPACE},target=/home/darkpack,U=true -w /home/darkpack docker.io/marcopalmiotto/darkpack-deploy:${{ matrix.distro }} /bin/bash -c "./run_CI.sh"     

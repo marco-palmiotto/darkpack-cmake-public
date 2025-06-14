@@ -1,0 +1,34 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "configure",
+            "type": "shell",
+            "command": "cmake -S . -B ./build  -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DCMAKE_BUILD_TYPE=Debug  -DCMAKE_INSTALL_PREFIX=./build/.install  -G Ninja && cmake --build ./build --target install_headers_all",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": [],
+            "detail": "Run CMake to configure the project"
+        },
+        {
+            "label": "install-headers",
+            "type": "shell",
+            "command": "cmake --build ./build --target install_headers_all",
+            "dependsOn": "configure",
+            "problemMatcher": [],
+            "detail": "Install the headers of DarkPACK's libraries"
+        },
+        {
+            "label": "build",
+            "type": "shell",
+            "command": "ninja -C build",
+            "dependsOn": "configure",
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "detail": "Build the project using the chosen build system"
+        }
+    ]
+}

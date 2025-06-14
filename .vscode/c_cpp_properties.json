@@ -1,0 +1,27 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${default}",
+                "/usr/include/eigen3",
+                "${workspaceFolder}/build/.install/include",
+                "${workspaceFolder}/src/DPMathLib",
+                "${workspaceFolder}/src/TemplatedLib",
+                "${workspaceFolder}/src/u1f2to2/include",
+                "${workspaceFolder}/src/u1f2to2/clib",
+                "${workspaceFolder}/src/dp_u1f2to2",
+                "${workspaceFolder}/build/.install/include"
+            ],
+            "defines": [],
+            "compilerPath": "/usr/bin/g++",
+            "cStandard": "c23",
+            "cppStandard": "gnu++23",
+            "intelliSenseMode": "linux-gcc-x64",
+            "compileCommands": [
+                "${workspaceFolder}/build/compile_commands.json"
+            ]
+        }
+    ],
+    "version": 4
+}

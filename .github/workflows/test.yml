@@ -1,0 +1,44 @@
+name: Test darkpack
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        distro: ['fedora36', 'debian', 'fedora41gcc13', 'fedora41']
+    
+    steps:
+      - name: Install Podman
+        uses: gacts/install-podman@v1
+
+      - name: Check Podman version
+        run: podman version
+
+      - name: Clean workspace
+        run: if [ -d workspace ] ; then rm -rf workspace ; fi && mkdir workspace && cd workspace
+
+      - name: Check out repository code
+        uses: actions/checkout@v4
+
+      - name: List files in the workspace
+        run: ls -la ${GITHUB_WORKSPACE}
+  
+      - name: Set permissions on workspace
+        run: |
+          chown -R $(id -u):$(id -g) ${GITHUB_WORKSPACE}
+          chmod -R 755 ${GITHUB_WORKSPACE}
+
+      - name: Pull image
+        run: podman pull docker.io/marcopalmiotto/darkpack-deploy:${{ matrix.distro }}
+
+      - name: Test on podman container
+        run: podman run --rm --userns=keep-id --mount type=bind,src=${GITHUB_WORKSPACE},target=/home/darkpack,U=true -w /home/darkpack docker.io/marcopalmiotto/darkpack-deploy:${{ matrix.distro }} /bin/bash -c "./run_CI.sh"     

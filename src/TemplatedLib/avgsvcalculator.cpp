@@ -152,7 +152,7 @@ namespace __SPEC_LIB_NAME__
   {
     input = input_ext;
     run.init(input);
-    run.setHiggsLoopFactor(true);
+    // run.setHiggsLoopFactor(true);
 
     runningenabled = true;
 
@@ -170,7 +170,7 @@ namespace __SPEC_LIB_NAME__
   {
     input = input_ext;
     run.init(input);
-    run.setHiggsLoopFactor(true);
+    // run.setHiggsLoopFactor(true);
 
     runningenabled = true;
 
@@ -191,7 +191,7 @@ namespace __SPEC_LIB_NAME__
     input = input_ext;
     input.refresh();
     run.init(input);
-    run.setHiggsLoopFactor(true);
+    // run.setHiggsLoopFactor(true);
 
     if (hasMassSpetrumChanged)
     {

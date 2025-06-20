@@ -143,6 +143,8 @@ public:
       print_procs(out);
       print_g2_wefftable(out);
       print_coefficients(out);
+      input.Print(out);
+      run.print(out);
     };
 
     /**

@@ -196,8 +196,10 @@ int main()
     lib.importLHAModule(MARTYPATH);
   #endif
   */
+  /*
   std::cout << "Adding the flag for using posix threads in the C++ files in the library\n";
   lib.addLibrary("-lpthread");
+  */
 
   std::cout << "\nListing all the Physical particles\n";
   std::vector<Particle> part_0 = scalar.getPhysicalParticles([&](Particle p) { return p->isPhysical(); });

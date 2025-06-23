@@ -11,7 +11,7 @@ using namespace advmath;
 
 const std::string PATHPLOTS = std::string(OUTPATH) + "plots/"; //<- Path to the plots directory
 
-scalar2to2::RunningSM run; //<- Instance of the RunningSM class to handle running parameters
+RunningSM run; //<- Instance of the RunningSM class to handle running parameters
 
 inline double sq(const double x) { return x * x; } //<- Function to compute the square of a number
 
@@ -414,7 +414,6 @@ int main(int argc, char** argv)
 
   const double relic_density = boltz.relic_density();
   std::cout << "The relic density is: " << relic_density << '\n';
-
 
   return 0;
 }

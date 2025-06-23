@@ -226,7 +226,7 @@ public:
      * @param x true to enable, false to disable
      * @see Formula (2.11) from the micromega 1.3 manual
      */
-    inline void setHiggsLoopFactor(const bool x = true) { higgsloops = x; };
+    // inline void setHiggsLoopFactor(const bool x = true) { higgsloops = x; };
 
     /**
      * @brief Returns the value of the top pole mass, stored as a data member of the instance.
@@ -330,9 +330,11 @@ public:
       @param Q The energy scale.
     */
     void HandleParamRunning(Param_t& input, const real_t& Q);
+
+    void TestRunningMasses(Param_t& input);
   };
 
-  void TestRunningMasses(RunningSM* const run, Param_t& input);
+  // void TestRunningMasses(RunningSM* const run, Param_t& input);
 
 } // End of namespace __SPEC_LIB_NAME__
 

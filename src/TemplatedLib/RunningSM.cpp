@@ -1,9 +1,10 @@
 #include "RunningSM.hpp"
+#include <algorithm>
 // Needed for TestRunning masses
 #include <fstream>
 #include <iomanip>
 
-#define NO_RUN
+// #define NO_RUN
 
 namespace __SPEC_LIB_NAME__
 {
@@ -20,7 +21,7 @@ namespace __SPEC_LIB_NAME__
     int i;
     runlightquarks = false;
     runcharm = false;
-    higgsloops = false;
+    higgsloops = true;
 
     // Initialising class fixed parametrs
     alphas_MZ = input.alpha_str_Mz;
@@ -95,7 +96,7 @@ namespace __SPEC_LIB_NAME__
     setSanitNames();
     runlightquarks = false;
     runcharm = false;
-    higgsloops = false;
+    higgsloops = true;
 
     // Initialising class fixed parametrs
     alphas_MZ = pdgValue::alpha_str_Mz;
@@ -1403,14 +1404,39 @@ namespace __SPEC_LIB_NAME__
     std::cout << "I run all the masses at once, if they're not already ran\n";
 #endif
 
+    // Anonymous function to calculate the Higgs corrections
+    auto loophiggs = [&](const unsigned short int nf)
+    {
+      if (!higgsloops)
+        return 1.;
+      alphas = AlphaStrong(Qf);
+      Q_alphas = Qf;
+      const real_t a = alphas / M_PI;
+      return std::sqrt(1. + 5.67 * a + (35.94 - 1.36 * nf) * a * a + (164.14 - nf * (25.77 - 0.259 * nf)) * a * a * a);
+    };
+
+    // if (std::abs(Qf - LastQuarkMassQ[BEAUTY]) > NEGLIGIBLE_ENERGY_DIFFERENCE)
+    // {
+    //   std::cout << "The higgs corrections for the beauty quark at scale " << Qf << " is: " << loophiggs(5) << "\n";
+    // }
+
+    // if (std::abs(Qf - LastQuarkMassQ[TOP]) > NEGLIGIBLE_ENERGY_DIFFERENCE)
+    // {
+    //   std::cout << "The higgs corrections for the t quark at scale " << Qf << " is: " << loophiggs(6) << "\n";
+    // }
+
     // I run all the masses at once, if they're not already ran
     if (std::fabs(Qf - LastQuarkMassQ[part]) > NEGLIGIBLE_ENERGY_DIFFERENCE)
     {
-      real_t Qfmq = std::abs(Qf - QuarkMassQ[part]);
-      real_t QfQ = std::abs(Qf - LastQuarkMassQ[part]);
+      // Difference between the current scale Qf and the scale of the initial quark mass
+      const real_t Qfmq = std::abs(Qf - QuarkMassQ[part]);
 
-      real_t mq_in = (Qfmq < QfQ) ? QuarkMass[part] : LastQuarkMass[part];
-      real_t Q_in = (Qfmq < QfQ) ? QuarkMassQ[part] : LastQuarkMassQ[part];
+      // Difference between the current scale Qf and the scale of the last quark mass
+      const real_t QfQ = std::abs(Qf - LastQuarkMassQ[part]);
+
+      // Taking as input parameters the ones with the least difference
+      const real_t mq_in = (Qfmq < QfQ) ? QuarkMass[part] : LastQuarkMass[part];
+      const real_t Q_in = (Qfmq < QfQ) ? QuarkMassQ[part] : LastQuarkMassQ[part];
 
       LastQuarkMass[part] = RunQuarkMass(mq_in, Q_in, Qf);
       LastQuarkMassQ[part] = Qf;
@@ -1423,34 +1449,19 @@ namespace __SPEC_LIB_NAME__
     // the multiplication is the (2.11) from the micromega 1.3 manual
     //  **  it takes into account Higgs corrections
     // the return value has finally always to be less than the pole mass
-
-    auto loophiggs = [&](const int nf)
-    {
-      if (!higgsloops)
-        return 1.;
-      alphas = AlphaStrong(Qf);
-      Q_alphas = Qf;
-      const real_t a = alphas / M_PI;
-      return std::sqrt(1. + 5.67 * a + (35.94 - 1.36 * nf) * a * a + (164.14 - nf * (25.77 - 0.259 * nf)) * a * a * a);
-    };
-
     if (part == BEAUTY)
     {
-      real_t mb = LastQuarkMass[BEAUTY] * loophiggs(5);
-      if (mass_b_pole < mb)
-        return mass_b_pole;
-      else
-        return mb;
+      const real_t mb = LastQuarkMass[BEAUTY] * loophiggs(5);
+      return std::min(mb, mass_b_pole.get());
     }
 
     if (part == TOP)
     {
-      real_t mt = LastQuarkMass[TOP] * loophiggs(6);
-      if (mass_top_pole < mt)
-        return mass_top_pole;
-      else
-        return mt;
+      const real_t mt = LastQuarkMass[TOP] * loophiggs(6);
+      return std::min(mt, mass_top_pole.get());
     }
+
+    // If the quark is nor top nor beauty, we return the mass with no Higgs corrections
     return LastQuarkMass[part];
   }
 
@@ -1532,8 +1543,6 @@ namespace __SPEC_LIB_NAME__
       input.masses_vector[corr::c] = input.m_c;
     }
 
-
-
 #ifdef DEBUG
     std::cout << "Running heavy quark masses\n";
 #endif
@@ -1555,9 +1564,9 @@ namespace __SPEC_LIB_NAME__
   }
 
 
-  void TestRunningMasses(RunningSM* const run, Param_t& input)
+  void RunningSM::TestRunningMasses(Param_t& input)
   {
-    const real_t Emin = 0.01, Emax = 2000, deltae = 1.0;
+    const real_t Emin = 0.01, Emax = 10.e+4, deltae = 1.0;
     const int precision = 10;
     std::string pathplots = static_cast<std::string>(OUTPATH) + static_cast<std::string>("running_MARTY");
     char filename[7][1000];
@@ -1585,7 +1594,7 @@ namespace __SPEC_LIB_NAME__
 
     for (real_t Q = Emin; Q < Emax; Q += deltae)
     {
-      run->HandleParamRunning(input, Q);
+      this->HandleParamRunning(input, Q);
       file[0] << Q << "\t" << (*values[0]) * (*values[0]) / 4. / M_PI << std::endl;
 
       for (int i = 1; i < 7; i++)

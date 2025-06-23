@@ -77,7 +77,7 @@ private:
 
     bool runlightquarks; //!< Boolean parameter to determine if the light quark masses will or not be ran
     bool runcharm;       //!< Boolean parameter to determine if the charm quark mass will or not be ran
-    // bool higgsloops;     //!< Boolean parameter to determine if the Higgs loop factor correction is enabled or not
+    bool higgsloops;     //!< Boolean parameter to determine if the Higgs loop factor correction is enabled or not
 
     csl::InitSanitizer<real_t> mass_b_pole{"mass_b_pole"}; //!< Member to store the pole mass of the b-quark
     csl::InitSanitizer<real_t> mass_c_pole{"mass_c_pole"}; //!< Member to store the pole mass of the c-quark

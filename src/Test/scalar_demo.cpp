@@ -11,7 +11,7 @@ using namespace advmath;
 
 const std::string PATHPLOTS = std::string(OUTPATH) + "plots/"; //<- Path to the plots directory
 
-RunningSM* run; //<- Instance of the RunningSM class to handle running parameters
+RunningSM run; //<- Instance of the RunningSM class to handle running parameters
 
 inline double sq(const double x) { return x * x; } //<- Function to compute the square of a number
 
@@ -62,7 +62,7 @@ double gamma_phi_pred(const Param_t& input)
 // Computation of the sum of the squared amplitudes from a given formula (the one I found)
 double sum_Squaredampl_pred(Param_t& input, const double Ecm, const int Ncolors, const double gf, const double mf)
 {
-  run->HandleParamRunning(input, Ecm);
+  run.HandleParamRunning(input, Ecm);
   // Defining prefactor
   const double C = sq(mf * gf * input.g_chi * input.e_em / (input.m_W * std::sin(input.theta_W)));
   // Defining s
@@ -85,7 +85,7 @@ double sum_Squaredampl_pred(Param_t& input, const double Ecm, const int Ncolors,
 // starting from the |M|^2 expression defined in DarkPACK
 double dW_dcos_pred(Param_t& input, const double Ecm, const int Ncolors, const double gf, const double mf)
 {
-  run->HandleParamRunning(input, Ecm);
+  run.HandleParamRunning(input, Ecm);
   // Defining prefactor
   const double M2 = sum_Squaredampl_pred(input, Ecm, Ncolors, gf, mf);
 
@@ -106,7 +106,7 @@ double dW_dcos_pred(Param_t& input, const double Ecm, const int Ncolors, const d
 // starting from the |M|^2 expression defined in DarkPACK
 double dW_dcos_pred_nocoeff(Param_t& input, const double Ecm, const int Ncolors, const double gf, const double mf)
 {
-  run->HandleParamRunning(input, Ecm);
+  run.HandleParamRunning(input, Ecm);
   // Defining prefactor
   const double M2 = sum_Squaredampl_pred(input, Ecm, Ncolors, gf, mf);
 
@@ -120,7 +120,7 @@ double dW_dcos_pred_nocoeff(Param_t& input, const double Ecm, const int Ncolors,
 // This function computes the total Weff starting from the |M|^2 expression defined in DarkPACK
 double Weff_pred_fromM2(Param_t& input, const double Ecm)
 {
-  run->HandleParamRunning(input, Ecm);
+  run.HandleParamRunning(input, Ecm);
 
   // std::cout << "\nIn Weff_pred_fromM2, " << input.masses_vector[corr::c] << " " << input.m_c << " " << input.m_c_m_c
   //           << "\n";
@@ -155,7 +155,7 @@ double Weff_pred_fromM2(Param_t& input, const double Ecm)
 // This function computes Weff using the formula derived by hand
 double Weff_formula(Param_t& input, const double Ecm)
 {
-  run->HandleParamRunning(input, Ecm);
+  run.HandleParamRunning(input, Ecm);
 
   //   std::cout << input;
 
@@ -214,11 +214,11 @@ int main(int argc, char** argv)
   // with the results of the formulas derived by hand, or present in literature.
   // In order to compute the latters, we initalise the instance of the global
   // RunningSM class.
-  run = new RunningSM(input);
-  // run->init(input);
-  run->RunCharmMass(false);
+  // run = new RunningSM(input);
+  run.init(input);
+  run.RunCharmMass(false);
 
-  run->TestRunningMasses(input); //<- Testing the running of the masses
+  run.TestRunningMasses(input); //<- Testing the running of the masses
 
   std::cout << "The Higgs vev is:\n";
   std::cout << "v = " << 2 * (input.m_W * std::sin(input.theta_W) / input.e_em);
@@ -245,11 +245,11 @@ int main(int argc, char** argv)
       continue;
 
     std::cout << '\n' << singleproc;
-    run->HandleParamRunning(input, sqrts);
+    run.HandleParamRunning(input, sqrts);
     Param_t input_m(input); //<- Copy of the input to pass to the Process2to2 instance
 
     // Optimisation for the running
-    singleproc.setRunningData(run);
+    singleproc.setRunningData(&run);
     singleproc.setRunningExternal();
 
     const double marty = singleproc.getSumSquaredAmpl(input_m, sqrts, costheta); //<- Prediction from MARTY
@@ -271,7 +271,7 @@ int main(int argc, char** argv)
               << std::setw(width_field) << predweff << '\t' << std::setw(width_field) << martydweff / predweff << '\n';
   }
 
-  run->HandleParamRunning(input, sqrts);
+  run.HandleParamRunning(input, sqrts);
 
   const double weff_from_darkpack =
       avgsvcalc.getWeff(sqrts); //<- Weff computed by DarkPACK, using the numerical integration
@@ -284,12 +284,12 @@ int main(int argc, char** argv)
 
   std::cout << "Ratio Weff/formula  = " << weff_from_darkpack / weff_formula_by_hand << std::endl;
 
-  std::cout << "The input structure after running:\n";
-  input.Print();
-  run->print();
+  // std::cout << "The input structure after running:\n";
+  // input.Print();
+  // run.print();
 
-  std::cout << "The input structure inside the avcgsvcalc:\n";
-  avgsvcalc.print();
+  // std::cout << "The input structure inside the avcgsvcalc:\n";
+  // avgsvcalc.print();
 
 
   std::cout << "Defining a low temperature, to compare computed and predicted values of <σv>\n";
@@ -300,7 +300,7 @@ int main(int argc, char** argv)
   // Lambda function for computing the value of <σv> predicted by the literature
   auto sigmav_pred = [](const double Temp, const int Nc, const int part_l, const double gf, Param_t& input_l) mutable
   {
-    run->HandleParamRunning(input_l, input_l.getLightestBSMmass());
+    run.HandleParamRunning(input_l, input_l.getLightestBSMmass());
     // Higgs vev in the SM
     const double v_h = std::pow(2., -0.25) * std::pow(input_l.Gfermi, -0.5);
     const double Y_f = std::sqrt(2.) * input_l.masses_vector[part_l] / v_h;
@@ -363,7 +363,7 @@ int main(int argc, char** argv)
 
     const double Ecm = Ecmv[i];
 
-    run->HandleParamRunning(input, Ecm);
+    run.HandleParamRunning(input, Ecm);
 
     fout << std::scientific << Ecm << '\t' << 0.5 * Ecm * Ecm / avgsvcalc.getMassLBSM() / avgsvcalc.getMassLBSM() - 1.
          << '\t' << g2_weff / sq(corr::part_hel_dof[corr::chi]) << '\t' << Weff_formula(input, Ecm) << '\t'
@@ -426,6 +426,5 @@ int main(int argc, char** argv)
   const double relic_density = boltz.relic_density();
   std::cout << "The relic density is: " << relic_density << '\n';
 
-  delete run;
   return 0;
 }

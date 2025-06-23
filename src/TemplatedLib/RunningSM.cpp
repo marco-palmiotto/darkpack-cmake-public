@@ -21,7 +21,7 @@ namespace __SPEC_LIB_NAME__
     int i;
     runlightquarks = false;
     runcharm = false;
-    // higgsloops = true;
+    higgsloops = true;
 
     // Initialising class fixed parametrs
     alphas_MZ = input.alpha_str_Mz;
@@ -96,7 +96,7 @@ namespace __SPEC_LIB_NAME__
     setSanitNames();
     runlightquarks = false;
     runcharm = false;
-    // higgsloops = true;
+    higgsloops = true;
 
     // Initialising class fixed parametrs
     alphas_MZ = pdgValue::alpha_str_Mz;
@@ -1403,15 +1403,12 @@ namespace __SPEC_LIB_NAME__
 #ifdef DEBUG
     std::cout << "I run all the masses at once, if they're not already ran\n";
 #endif
-    // Setting returning values according to lines 272-280 of omega.c
-    // the multiplication is the (2.11) from the micromega 1.3 manual
-    //  **  it takes into account Higgs corrections
-    // the return value has finally always to be less than the pole mass
 
+    // Anonymous function to calculate the Higgs corrections
     auto loophiggs = [&](const unsigned short int nf)
     {
-      // if (!higgsloops)
-      //   return 1.;
+      if (!higgsloops)
+        return 1.;
       alphas = AlphaStrong(Qf);
       Q_alphas = Qf;
       const real_t a = alphas / M_PI;
@@ -1448,6 +1445,10 @@ namespace __SPEC_LIB_NAME__
     std::cout << "Setting returning values according to lines 272-280 of omega.c\n";
 #endif
 
+    // Setting returning values according to lines 272-280 of omega.c
+    // the multiplication is the (2.11) from the micromega 1.3 manual
+    //  **  it takes into account Higgs corrections
+    // the return value has finally always to be less than the pole mass
     if (part == BEAUTY)
     {
       const real_t mb = LastQuarkMass[BEAUTY] * loophiggs(5);
@@ -1541,8 +1542,6 @@ namespace __SPEC_LIB_NAME__
       input.m_c = GetQuarkMass(RunningSM::CHARM, Q);
       input.masses_vector[corr::c] = input.m_c;
     }
-
-
 
 #ifdef DEBUG
     std::cout << "Running heavy quark masses\n";

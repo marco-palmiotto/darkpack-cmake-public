@@ -105,3 +105,4 @@ doc/*/*.xml
 doc/*/*.pdf
 !doc/Doxyfile
 doc/modified_cosmology/main.synctex.gz
+.sync.ffs_db

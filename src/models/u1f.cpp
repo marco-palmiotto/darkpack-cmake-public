@@ -17,6 +17,7 @@ class U1f_Model : public virtual SU2f_Model
     // Deactivating charged bosons
     mty::ModelData::removeParticle("chi_p");
     mty::ModelData::removeParticle("V");
+    mty::ModelData::removeParticle("chi_dm_2");
 
     SU2f_Model::refresh();
   }
@@ -115,7 +116,7 @@ int main()
 
   std::cout << "Separating SM and BSM particles" << std::endl;
   std::vector<Particle> psm;
-  std::vector<Particle> pbsm({my_model.getParticle("chi_dm_1"), my_model.getParticle("chi_dm_2")});
+  std::vector<Particle> pbsm({my_model.getParticle("chi_dm_1")});
   for (size_t i = 0; i != part.size(); i++)
   {
     bool istoadd = true;
@@ -182,17 +183,13 @@ int main()
 
   std::cout << "Building the list of SM leptons\n";
 
-  std::array<Particle, 2> bsm_fields({my_model.getParticle("chi_dm_1"), my_model.getParticle("chi_dm_2")});
-
-  for (size_t i1 = 0; i1 < bsm_fields.size(); i1++)
+  for (size_t i1 = 0; i1 < pbsm.size(); i1++)
   {
-    for (mty::Insertion state1 :
-         std::array<mty::Insertion, 2>({Incoming(bsm_fields[i1]), Incoming(AntiPart(bsm_fields[i1]))}))
+    for (mty::Insertion state1 : std::array<mty::Insertion, 2>({Incoming(pbsm[i1]), Incoming(AntiPart(psm[i1]))}))
     {
-      for (size_t i2 = i1; i2 < bsm_fields.size(); i2++)
+      for (size_t i2 = i1; i2 < pbsm.size(); i2++)
       {
-        for (mty::Insertion state2 :
-             std::array<mty::Insertion, 2>({Incoming(bsm_fields[i2]), Incoming(AntiPart(bsm_fields[i2]))}))
+        for (mty::Insertion state2 : std::array<mty::Insertion, 2>({Incoming(pbsm[i2]), Incoming(AntiPart(pbsm[i2]))}))
         {
           for (size_t j1 = 0; j1 < psm.size(); j1++)
           {
@@ -221,6 +218,14 @@ int main()
     }
   }
 
+  {
+    int i = 0;
+    for (const auto& single_proc : list_of_processes)
+    {
+      const std::string procname = processName(single_proc.process);
+      std::cout << "Process n " << i++ << " / " << list_of_processes.size() << " : " << procname << '\n';
+    }
+  }
 
   computeAndAddToLibFromList(my_model, lib, list_of_processes);
 

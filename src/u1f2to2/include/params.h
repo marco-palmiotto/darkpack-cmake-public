@@ -70,11 +70,10 @@ struct param_t {
     csl::InitSanitizer<real_t> m_phi { "m_phi" };
     csl::InitSanitizer<real_t> m_tau { "m_tau" };
     csl::InitSanitizer<real_t> m_chi_dm_1 { "m_chi_dm_1" };
-    csl::InitSanitizer<real_t> m_chi_dm_2 { "m_chi_dm_2" };
 
     void reset()
     {
-        using real_params = std::array<csl::InitSanitizer<real_t>*, 40>;
+        using real_params = std::array<csl::InitSanitizer<real_t>*, 39>;
         using complex_params = std::array<csl::InitSanitizer<complex_t>*, 5>;
 
         for (auto &par : real_params{
@@ -84,7 +83,7 @@ struct param_t {
                 &theta_12_L, &theta_12_R, &theta_13_L, &theta_13_R, &theta_23_L, &theta_23_R, 
                 &g_s, &m_W, &m_Z, &m_b, &m_c, &m_d, 
                 &m_e, &m_h, &m_s, &m_t, &m_u, &m_mu, 
-                &m_V_3, &m_phi, &m_tau, &m_chi_dm_1, &m_chi_dm_2, })
+                &m_V_3, &m_phi, &m_tau, &m_chi_dm_1, })
         {
             par->reset();
         }
@@ -97,7 +96,7 @@ struct param_t {
 
     void print(std::ostream &out = std::cout) const
     {
-        using real_params = std::array<csl::InitSanitizer<real_t> const*, 40>;
+        using real_params = std::array<csl::InitSanitizer<real_t> const*, 39>;
         using complex_params = std::array<csl::InitSanitizer<complex_t> const*, 5>;
 
         out << "param_t struct:\n";
@@ -109,7 +108,7 @@ struct param_t {
                 &theta_12_L, &theta_12_R, &theta_13_L, &theta_13_R, &theta_23_L, &theta_23_R, 
                 &g_s, &m_W, &m_Z, &m_b, &m_c, &m_d, 
                 &m_e, &m_h, &m_s, &m_t, &m_u, &m_mu, 
-                &m_V_3, &m_phi, &m_tau, &m_chi_dm_1, &m_chi_dm_2, })
+                &m_V_3, &m_phi, &m_tau, &m_chi_dm_1, })
         {
             out << "  -> " << par->getName() << ": ";
             if (par->hasValue()) {
@@ -175,7 +174,6 @@ struct param_t {
         {"m_phi", &m_phi},
         {"m_tau", &m_tau},
         {"m_chi_dm_1", &m_chi_dm_1},
-        {"m_chi_dm_2", &m_chi_dm_2},
     };
 
     std::map<std::string, csl::InitSanitizer<complex_t>*> complexParams {

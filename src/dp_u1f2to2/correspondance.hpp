@@ -29,7 +29,6 @@ namespace u1f2to2
       nu_mu,
       nu_tau,
       chi_dm_1,
-      chi_dm_2,
       e,
       mu,
       tau,
@@ -43,33 +42,31 @@ namespace u1f2to2
 
 #include "smBsm.hpp"
     inline const std::array<std::string, TOTAL_PARTICLES + 1> part_names = {
-        " ",        "G",        "V_3", "phi", "W",   "h", "A", "Z", "nu_e", "nu_mu", "nu_tau",
-        "chi_dm_1", "chi_dm_2", "e",   "mu",  "tau", "u", "c", "t", "d",    "s",     "b"};
+        " ",        "G", "V_3", "phi", "W", "h", "A", "Z", "nu_e", "nu_mu", "nu_tau",
+        "chi_dm_1", "e", "mu",  "tau", "u", "c", "t", "d", "s",    "b"};
 
-    inline const std::array<bool, TOTAL_PARTICLES + 1> isboson = {
-        false, true,  true,  true,  true,  true,  true,  true,  false, false, false,
-        false, false, false, false, false, false, false, false, false, false, false};
+    inline const std::array<bool, TOTAL_PARTICLES + 1> isboson = {false, true,  true,  true,  true,  true,  true,
+                                                                  true,  false, false, false, false, false, false,
+                                                                  false, false, false, false, false, false, false};
 
     inline const std::string mass_codes = {
-        EMPTYCHAR,          EMPTYCHAR + G,        EMPTYCHAR + V_3,      EMPTYCHAR + phi,  EMPTYCHAR + W,
-        EMPTYCHAR + h,      EMPTYCHAR + A,        EMPTYCHAR + Z,        EMPTYCHAR + nu_e, EMPTYCHAR + nu_mu,
-        EMPTYCHAR + nu_tau, EMPTYCHAR + chi_dm_1, EMPTYCHAR + chi_dm_2, EMPTYCHAR + e,    EMPTYCHAR + mu,
-        EMPTYCHAR + tau,    EMPTYCHAR + u,        EMPTYCHAR + c,        EMPTYCHAR + t,    EMPTYCHAR + d,
-        EMPTYCHAR + s,      EMPTYCHAR + b};
+        EMPTYCHAR,     EMPTYCHAR + G,  EMPTYCHAR + V_3,  EMPTYCHAR + phi,   EMPTYCHAR + W,      EMPTYCHAR + h,
+        EMPTYCHAR + A, EMPTYCHAR + Z,  EMPTYCHAR + nu_e, EMPTYCHAR + nu_mu, EMPTYCHAR + nu_tau, EMPTYCHAR + chi_dm_1,
+        EMPTYCHAR + e, EMPTYCHAR + mu, EMPTYCHAR + tau,  EMPTYCHAR + u,     EMPTYCHAR + c,      EMPTYCHAR + t,
+        EMPTYCHAR + d, EMPTYCHAR + s,  EMPTYCHAR + b};
 
     inline const std::array<double, TOTAL_PARTICLES + 1> part_charge = {
-        0, 0, 0,  0,  1,  0,        0,        0,        0,         0,         0,
-        0, 0, -1, -1, -1, 0.666667, 0.666667, 0.666667, -0.333333, -0.333333, -0.333333};
+        0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, -1, -1, -1, 0.666667, 0.666667, 0.666667, -0.333333, -0.333333, -0.333333};
 
-    inline const std::array<int, TOTAL_PARTICLES + 1> part_tot_dof = {0, 16, 3, 1, 6, 1,  2,  3,  4,  4,  4,
-                                                                      4, 4,  4, 4, 4, 12, 12, 12, 12, 12, 12};
+    inline const std::array<int, TOTAL_PARTICLES + 1> part_tot_dof = {0, 16, 3, 1, 6,  1,  2,  3,  4,  4, 4,
+                                                                      4, 4,  4, 4, 12, 12, 12, 12, 12, 12};
 
     inline const std::array<int, TOTAL_PARTICLES + 1> part_hel_dof = {0, 16, 3, 1, 3, 1, 2, 3, 2, 2, 2,
-                                                                      2, 2,  2, 2, 2, 6, 6, 6, 6, 6, 6};
+                                                                      2, 2,  2, 2, 6, 6, 6, 6, 6, 6};
 
     inline const std::array<bool, TOTAL_PARTICLES + 1> part_isSelfConj = {
         false, true,  true,  true,  false, true,  true,  true,  false, false, false,
-        false, false, false, false, false, false, false, false, false, false, false};
+        false, false, false, false, false, false, false, false, false, false};
 
 
     extern const std::unordered_map<std::string, Entry_t> squaredampl;
@@ -100,8 +97,6 @@ namespace u1f2to2
         return 0.0;
       case (chi_dm_1):
         return static_cast<double>(input.m_chi_dm_1);
-      case (chi_dm_2):
-        return static_cast<double>(input.m_chi_dm_2);
       case (e):
         return static_cast<double>(input.m_e);
       case (mu):

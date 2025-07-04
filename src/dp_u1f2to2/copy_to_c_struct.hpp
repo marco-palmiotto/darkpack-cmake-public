@@ -53,7 +53,6 @@ namespace u1f2to2
     output.m_phi = input.m_phi;
     output.m_tau = input.m_tau;
     output.m_chi_dm_1 = input.m_chi_dm_1;
-    output.m_chi_dm_2 = input.m_chi_dm_2;
     output.V_cd = CONVERT_COMPLEX(input.V_cd);
     output.V_cs = CONVERT_COMPLEX(input.V_cs);
     output.V_td = CONVERT_COMPLEX(input.V_td);

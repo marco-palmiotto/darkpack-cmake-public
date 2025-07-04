@@ -95,8 +95,6 @@ namespace __SPEC_LIB_NAME__
       return false;
     if (!(p1.m_chi_dm_1 == p2.m_chi_dm_1))
       return false;
-    if (!(p1.m_chi_dm_2 == p2.m_chi_dm_2))
-      return false;
     return true;
   }
 } // namespace __SPEC_LIB_NAME__

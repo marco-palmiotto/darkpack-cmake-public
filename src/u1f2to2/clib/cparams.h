@@ -54,7 +54,6 @@ typedef struct cparam_s {
     creal_t m_phi;
     creal_t m_tau;
     creal_t m_chi_dm_1;
-    creal_t m_chi_dm_2;
 } cparam_t;
 #ifdef __cplusplus
 } // extern "C" block

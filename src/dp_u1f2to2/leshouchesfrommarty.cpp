@@ -132,7 +132,7 @@ namespace u1f2to2::readmodule
     param.g_f = get_value(data, "U1LEPTONIC", 7);
     param.m_V_3 = get_value(data, "U1LEPTONIC", 8);
     param.m_phi = get_value(data, "U1LEPTONIC", 9);
-    param.m_chi_dm_2 = param.m_chi_dm_1 = param.m_cdm = get_value(data, "U1LEPTONIC", 10);
+    param.m_chi_dm_1 = param.m_cdm = get_value(data, "U1LEPTONIC", 10);
   }
 
   void AssignBSMparams(Param_t& param)

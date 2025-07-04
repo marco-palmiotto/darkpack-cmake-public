@@ -92,7 +92,7 @@ int computeAndAddToLibFromList(mty::Model& model, // model
 
 #ifdef CORRESPONDANCE
   std::cout << "\nCreating correspondance file\n";
-  std::ofstream correspondancefileh;
+  std::ofstream output_stream;
 
   //     std::cout << "Building the directory if needed\n";
   //     sprintf(tempstring_c, "[ -d \"%s/include\" ] || mkdir -p \"%s/include\" ; [ -d \"%s/src\" ] || mkdir -p
@@ -106,34 +106,33 @@ int computeAndAddToLibFromList(mty::Model& model, // model
   std::system(tempstring_c);
 
   sprintf(tempstring_c, "auxiliary_library/%s/correspondance.hpp", lib.getName().c_str());
-  correspondancefileh.open(tempstring_c);
+  output_stream.open(tempstring_c);
 
-  if (!correspondancefileh)
+  if (!output_stream)
   {
     std::cerr << "Impossible to write the correspondance.hpp file\n";
     exit(1);
   }
   std::cout << "Creating correspondance.hpp file\n";
-  correspondancefileh << "#pragma once\n\n";
-  correspondancefileh << "#ifndef __cplusplus\n";
-  correspondancefileh << "#define __cplusplus\n";
-  correspondancefileh << "#endif\n\n";
-  correspondancefileh << "#include \"" << lib.getName() << ".h\"\n";
-  correspondancefileh << "#include \"clib_" << lib.getName() << ".h\"\n";
-  correspondancefileh << "#include <unordered_map>\n";
-  correspondancefileh << "namespace " << lib.getName() << "{\n";
-  correspondancefileh
-      << "// We are using char 32 (space) as possible separator, char 126 (tilde) as antiParticle tag\n";
-  correspondancefileh << "#define EMPTYCHAR 32\n";
-  correspondancefileh << "#define ANTICHAR 126\n";
-  correspondancefileh << "using Cfptr_t = ccomplex_return_t (*) (cparam_t const *);\n";
-  correspondancefileh << "namespace corr{\n";
-  correspondancefileh << "  using Entry_t = std::tuple<Cfptr_t, short int, short int>;\n";
-  correspondancefileh << "  enum Part_t { \n";
+  output_stream << "#pragma once\n\n";
+  output_stream << "#ifndef __cplusplus\n";
+  output_stream << "#define __cplusplus\n";
+  output_stream << "#endif\n\n";
+  output_stream << "#include \"" << lib.getName() << ".h\"\n";
+  output_stream << "#include \"clib_" << lib.getName() << ".h\"\n";
+  output_stream << "#include <unordered_map>\n";
+  output_stream << "namespace " << lib.getName() << "{\n";
+  output_stream << "// We are using char 32 (space) as possible separator, char 126 (tilde) as antiParticle tag\n";
+  output_stream << "#define EMPTYCHAR 32\n";
+  output_stream << "#define ANTICHAR 126\n";
+  output_stream << "using Cfptr_t = ccomplex_return_t (*) (cparam_t const *);\n";
+  output_stream << "namespace corr{\n";
+  output_stream << "  using Entry_t = std::tuple<Cfptr_t, short int, short int>;\n";
+  output_stream << "  enum Part_t { \n";
   #ifdef DEBUG
   std::cout << "Writing particle names in enum Part_t\n";
   #endif
-  correspondancefileh << "        " << pnames[0] << "=1,\n";
+  output_stream << "        " << pnames[0] << "=1,\n";
   #ifdef DEBUG
   std::cout << "i = 0\n";
   #endif
@@ -142,113 +141,113 @@ int computeAndAddToLibFromList(mty::Model& model, // model
   #ifdef DEBUG
     std::cout << "i = " << i << " Writing " << pnames[i] << std::endl;
   #endif
-    correspondancefileh << "        " << pnames[i] << ",\n";
+    output_stream << "        " << pnames[i] << ",\n";
   }
-  correspondancefileh << "       " << pnames.back() << std::endl;
-  correspondancefileh << "   };\n\n";
+  output_stream << "       " << pnames.back() << std::endl;
+  output_stream << "   };\n\n";
 
-  correspondancefileh << "#include \"" << nameSmBsmFile << "\"\n";
+  output_stream << "#include \"" << nameSmBsmFile << "\"\n";
   #ifdef DEBUG
   std::cout << "Writing particle names in part_names\n";
   #endif
-  correspondancefileh << "inline const std::array<std::string,TOTAL_PARTICLES+1> part_names={\" \",\n";
+  output_stream << "inline const std::array<std::string,TOTAL_PARTICLES+1> part_names={\" \",\n";
   for (size_t i = 0; i != part.size() - 1; i++)
   {
-    correspondancefileh << "        \"" << pnames[i] << "\",\n";
+    output_stream << "        \"" << pnames[i] << "\",\n";
   }
-  correspondancefileh << "       \"" << pnames.back() << '\"' << std::endl;
-  correspondancefileh << "   };\n\n";
+  output_stream << "       \"" << pnames.back() << '\"' << std::endl;
+  output_stream << "   };\n\n";
 
   #ifdef DEBUG
   std::cout << "Writing particle statistic\n";
   #endif
 
-  correspondancefileh << "inline const std::array<bool,TOTAL_PARTICLES+1> isboson={false, \n";
+  output_stream << "inline const std::array<bool,TOTAL_PARTICLES+1> isboson={false, \n";
   for (size_t i = 0; i != part.size() - 1; i++)
   {
-    correspondancefileh << "        " << (part[i]->isBosonic() ? "true" : "false") << ",\n";
+    output_stream << "        " << (part[i]->isBosonic() ? "true" : "false") << ",\n";
   }
-  correspondancefileh << "       " << (part.back()->isBosonic() ? "true" : "false") << std::endl;
-  correspondancefileh << "   };\n\n";
+  output_stream << "       " << (part.back()->isBosonic() ? "true" : "false") << std::endl;
+  output_stream << "   };\n\n";
 
 
   #ifdef DEBUG
   std::cout << "Writing particle codes\n";
   #endif
-  correspondancefileh << "inline const std::string mass_codes={EMPTYCHAR, \n";
+  output_stream << "inline const std::string mass_codes={EMPTYCHAR, \n";
   for (size_t i = 0; i != part.size() - 1; i++)
   {
-    correspondancefileh << "        EMPTYCHAR+" << pnames[i] << ",\n";
+    output_stream << "        EMPTYCHAR+" << pnames[i] << ",\n";
   }
-  correspondancefileh << "       EMPTYCHAR+" << pnames.back() << std::endl;
-  correspondancefileh << "   };\n\n";
+  output_stream << "       EMPTYCHAR+" << pnames.back() << std::endl;
+  output_stream << "   };\n\n";
 
   #ifdef DEBUG
   std::cout << "Writing particle charge\n";
   #endif
-  correspondancefileh << "inline const std::array<double,TOTAL_PARTICLES+1> part_charge={ 0,\n";
+  output_stream << "inline const std::array<double,TOTAL_PARTICLES+1> part_charge={ 0,\n";
   for (size_t i = 0; i != part.size() - 1; i++)
   {
-    correspondancefileh << "        " << electric_charges.at(i) << ",\n";
+    output_stream << "        " << electric_charges.at(i) << ",\n";
   }
-  correspondancefileh << "        " << electric_charges.back() << "\n};\n\n";
+  output_stream << "        " << electric_charges.back() << "\n};\n\n";
 
   #ifdef DEBUG
   std::cout << "Writing particle total degrees of freedom\n";
   #endif
-  correspondancefileh << "inline const std::array<int,TOTAL_PARTICLES+1> part_tot_dof={ 0,\n";
+  output_stream << "inline const std::array<int,TOTAL_PARTICLES+1> part_tot_dof={ 0,\n";
   for (size_t i = 0; i != part.size() - 1; i++)
   {
-    correspondancefileh << "        " << dofs.at(i) << ",\n";
+    output_stream << "        " << dofs.at(i) << ",\n";
   }
-  correspondancefileh << "        " << dofs.back() << "\n};\n\n";
+  output_stream << "        " << dofs.back() << "\n};\n\n";
 
   #ifdef DEBUG
   std::cout << "Writing particle helicity degrees of freedom\n";
   #endif
-  correspondancefileh << "inline const std::array<int,TOTAL_PARTICLES+1> part_hel_dof={ 0,\n";
+  output_stream << "inline const std::array<int,TOTAL_PARTICLES+1> part_hel_dof={ 0,\n";
   for (size_t i = 0; i != part.size() - 1; i++)
   {
-    correspondancefileh << "        " << h_dofs.at(i) << ",\n";
+    output_stream << "        " << h_dofs.at(i) << ",\n";
   }
-  correspondancefileh << "        " << h_dofs.back() << "\n};\n\n";
+  output_stream << "        " << h_dofs.back() << "\n};\n\n";
 
   #ifdef DEBUG
   std::cout << "Writing particle conjugation\n";
   #endif
-  correspondancefileh << "inline const std::array<bool,TOTAL_PARTICLES+1> part_isSelfConj={ false,\n";
+  output_stream << "inline const std::array<bool,TOTAL_PARTICLES+1> part_isSelfConj={ false,\n";
   for (size_t i = 0; i != part.size() - 1; i++)
   {
-    correspondancefileh << "        " << (isSelfConjugate.at(i) ? "true" : "false") << ",\n";
+    output_stream << "        " << (isSelfConjugate.at(i) ? "true" : "false") << ",\n";
   }
-  correspondancefileh << "        " << (isSelfConjugate.back() ? "true" : "false") << "\n};\n\n";
+  output_stream << "        " << (isSelfConjugate.back() ? "true" : "false") << "\n};\n\n";
 
 
-  correspondancefileh << "\nextern const std::unordered_map<std::string, Entry_t> squaredampl;\n";
+  output_stream << "\nextern const std::unordered_map<std::string, Entry_t> squaredampl;\n";
 
   #ifdef DEBUG
   std::cout << "Writing getMassFirst\n";
   #endif
-  correspondancefileh << "\ninline double getMassFirst(const int p, const param_t &input)\n";
-  correspondancefileh << "{\n";
+  output_stream << "\ninline double getMassFirst(const int p, const param_t &input)\n";
+  output_stream << "{\n";
 
-  correspondancefileh << "    switch (p)\n";
-  correspondancefileh << "    {\n";
+  output_stream << "    switch (p)\n";
+  output_stream << "    {\n";
 
   for (size_t i = 0; i != part.size(); i++)
   {
-    correspondancefileh << "        case(" << pnames[i] << ") : \n";
-    correspondancefileh << "            return " << mnames[i] << ";\n";
+    output_stream << "        case(" << pnames[i] << ") : \n";
+    output_stream << "            return " << mnames[i] << ";\n";
   }
-  correspondancefileh << "        default : \n";
-  correspondancefileh << "            return -1.;\n";
-  correspondancefileh << "    }\n";
-  correspondancefileh << "}// End of getMassFirst\n";
+  output_stream << "        default : \n";
+  output_stream << "            return -1.;\n";
+  output_stream << "    }\n";
+  output_stream << "}// End of getMassFirst\n";
 
-  correspondancefileh << "}//End of namespace corr\n";
-  correspondancefileh << "}//End of namespace " << lib.getName() << "\n";
+  output_stream << "}//End of namespace corr\n";
+  output_stream << "}//End of namespace " << lib.getName() << "\n";
   // correspondancefileh << "#endif\n";
-  correspondancefileh.close();
+  output_stream.close();
 
   std::cout << "correspondance.h has been created succesfully.\n";
 
@@ -262,16 +261,16 @@ int computeAndAddToLibFromList(mty::Model& model, // model
 
   std::cout << "Creating initialise_map.cpp file\n";
   sprintf(tempstring_c, "auxiliary_library/%s/initialise_map.cpp", lib.getName().c_str());
-  correspondancefileh.open(tempstring_c);
-  if (!correspondancefileh)
+  output_stream.open(tempstring_c);
+  if (!output_stream)
   {
     std::cerr << "Impossible to write the " << tempstring_c << " file\n";
     return 1;
   }
 
-  correspondancefileh << "#include \"correspondance.hpp\"\n"
-                      << "namespace " << lib.getName() << "::corr{\n"
-                      << "const std::unordered_map<std::string, Entry_t> squaredampl{ \n";
+  output_stream << "#include \"correspondance.hpp\"\n"
+                << "namespace " << lib.getName() << "::corr{\n"
+                << "const std::unordered_map<std::string, Entry_t> squaredampl{ \n";
 
   #endif // End of ifdef CORRESPONDANCE
 
@@ -280,30 +279,31 @@ int computeAndAddToLibFromList(mty::Model& model, // model
   prevname1 = listofprocs[0].process[0].getField()->getName();
   prevname2 = listofprocs[0].process[1].getField()->getName();
 
-  const size_t lastproc = listofprocs.size();
-  for (size_t i = 0; i != lastproc; i++)
+  const size_t lastproc_index = listofprocs.size();
+  size_t i = 1;
+  for (auto& single_proc : listofprocs)
   {
     count_converted++;
-    std::string procname = processName(listofprocs[i].process);
-    std::string nameSumSq = "sumSqAmpl_" + procname;
-    std::string nameCombFac = "combFac_" + procname;
-    std::cout << "Process n " << i + 1 << " / " << lastproc << "\n";
+    const std::string procname = processName(single_proc.process);
+    const std::string nameSumSq = "sumSqAmpl_" + procname;
+    const std::string nameCombFac = "combFac_" + procname;
+    std::cout << "Process n " << i << " / " << lastproc_index << "\n";
 
     // Adding the process in the library
     std::cout << "Computing " << nameSumSq << " ";
     // Setting W boson gauge
-    model.getParticle("W")->setGaugeChoice(listofprocs[i].Wgauge);
+    model.getParticle("W")->setGaugeChoice(single_proc.Wgauge);
 
     // Creating a lambda function that returns the amplitude at the desired order
     auto lambda_ampl = [&]()
     {
-      if (!listofprocs[i].leading_order)
-        return model.computeAmplitude(listofprocs[i].order, listofprocs[i].process);
+      if (!single_proc.leading_order)
+        return model.computeAmplitude(single_proc.order, single_proc.process);
       // If you want it at the leading order, let us compute the tree-level expression
-      auto ampl_tree = model.computeAmplitude(mty::Order::TreeLevel, listofprocs[i].process);
+      auto ampl_tree = model.computeAmplitude(mty::Order::TreeLevel, single_proc.process);
       if (!ampl_tree.empty())
         return ampl_tree;
-      auto ampl_one_loop = model.computeAmplitude(mty::Order::OneLoop, listofprocs[i].process);
+      auto ampl_one_loop = model.computeAmplitude(mty::Order::OneLoop, single_proc.process);
       return ampl_one_loop;
     };
 
@@ -319,13 +319,13 @@ int computeAndAddToLibFromList(mty::Model& model, // model
     // Saving the single diagram
     SaveDiagrams(lib.getName() + "_graphs/" + procname + ".json", ampl);
     // Grouping diagrams and saving them
-    if (listofprocs[i].process[0].getField()->getName() != prevname1 ||
-        listofprocs[i].process[1].getField()->getName() != prevname2)
+    if (single_proc.process[0].getField()->getName() != prevname1 ||
+        single_proc.process[1].getField()->getName() != prevname2)
     {
       // If one of the two particles is different, I save the file and I start a new one
       SaveDiagrams(lib.getName() + "_graphs/" + prevname1 + "_" + prevname2 + ".json", graphs);
-      prevname1 = listofprocs[i].process[0].getField()->getName();
-      prevname2 = listofprocs[i].process[1].getField()->getName();
+      prevname1 = single_proc.process[0].getField()->getName();
+      prevname2 = single_proc.process[1].getField()->getName();
       graphs.clear();
     }
     auto process_graphs = ampl.obtainGraphs();
@@ -373,48 +373,48 @@ int computeAndAddToLibFromList(mty::Model& model, // model
     std::string mass_string = " ";
     for (size_t j = 0; j < 4; j++)
     {
-      Expr tempmass = listofprocs[i].process[j].getField()->getMass();
+      Expr tempmass = single_proc.process[j].getField()->getMass();
       std::string tempstring = (tempmass != CSL_0) ? "static_cast<double>(input." + tempmass->getName() + ")" : "0.0";
       mass_string += tempstring + ",";
     }
 
     // Determining the symmetry factor
-    Sf34 =
-        (((listofprocs[i].process[2].isOutgoingParticle() && listofprocs[i].process[3].isOutgoingParticle()) ||
-          (listofprocs[i].process[2].isOutgoingAntiParticle() && listofprocs[i].process[3].isOutgoingAntiParticle())) &&
-         listofprocs[i].process[2].getField()->getName() == listofprocs[i].process[3].getField()->getName())
-            ? 2
-            : 1;
+    Sf34 = (((single_proc.process[2].isOutgoingParticle() && single_proc.process[3].isOutgoingParticle()) ||
+             (single_proc.process[2].isOutgoingAntiParticle() && single_proc.process[3].isOutgoingAntiParticle())) &&
+            single_proc.process[2].getField()->getName() == single_proc.process[3].getField()->getName())
+               ? 2
+               : 1;
 
     // Determining the CP symmetry factor
-    C1234 = checkCPsymmetric(model, listofprocs[i].process) ? 2 : 1;
+    C1234 = checkCPsymmetric(model, single_proc.process) ? 2 : 1;
   #ifdef CORRESPONDANCE
     // Writing on the correspondance file
-    correspondancefileh << "{ {";
+    output_stream << "{ {";
     for (int j = 0; j <= 2; j++)
     {
-      if (!listofprocs[i].process[j].isParticle())
-        correspondancefileh << "ANTICHAR,";
-      correspondancefileh << "EMPTYCHAR+corr::" << listofprocs[i].process[j].getField()->getName() << ",";
+      if (!single_proc.process[j].isParticle())
+        output_stream << "ANTICHAR,";
+      output_stream << "EMPTYCHAR+corr::" << single_proc.process[j].getField()->getName() << ",";
     }
-    if (!listofprocs[i].process[3].isParticle())
-      correspondancefileh << "ANTICHAR,";
-    correspondancefileh << "EMPTYCHAR+corr::" << listofprocs[i].process[3].getField()->getName() << "},";
+    if (!single_proc.process[3].isParticle())
+      output_stream << "ANTICHAR,";
+    output_stream << "EMPTYCHAR+corr::" << single_proc.process[3].getField()->getName() << "},";
     // Writing the value field
-    correspondancefileh << "{ ";
+    output_stream << "{ ";
     // Writing the functions
-    correspondancefileh << " &c_" << nameSumSq << ", ";
-    correspondancefileh << comb_factor << ",";
+    output_stream << " &c_" << nameSumSq << ", ";
+    output_stream << comb_factor << ",";
     // Writing the number
-    correspondancefileh << C1234;
-    correspondancefileh << "} }";
-    if (i != lastproc - 1)
-      correspondancefileh << ",\n";
+    output_stream << C1234;
+    output_stream << "} }";
+    if (i != lastproc_index - 1)
+      output_stream << ",\n";
   #endif // End of ifdef CORRESPONDANCE
+    i++;
   } // Ends the cycle on the processes
   #ifdef CORRESPONDANCE
-  correspondancefileh << "};\n}\n";
-  correspondancefileh.close();
+  output_stream << "};\n}\n";
+  output_stream.close();
   #endif
 
 #endif // ended #ifndef DISABLE_LIB_CREATION

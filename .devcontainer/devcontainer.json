@@ -2,9 +2,11 @@
 // README at: https://github.com/devcontainers/templates/tree/main/src/cpp
 {
 	"name": "DarkPackTesting",
-	"build": {
-		"dockerfile": "Dockerfile-fedora41-dev" // "test/Dockerfile-ubuntu2404-deploy" //
-	},
+	"image": "docker.io/marcopalmiotto/darkpack-dev:fedora41",
+	// "build": {
+	// 	"dockerfile": "Dockerfile-fedora41-dev" // "test/Dockerfile-ubuntu2404-deploy" //
+	
+	// },
 	"runArgs": [
 		// This argument is needed to allow podman containers to have writing permission into the host filesystem
 		// Note: to use podman, you need to set "podman" as docker binary and "podman compose up" as docker compose binary in the settings

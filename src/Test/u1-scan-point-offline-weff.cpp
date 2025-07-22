@@ -40,7 +40,7 @@ int main(int argc, char* argv[])
   constexpr const double mchi_over_mv = 0.33;
 
   std::vector<real_t> m_V_jumps = {10.5926, 10.7978};
-  std::vector<real_t> g_f_jumps = {0.0548977, 0.055293};
+  std::vector<real_t> g_f_jumps = {0.0540916, 0.0544612};
 
   const real_t slope_before_jump = (m_V_jumps[1] - m_V_jumps[0]) / (g_f_jumps[1] - g_f_jumps[0]);
   const std::vector<real_t> m_V_trial_vec(
@@ -56,16 +56,16 @@ int main(int argc, char* argv[])
   }
 
   // m_V_jumps.push_back(11.007);
-  // g_f_jumps.push_back(0.0521988); // Function and paramters' first definition
+  // g_f_jumps.push_back(0.0517103); // Function and paramters' first definition
   // m_V_jumps.push_back(11.2202);
-  // g_f_jumps.push_back(0.0525978);
+  // g_f_jumps.push_back(0.0516542);
   {
     const real_t m_V = 10.9;
     input.g_f = 0.1;
     input.m_V_3 = m_V;
     input.m_phi = 2. * m_V;
     input.m_chi_dm_1 = mchi_over_mv * m_V;
-    input.m_chi_dm_2 = mchi_over_mv * m_V;
+    // input.m_chi_dm_2 = mchi_over_mv * m_V;
   }
 
   input.refresh();
@@ -77,7 +77,7 @@ int main(int argc, char* argv[])
     input.g_f = g_f;
     input.m_phi = m_phi_over_mv * input.m_V_3;
     input.m_chi_dm_1 = mchi_over_mv * input.m_V_3;
-    input.m_chi_dm_2 = mchi_over_mv * input.m_V_3;
+    // input.m_chi_dm_2 = mchi_over_mv * input.m_V_3;
     input.refresh();
     BoltzmannSolver boltz(input);
 

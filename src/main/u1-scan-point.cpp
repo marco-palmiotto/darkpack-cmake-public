@@ -89,7 +89,7 @@ int main(int argc, char* argv[])
   input.m_V_3 = m_V;
   input.m_phi = 2. * m_V;
   input.m_chi_dm_1 = mchi_over_mv * m_V;
-  input.m_chi_dm_2 = mchi_over_mv * m_V;
+  // input.m_chi_dm_2 = mchi_over_mv * m_V;
   input.refresh();
   BoltzmannSolver boltz(input);
   boltz.full_comput = true; // We want to compute the relic density with the full algorithm

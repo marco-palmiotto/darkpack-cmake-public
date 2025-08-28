@@ -39,11 +39,11 @@ int main(int argc, char* argv[])
 
   constexpr const double mchi_over_mv = 0.33;
 
-  std::vector<real_t> m_V_jumps = {//0.000510392, 0.000771106, 0.00106936, 0.00118252, 0.00126454,
-                                  //  0.00135406,  0.00143791,  
+  std::vector<real_t> m_V_jumps = {// 0.000510392, 0.000771106, 0.00106936, 0.00118252, 0.00126454,
+                                   //  0.00135406,  0.00143791,
                                    0.00152342, 0.00161401, 77.9232};
-  std::vector<real_t> g_f_jumps = {//0.00588459, 0.00591574, 0.00639891, 0.00648346, 0.00650477,
-                                  //  0.00649191, 0.00637008, 
+  std::vector<real_t> g_f_jumps = {// 0.00588459, 0.00591574, 0.00639891, 0.00648346, 0.00650477,
+                                   //  0.00649191, 0.00637008,
                                    0.00292935, 0.00594678, 0.12692};
 
   // size_t n = 0;
@@ -82,12 +82,12 @@ int main(int argc, char* argv[])
     std::vector<const Process2to2*> list_allowed(boltz.compute_contributing_processes());
     // if (n < list_allowed.size())
     // {
-      // n = list_allowed.size();
-      // size_t i = 1;
-      // for (const Process2to2* proc : list_allowed)
-      // {
-      //   std::cout << i++ << ": " << proc->getMname() << '\n';
-      // }
+    // n = list_allowed.size();
+    // size_t i = 1;
+    // for (const Process2to2* proc : list_allowed)
+    // {
+    //   std::cout << i++ << ": " << proc->getMname() << '\n';
+    // }
     // }
 
     const real_t relic_density = boltz.relic_density();
@@ -144,12 +144,12 @@ int main(int argc, char* argv[])
       for (const Process2to2* proc : group_of_processes)
       {
         std::cout << "  - " << proc->getMname() << " (Threshold: " << proc->compute_final_state_treshold(input)
-                  << ", m_V_min = " << proc->compute_final_state_treshold(input)*2./3. << ")\n";
+                  << ", m_V_min = " << proc->compute_final_state_treshold(input) * 2. / 3. << ")\n";
       }
     }
   }
 
-  // Creating the process list with thresholds also for m_V 
+  // Creating the process list with thresholds also for m_V
 
 
 

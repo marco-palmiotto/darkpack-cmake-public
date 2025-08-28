@@ -1,20 +1,27 @@
 // For format details, see https://aka.ms/devcontainer.json. For config options, see the
 // README at: https://github.com/devcontainers/templates/tree/main/src/cpp
+
+// Note: to use Podman, you need to set "podman" as docker binary and 
+//       "Podman compose up" as docker compose binary in the settings
+
 {
 	"name": "DarkPackTesting",
-	"image": "docker.io/marcopalmiotto/darkpack-dev:fedora41",
+
+	"image": "docker.io/marcopalmiotto/darkpack-dev:fedora41", // <- Uses the image by pulling from Dockerhub
+	// The following uses the designed Dockerfile in the current folder to build the image.
 	// "build": {
-	// 	"dockerfile": "Dockerfile-fedora41-dev" // "test/Dockerfile-ubuntu2404-deploy" //
-	
+	// 	"dockerfile": "Dockerfile-fedora41-dev"
 	// },
+
+	// Custom arguments to pass to the container manager when creating the container from the image
 	"runArgs": [
-		// This argument is needed to allow podman containers to have writing permission into the host filesystem
-		// Note: to use podman, you need to set "podman" as docker binary and "podman compose up" as docker compose binary in the settings
-		"--userns=keep-id"
+		//"--userns=keep-id" // <- If you are using Podman container mannager, this  argument is needed to
+		                   //    allow podman containers to have writing permission into the host filesystem
 	//   "--memory=8g",
 	//   "--memory-swap=10g",
 	//   "--cpus=6"
 	],
+
 	"customizations": {
 		"vscode": {
 			"extensions": [

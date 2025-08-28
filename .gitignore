@@ -16,6 +16,7 @@ cmake-build-debug*/
 /**/configured
 
 .devcontainer/.zshrc
+.devcontainer/devcontainer.json
 
 .containers/*/*.tar
 .containers/*.tar

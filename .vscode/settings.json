@@ -79,7 +79,8 @@
         "span": "cpp",
         "text_encoding": "cpp",
         "cfenv": "cpp",
-        "filesystem": "cpp"
+        "filesystem": "cpp",
+        "locale": "cpp"
     },
     "C_Cpp.default.compilerPath": "/usr/bin/g++"
 }

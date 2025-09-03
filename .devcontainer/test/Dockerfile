@@ -39,7 +39,7 @@ WORKDIR /home/${username}
 
 RUN git clone https://github.com/docbrown1955/marty-public.git && \
     cd marty-public && \
-    git checkout dac95a471e0c7ea12f18ba13df0a7383406fdd16 && \
+    git checkout separating_global && \
     mkdir bin include lib build 
 
 ENV CC="/usr/bin/gcc-14"

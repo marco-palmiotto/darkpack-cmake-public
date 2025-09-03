@@ -1,17 +1,19 @@
+#pragma once
+
 #ifndef LESHOUCESFROMMARTY_INCLUDED
-#define LESHOUCESFROMMARTY_INCLUDED
+  #define LESHOUCESFROMMARTY_INCLUDED
 // NOTE: DO NOT replace the include guard with pragma once!
 //       The constructor Param_t(std::string) needs the macro to be defined
 
-#ifndef __cplusplus
-  #define __cplusplus
-#endif
+  #ifndef __cplusplus
+    #define __cplusplus
+  #endif
 
-#include "RunningSM.hpp"
-#include "config.hpp"
-#include "correspondance.hpp"
-#include "marty/lha/lha.h"
-#include "params_new.hpp"
+  #include "RunningSM.hpp"
+  #include "config.hpp"
+  #include "correspondance.hpp"
+  #include "marty/lha/lha.h"
+  #include "params_new.hpp"
 
 
 namespace u1f2to2::readmodule

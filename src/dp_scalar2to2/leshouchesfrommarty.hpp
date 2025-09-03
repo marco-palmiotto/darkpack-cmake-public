@@ -1,16 +1,18 @@
+#pragma once
+
 #ifndef LESHOUCESFROMMARTY_INCLUDED
-#define LESHOUCESFROMMARTY_INCLUDED
+  #define LESHOUCESFROMMARTY_INCLUDED
 
 
-#ifndef __cplusplus
-  #define __cplusplus
-#endif
+  #ifndef __cplusplus
+    #define __cplusplus
+  #endif
 
-#include "RunningSM.hpp"
-#include "correspondance.hpp"
-#include "marty/lha/lha.h"
-#include "params_new.hpp"
-#include "scalar2to2.h"
+  #include "RunningSM.hpp"
+  #include "correspondance.hpp"
+  #include "marty/lha/lha.h"
+  #include "params_new.hpp"
+  #include "scalar2to2.h"
 
 
 namespace scalar2to2::readmodule

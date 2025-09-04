@@ -3,11 +3,6 @@
 
 namespace __SPEC_LIB_NAME__
 {
-
-#ifndef GEVTOPBARN
-  #define GEVTOPBARN (0.389379 * 1.0e+9)
-#endif
-
 // Constant to convert GeV^-2 to pbarn (surfaces)
 #ifndef GEVTOPBARN
   #define GEVTOPBARN (0.389379 * 1.0e+9)

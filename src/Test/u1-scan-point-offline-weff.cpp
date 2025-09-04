@@ -1,20 +1,11 @@
 #include <fstream>
 #include <iomanip>
 #include <iostream>
-
-// #include <algorithm>
-// #include <execution>
 #include <ranges>
 
-#include "dp_u1f2to2/avgsvcalculator.hpp"
 #include "dp_u1f2to2/boltzmann.hpp"
-#include "dp_u1f2to2/config.hpp"
-#include "dp_u1f2to2/correspondance.hpp"
-#include "dp_u1f2to2/leshouchesfrommarty.hpp"
-#include "dp_u1f2to2/process.hpp"
 
 using namespace u1f2to2;
-
 using namespace advmath;
 
 static inline double sq(const double x) { return x * x; }
@@ -39,45 +30,75 @@ int main(int argc, char* argv[])
 
   constexpr const double mchi_over_mv = 0.33;
 
-  std::vector<real_t> m_V_jumps = {10.5926, 10.7978};
+  // The following 2 vectors are initialised with data from summary.dat
+  // and before th jump 
+  std::vector<real_t> m_V_jumps = {10.5926, 10.7978};    
   std::vector<real_t> g_f_jumps = {0.0540916, 0.0544612};
 
-  const real_t slope_before_jump = (m_V_jumps[1] - m_V_jumps[0]) / (g_f_jumps[1] - g_f_jumps[0]);
+  // Using the data to compute the slope
+  const real_t delta_g_over_delta_m = (g_f_jumps[1] - g_f_jumps[0])/(m_V_jumps[1] - m_V_jumps[0]);
+
+  // This vector contains the trial m_V values, for which we will lineary interpolate g_f
   const std::vector<real_t> m_V_trial_vec(
       {10.9, 10.91, 10.92, 10.93, 10.94, 10.95, 10.96, 10.97, 10.98, 10.99, 11.0, 11.01});
 
+  // Lambda function to linearly estrapolate g_f
   auto g_f_trial = [=](const real_t m_V_trial)
-  { return g_f_jumps[1] + 1. / slope_before_jump * (m_V_trial - m_V_jumps[1]); };
+  { return g_f_jumps[1] + delta_g_over_delta_m * (m_V_trial - m_V_jumps[1]); };
 
+  // Extending the first two vectors with the trial values
   for (auto& elem : m_V_trial_vec)
   {
     m_V_jumps.push_back(elem);
     g_f_jumps.push_back(g_f_trial(elem));
   }
 
-  // m_V_jumps.push_back(11.007);
-  // g_f_jumps.push_back(0.0517103); // Function and paramters' first definition
-  // m_V_jumps.push_back(11.2202);
-  // g_f_jumps.push_back(0.0516542);
+  const constexpr bool add_points_after_jump = false;
+  if (add_points_after_jump)
   {
-    const real_t m_V = 10.9;
+    m_V_jumps.push_back(11.007);
+    g_f_jumps.push_back(0.0517103);
+    m_V_jumps.push_back(11.2202);
+    g_f_jumps.push_back(0.0516542);
+  }
+
+  // Initialising the input Param_t structure
+  {
+    const real_t m_V = m_V_trial_vec [0];
     input.g_f = 0.1;
     input.m_V_3 = m_V;
     input.m_phi = 2. * m_V;
     input.m_chi_dm_1 = mchi_over_mv * m_V;
-    // input.m_chi_dm_2 = mchi_over_mv * m_V;
   }
-
   input.refresh();
-  size_t n = 0;
 
+  /* This variable is used to ensure that the list of contributing processes is printed only when 
+     a new maximum number of processes is found for a given parameter set */
+  size_t last_number_of_contributing_processes = 0;
+
+
+  /*
+    This loop iterates over pairs of (m_V, g_f) values, where:
+      - m_V: vector of mediator masses
+      - g_f: corresponding vector of coupling values (interpolated where needed)
+
+    For each (m_V, g_f) pair:
+      1. Updates the input parameters for the Boltzmann solver.
+      2. Computes and writes the sigma_v table to a file "sigma_v_<m_V>.dat"
+      3. Computes and writes the Weff table to a file "Weff_<m_V>.dat"
+      4. Computes the relic density using both the full and non-full algorithms, and writes results to a file "Oh2_xfo_<m_V>.dat"
+         Such a file contains 3 columns: 
+          Oh2 (full), Oh2 (non-full), xfo
+      5. Groups contributing processes by their final state threshold, and for each group:
+         - Computes and writes group-specific sigma_v and Weff tables.
+         - Prints process grouping information to stdout.
+  */
   for (auto [m_V, g_f] : std::views::zip(m_V_jumps, g_f_jumps))
   {
     input.m_V_3 = m_V;
     input.g_f = g_f;
     input.m_phi = m_phi_over_mv * input.m_V_3;
     input.m_chi_dm_1 = mchi_over_mv * input.m_V_3;
-    // input.m_chi_dm_2 = mchi_over_mv * input.m_V_3;
     input.refresh();
     BoltzmannSolver boltz(input);
 
@@ -102,24 +123,20 @@ int main(int argc, char* argv[])
     std::cout << "Generating and writing the sigma_v table for the totality of the processes\n";
     boltz.setTfo();
     const real_t Tfo = boltz.getTfo();
-    constexpr const real_t x_in = 50., x_fin = 0.1;
-    // const real_t T_in = 10. * Tfo;
-    // const real_t T_fin = 2.7;
-    // const real_t inverse_T_fin = 1. / T_fin;
 
-    constexpr const unsigned int n_points = 1000;
-    const real_t mult_factor = std::pow(x_fin / x_in, 1. / n_points);
-    std::array<real_t, n_points + 1> x_values;
-
+    /* Initial and final values of x = m_LBSM / T, for which the sigma_v table will be computed */
+    constexpr const real_t x_in = 50., x_fin = 0.1; // x = m_LBSM / T
+    
+    constexpr const unsigned int n_points = 1000; // Number of points (minus 1) in the sigma_v table
+    
+    // Variable to create a logarithmic grid in x
+    const real_t x_mult_factor = std::pow(x_fin / x_in, 1. / n_points); 
+    
+    std::array<real_t, n_points + 1> x_values; // Array to store the x values
     for (auto i : std::views::iota(0u, n_points))
     {
-      x_values[i] = std::pow(mult_factor, i) * x_in;
+      x_values[i] = std::pow(x_mult_factor, i) * x_in;
     }
-
-    // const auto abscissae_view = std::ranges::iota_view(0u, n_points);
-
-    // std::transform(std::execution::par, abscissae_view.begin(), abscissae_view.end(), abscissae_sigmav.begin(),
-    //                [&](const auto i) { return std::pow(mult_factor, i) / T_in; });
 
     sigma_v_file << "# x sigmav Y_eq sigmavnum sigmavden\n" << std::scientific << std::setprecision(4);
     for (const real_t& x : x_values)
@@ -154,13 +171,15 @@ int main(int argc, char* argv[])
 
     // Retrieve the contributing processes
     std::vector<const Process2to2*> list_allowed(boltz.compute_contributing_processes());
-    if (n < list_allowed.size())
+    
+    // Print the contributing processes if there are new ones
+    if (last_number_of_contributing_processes < list_allowed.size())
     {
-      n = list_allowed.size();
+      last_number_of_contributing_processes = list_allowed.size();
       size_t i = 1;
-      for (const Process2to2* proc : list_allowed)
+      for (const Process2to2* proc_ptr : list_allowed)
       {
-        std::cout << i++ << ": " << proc->getMname() << '\n';
+        std::cout << i++ << ": " << proc_ptr->getMname() << '\n';
       }
     }
 
@@ -205,26 +224,24 @@ int main(int argc, char* argv[])
     else
       std::cerr << "Error: Could not open file " << filename.str() << " for writing.\n";
 
-    // return 0;
-
     std::cout << "Working on the processes grouped by final state threshold...\n";
     std::vector<std::vector<const Process2to2*>> grouped_processes;
     if (!list_allowed.empty())
     {
-      for (const Process2to2* proc : list_allowed)
+      for (const Process2to2* proc_ptr : list_allowed)
       {
         bool added_to_group = false;
-        const real_t threshold_proc = proc->compute_final_state_treshold(input);
+        const real_t threshold_proc = proc_ptr->compute_final_state_treshold(input);
 
         // Check if the process can be added to an existing group
         for (auto& group : grouped_processes)
         {
           const real_t threshold_group = group.front()->compute_final_state_treshold(input);
 
-          if ((threshold_proc == 0. && threshold_group == 0.) ||
+          if ((threshold_proc == 0. && threshold_group == 0.) or
               std::abs(threshold_proc - threshold_group) / std::abs(threshold_proc + threshold_group) < 1.0e-3)
           {
-            group.push_back(proc);
+            group.push_back(proc_ptr);
             added_to_group = true;
             break;
           }
@@ -233,7 +250,7 @@ int main(int argc, char* argv[])
         // If not added to any group, create a new group
         if (!added_to_group)
         {
-          grouped_processes.emplace_back(std::vector<const Process2to2*>{proc});
+          grouped_processes.emplace_back(std::vector<const Process2to2*>{proc_ptr});
         }
       }
     }
@@ -244,11 +261,11 @@ int main(int argc, char* argv[])
     {
       std::shared_ptr<std::vector<Process2to2>> group_ptr(std::make_shared<std::vector<Process2to2>>());
       std::cout << "Group " << group_index++ << ":\n";
-      for (const Process2to2* proc : group_of_processes)
+      for (const Process2to2* proc_ptr : group_of_processes)
       {
-        std::cout << "  - " << proc->getMname() << " (Threshold: " << proc->compute_final_state_treshold(input)
+        std::cout << "  - " << proc_ptr->getMname() << " (Threshold: " << proc_ptr->compute_final_state_treshold(input)
                   << ")\n";
-        group_ptr->push_back(*proc);
+        group_ptr->push_back(*proc_ptr);
       }
 
       BoltzmannSolver boltzgroup(input, group_ptr);

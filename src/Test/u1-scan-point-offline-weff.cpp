@@ -32,15 +32,15 @@ int main(int argc, char* argv[])
 
   // The following 2 vectors are initialised with data from summary.dat
   // and before th jump 
-  std::vector<real_t> m_V_jumps = {10.5926, 10.7978};    
-  std::vector<real_t> g_f_jumps = {0.0540916, 0.0544612};
+  std::vector<real_t> m_V_jumps = {10.3912, 10.5926};    
+  std::vector<real_t> g_f_jumps = {0.0544449, 0.0548977};
 
   // Using the data to compute the slope
   const real_t delta_g_over_delta_m = (g_f_jumps[1] - g_f_jumps[0])/(m_V_jumps[1] - m_V_jumps[0]);
 
   // This vector contains the trial m_V values, for which we will lineary interpolate g_f
   const std::vector<real_t> m_V_trial_vec(
-      {10.9, 10.91, 10.92, 10.93, 10.94, 10.95, 10.96, 10.97, 10.98, 10.99, 11.0, 11.01});
+      {10.7, 10.8, 10.9, 10.91, 10.92, 10.93, 10.94, 10.95, 10.96, 10.97, 10.98, 10.99, 11.0, 11.01});
 
   // Lambda function to linearly estrapolate g_f
   auto g_f_trial = [=](const real_t m_V_trial)
@@ -53,11 +53,11 @@ int main(int argc, char* argv[])
     g_f_jumps.push_back(g_f_trial(elem));
   }
 
-  const constexpr bool add_points_after_jump = false;
+  const constexpr bool add_points_after_jump = true;
   if (add_points_after_jump)
   {
-    m_V_jumps.push_back(11.007);
-    g_f_jumps.push_back(0.0517103);
+    // m_V_jumps.push_back(11.007);
+    // g_f_jumps.push_back(0.0517103);
     m_V_jumps.push_back(11.2202);
     g_f_jumps.push_back(0.0516542);
   }
@@ -334,7 +334,7 @@ int main(int argc, char* argv[])
 
       outfile.close();
       std::cout << "Weff table for group " << group_label << " written to " << filename.str() << "\n";
-      ;
+      
       std::cout << '\n';
     }
   }

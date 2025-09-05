@@ -31,12 +31,12 @@ int main(int argc, char* argv[])
   constexpr const double mchi_over_mv = 0.33;
 
   // The following 2 vectors are initialised with data from summary.dat
-  // and before th jump 
-  std::vector<real_t> m_V_jumps = {10.3912, 10.5926};    
-  std::vector<real_t> g_f_jumps = {0.0544449, 0.0548977};
+  // and before th jump
+  std::vector<real_t> m_V_jumps = {10.3912, 10.5926};
+  std::vector<real_t> g_f_jumps = {0.0536761, 0.0540916};
 
   // Using the data to compute the slope
-  const real_t delta_g_over_delta_m = (g_f_jumps[1] - g_f_jumps[0])/(m_V_jumps[1] - m_V_jumps[0]);
+  const real_t delta_g_over_delta_m = (g_f_jumps[1] - g_f_jumps[0]) / (m_V_jumps[1] - m_V_jumps[0]);
 
   // This vector contains the trial m_V values, for which we will lineary interpolate g_f
   const std::vector<real_t> m_V_trial_vec(
@@ -64,7 +64,7 @@ int main(int argc, char* argv[])
 
   // Initialising the input Param_t structure
   {
-    const real_t m_V = m_V_trial_vec [0];
+    const real_t m_V = m_V_trial_vec[0];
     input.g_f = 0.1;
     input.m_V_3 = m_V;
     input.m_phi = 2. * m_V;
@@ -72,7 +72,7 @@ int main(int argc, char* argv[])
   }
   input.refresh();
 
-  /* This variable is used to ensure that the list of contributing processes is printed only when 
+  /* This variable is used to ensure that the list of contributing processes is printed only when
      a new maximum number of processes is found for a given parameter set */
   size_t last_number_of_contributing_processes = 0;
 
@@ -86,9 +86,8 @@ int main(int argc, char* argv[])
       1. Updates the input parameters for the Boltzmann solver.
       2. Computes and writes the sigma_v table to a file "sigma_v_<m_V>.dat"
       3. Computes and writes the Weff table to a file "Weff_<m_V>.dat"
-      4. Computes the relic density using both the full and non-full algorithms, and writes results to a file "Oh2_xfo_<m_V>.dat"
-         Such a file contains 3 columns: 
-          Oh2 (full), Oh2 (non-full), xfo
+      4. Computes the relic density using both the full and non-full algorithms, and writes results to a file
+    "Oh2_xfo_<m_V>.dat" Such a file contains 3 columns: Oh2 (full), Oh2 (non-full), xfo
       5. Groups contributing processes by their final state threshold, and for each group:
          - Computes and writes group-specific sigma_v and Weff tables.
          - Prints process grouping information to stdout.
@@ -126,12 +125,12 @@ int main(int argc, char* argv[])
 
     /* Initial and final values of x = m_LBSM / T, for which the sigma_v table will be computed */
     constexpr const real_t x_in = 50., x_fin = 0.1; // x = m_LBSM / T
-    
+
     constexpr const unsigned int n_points = 1000; // Number of points (minus 1) in the sigma_v table
-    
+
     // Variable to create a logarithmic grid in x
-    const real_t x_mult_factor = std::pow(x_fin / x_in, 1. / n_points); 
-    
+    const real_t x_mult_factor = std::pow(x_fin / x_in, 1. / n_points);
+
     std::array<real_t, n_points + 1> x_values; // Array to store the x values
     for (auto i : std::views::iota(0u, n_points))
     {
@@ -171,7 +170,7 @@ int main(int argc, char* argv[])
 
     // Retrieve the contributing processes
     std::vector<const Process2to2*> list_allowed(boltz.compute_contributing_processes());
-    
+
     // Print the contributing processes if there are new ones
     if (last_number_of_contributing_processes < list_allowed.size())
     {
@@ -268,8 +267,9 @@ int main(int argc, char* argv[])
         group_ptr->push_back(*proc_ptr);
       }
 
-      BoltzmannSolver boltzgroup(input, group_ptr);
-      boltzgroup.relic_density();
+      AvgSvCalculator avgsv_group(input, group_ptr);
+      BoltzmannSolver boltz_group(avgsv_group);
+      boltz_group.relic_density();
 
       // Compute the label for the group based on the threshold of the first process
       const real_t threshold_group = group_of_processes.front()->compute_final_state_treshold(input);
@@ -295,10 +295,10 @@ int main(int argc, char* argv[])
       for (const real_t& x : x_values)
       {
         const real_t T = 1. / x * input.getLightestBSMmass();
-        const real_t sigma_v = boltzgroup.getAverageSigmav(T);
-        const real_t Y_eq = boltzgroup.Yeq(T);
-        const real_t sigmavnum = boltzgroup.getAverageSigmav_coan_hightemp_num(T);
-        const real_t sigmavden = boltzgroup.getAverageSigmav_coan_hightemp_den(T);
+        const real_t sigma_v = avgsv_group.getAverageSigmav(T);
+        const real_t Y_eq = boltz_group.Yeq(T);
+        const real_t sigmavnum = avgsv_group.getAverageSigmav_coan_hightemp_num(T);
+        const real_t sigmavden = avgsv_group.getAverageSigmav_coan_hightemp_den(T);
         group_file << x << " " << sigma_v << " " << Y_eq << " " << sigmavnum << " " << sigmavden << "\n";
         if (std::abs((sigmavnum / sigmavden - sigma_v) / (sigmavnum / sigmavden + sigma_v)) > 1.0e-3)
         {
@@ -325,16 +325,16 @@ int main(int argc, char* argv[])
       outfile << "# peff sqrts weff\n";
 
       // Generate and write the peff, sqrts, and weff tables
-      for (size_t i = 0; i < boltzgroup.getWefftabsize(); ++i)
+      for (size_t i = 0; i < avgsv_group.getWefftabsize(); ++i)
       {
         real_t peff, sqrts, weff;
-        boltzgroup.get_g2_WeffTabElement(i, peff, sqrts, weff);
+        avgsv_group.get_g2_WeffTabElement(i, peff, sqrts, weff);
         outfile << peff << " " << sqrts << " " << weff << "\n";
       }
 
       outfile.close();
       std::cout << "Weff table for group " << group_label << " written to " << filename.str() << "\n";
-      
+
       std::cout << '\n';
     }
   }

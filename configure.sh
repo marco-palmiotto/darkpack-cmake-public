@@ -5,7 +5,7 @@ cmake -S . -B ./build \
       -DCMAKE_INSTALL_PREFIX=./build/.install \
       -DENABLE_CLANG_FORMAT=ON \
       -DENABLE_CLANG_TIDY=ON \
-      -DENABLE_SUBMODULE_CMA=ON \
+      -DENABLE_SUBMODULE_CMA=OFF \
       -G Ninja \
       -DMODELS_LIBS_NAMES="dp_scalar2to2;dp_u1f2to2"
 

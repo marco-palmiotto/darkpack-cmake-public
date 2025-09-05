@@ -34,12 +34,12 @@ public:
 
     /**
       @brief Sets the model for the QCD equation of state.
-      @param x Integer representing the QCD equation of state model.
+      @param model_qcd_in Integer representing the QCD equation of state model.
       @see Documentation of Relicparam_t.
     */
-    void setQCDeosModel(const int x)
+    void setQCDeosModel(const int model_qcd_in)
     {
-      Relicparam_t::init(getMassLBSM(), x);
+      Relicparam_t::init(getMassLBSM(), model_qcd_in);
       reset_prevs();
     };
 
@@ -47,9 +47,10 @@ public:
      * @brief Constructor with given Param_t and QCD model.
      *
      * @param param Param_t structure with input values.
-     * @param x Integer corresponding to a QCD EOS model. Default x=2.
+     * @param model_qcd_in Integer corresponding to a QCD EOS model. Default model_qcd_in=2.
      */
-    BoltzmannSolver(const Param_t& param, int x = 2) : AvgSvCalculator(param), Relicparam_t(getMassLBSM(), x)
+    BoltzmannSolver(const Param_t& param, int model_qcd_in = 2)
+            : AvgSvCalculator(param), Relicparam_t(AvgSvCalculator::getMassLBSM(), model_qcd_in)
     {
       reset_prevs();
     };
@@ -58,9 +59,10 @@ public:
      * @brief Constructor with given AvgSvCalculator and QCD model.
      *
      * @param sop AvgSvCalculator class with input values.
-     * @param x Integer corresponding to a QCD EOS model. Default x=2.
+     * @param model_qcd_in Integer corresponding to a QCD EOS model. Default model_qcd_in=2.
      */
-    BoltzmannSolver(const AvgSvCalculator& sop, int x = 2) : AvgSvCalculator(sop), Relicparam_t(getMassLBSM(), x)
+    BoltzmannSolver(const AvgSvCalculator& sop, int model_qcd_in = 2)
+            : AvgSvCalculator(sop), Relicparam_t(AvgSvCalculator::getMassLBSM(), model_qcd_in)
     {
       reset_prevs();
     };
@@ -70,10 +72,10 @@ public:
      *
      * @param param Param_t structure with input values.
      * @param proclist Process list to consider for the calculation of \f$\langle \sigma v \rangle \f$
-     * @param x Integer corresponding to a QCD EOS model. Default x=2.
+     * @param model_qcd_in Integer corresponding to a QCD EOS model. Default x=2.
      */
-    BoltzmannSolver(const Param_t& param, std::shared_ptr<std::vector<Process2to2>> proclist, int x = 2)
-            : AvgSvCalculator(param, proclist), Relicparam_t(getMassLBSM(), x)
+    BoltzmannSolver(const Param_t& param, std::shared_ptr<std::vector<Process2to2>> proclist, int model_qcd_in = 2)
+            : AvgSvCalculator(param, proclist), Relicparam_t(getMassLBSM(), model_qcd_in)
     {
       reset_prevs();
     }
@@ -87,7 +89,7 @@ public:
     unsigned int changeInput(const Param_t& other)
     {
       AvgSvCalculator::changeInput(other);
-      Relicparam_t::init(other.getLightestBSMmass(), model_eff);
+      Relicparam_t::init(other.getLightestBSMmass(), Relicparam_t::model_eff);
       reset_prevs();
       Tfo = 0.;
       return 0;
@@ -104,9 +106,7 @@ public:
      */
     void print(std::ostream& out = std::cout) const override
     {
-      print_procs(out);
-      print_g2_wefftable(out);
-      print_relicparam(out);
+      AvgSvCalculator::print(out);
       out << "solver = " << solver << '\n';
       out << "Tfo = " << Tfo << '\n';
     };

@@ -26,15 +26,16 @@ namespace __SPEC_LIB_NAME__
   real_t BoltzmannSolver::Yeq(const real_t& T)
   {
     real_t Yeq = 0.;
-    const real_t x = getMassLBSM() / T;
+    const real_t x = AvgSvCalculator::getMassLBSM() / T;
 
     // Adding BSM particles' contribution
     for (const auto& part : corr::bsm_particles)
     {
-      Yeq += corr::part_hel_dof[part] * SQUARE(getMass(part)) * advmath::K2(x * getMass(part) / getMassLBSM());
+      Yeq += corr::part_hel_dof[part] * SQUARE(AvgSvCalculator::getMass(part)) *
+             advmath::K2(x * AvgSvCalculator::getMass(part) / AvgSvCalculator::getMassLBSM());
     }
 
-    Yeq *= 45. * x * x / (4. * std::pow(pi, 4.) * getgeff(T)) / SQUARE(getMassLBSM());
+    Yeq *= 45. * x * x / (4. * std::pow(pi, 4.) * getgeff(T)) / SQUARE(AvgSvCalculator::getMassLBSM());
 
     return Yeq;
   }
@@ -68,7 +69,7 @@ namespace __SPEC_LIB_NAME__
     const real_t s_dark = dark_entropy(T);
     const real_t s_tilde_dark = s_dark / s_rad;
 
-    const real_t n_tilde_dm = Y * s_rad * (1. + s_tilde_dark) * getMassLBSM() / rho_rad;
+    const real_t n_tilde_dm = Y * s_rad * (1. + s_tilde_dark) * AvgSvCalculator::getMassLBSM() / rho_rad;
 
     const real_t rho_dark = (phi_model.get() != 0 && rho_phi != 0.) ? rho_phi : dark_density(T);
     const real_t rho_tilde_dark = rho_dark / rho_rad;
@@ -171,7 +172,7 @@ namespace __SPEC_LIB_NAME__
       srad = 2. * pi * pi / 45. * getheff(T) * std::pow(T, 3.); // MODIFIED: exchanged with down line
       Yphi = rho_phi / srad;                                    // MODIFIED: exchanged with upper line
 
-      testTfo = (1. + delta) * T * dYeq_dT(T) - boltzright(T, getAverageSigmav(T), Y, Yphi);
+      testTfo = (1. + delta) * T * dYeq_dT(T) - boltzright(T, AvgSvCalculator::getAverageSigmav(T), Y, Yphi);
 
       if (testTfo < 0.)
         Tmax_local = T;
@@ -564,7 +565,7 @@ namespace __SPEC_LIB_NAME__
          if testdx=0, the step is too small, the loop has to be broken, and the accepted precision decreased */
       {
         T = std::exp(x);
-        sv = getAverageSigmav(T);
+        sv = AvgSvCalculator::getAverageSigmav(T);
         k1 = boltzright(T, sv, Y, Yphi);
         krhophi1 = boltzright_phi(T, Y, Yphi);
 
@@ -583,7 +584,7 @@ namespace __SPEC_LIB_NAME__
 #endif
           testdiv = 0;
           T = std::exp(x + dx / 2.);
-          sv = getAverageSigmav(T);
+          sv = AvgSvCalculator::getAverageSigmav(T);
           k2 = boltzright(T, sv, Y + k1 * dx / 2., Yphi + krhophi1 * dx / 2.);
           krhophi2 = boltzright_phi(T, Y + k1 * dx / 2., Yphi + krhophi1 * dx / 2.);
 
@@ -608,7 +609,7 @@ namespace __SPEC_LIB_NAME__
           if (!testdiv)
           {
             T = std::exp(x + dx);
-            sv = getAverageSigmav(T);
+            sv = AvgSvCalculator::getAverageSigmav(T);
             k4 = boltzright(T, sv, Y + k3 * dx, Yphi + krhophi3 * dx);
             krhophi4 = boltzright_phi(T, Y + k3 * dx, Yphi + krhophi3 * dx);
 
@@ -630,14 +631,14 @@ namespace __SPEC_LIB_NAME__
         dx = dx / 2.;
 
         T = std::exp(x + dx / 2.);
-        sv = getAverageSigmav(T);
+        sv = AvgSvCalculator::getAverageSigmav(T);
         k2 = boltzright(T, sv, Y + k1 * dx / 2., Yphi + krhophi1 * dx / 2.);
         krhophi2 = boltzright_phi(T, Y + k1 * dx / 2., Yphi + krhophi1 * dx / 2.);
         k3 = boltzright(T, sv, Y + k2 * dx / 2., Yphi + krhophi2 * dx / 2.);
         krhophi3 = boltzright_phi(T, Y + k2 * dx / 2., Yphi + krhophi2 * dx / 2.);
 
         T = std::exp(x + dx);
-        sv = getAverageSigmav(T);
+        sv = AvgSvCalculator::getAverageSigmav(T);
         k4 = boltzright(T, sv, Y + k3 * dx, Yphi + krhophi3 * dx);
         krhophi4 = boltzright_phi(T, Y + k3 * dx, Yphi + krhophi3 * dx);
 
@@ -648,14 +649,14 @@ namespace __SPEC_LIB_NAME__
         krhophi5 = boltzright_phi(T, Yb, Yphib);
 
         T = std::exp(x + 1.5 * dx);
-        sv = getAverageSigmav(T);
+        sv = AvgSvCalculator::getAverageSigmav(T);
         k6 = boltzright(T, sv, Yb + k5 * dx / 2., Yphib + krhophi5 * dx / 2.);
         krhophi6 = boltzright_phi(T, Yb + k5 * dx / 2., Yphib + krhophi5 * dx / 2.);
         k7 = boltzright(T, sv, Yb + k6 * dx / 2., Yphib + krhophi6 * dx / 2.);
         krhophi7 = boltzright_phi(T, Yb + k6 * dx / 2., Yphib + krhophi6 * dx / 2.);
 
         T = std::exp(x + 2. * dx);
-        sv = getAverageSigmav(T);
+        sv = AvgSvCalculator::getAverageSigmav(T);
         k8 = boltzright(T, sv, Yb + k7 * dx, Yphib + krhophi7 * dx);
         krhophi8 = boltzright_phi(T, Yb + k7 * dx, Yphib + krhophi7 * dx);
 
@@ -1015,12 +1016,12 @@ namespace __SPEC_LIB_NAME__
       {
         T = std::exp(x);
         krhophi1 = boltzright_phi_log(T, std::exp(logY), std::exp(logYphi));
-        sv = getAverageSigmav(T);
+        sv = AvgSvCalculator::getAverageSigmav(T);
         k1 = boltzright_log(T, sv, std::exp(logY), std::exp(logYphi));
 
         T = std::exp(x + dx / 2.);
         krhophi2 = boltzright_phi_log(T, std::exp(logY + k1 * dx / 2.), std::exp(logYphi + krhophi1 * dx / 2.));
-        sv = getAverageSigmav(T);
+        sv = AvgSvCalculator::getAverageSigmav(T);
         k2 = boltzright_log(T, sv, std::exp(logY + k1 * dx / 2.), std::exp(logYphi + krhophi1 * dx / 2.));
 
         krhophi3 = boltzright_phi_log(T, std::exp(logY + k2 * dx / 2.), std::exp(logYphi + krhophi2 * dx / 2.));
@@ -1028,7 +1029,7 @@ namespace __SPEC_LIB_NAME__
 
         T = std::exp(x + dx);
         krhophi4 = boltzright_phi_log(T, std::exp(logY + k3 * dx), std::exp(logYphi + krhophi3 * dx));
-        sv = getAverageSigmav(T);
+        sv = AvgSvCalculator::getAverageSigmav(T);
         k4 = boltzright_log(T, sv, std::exp(logY + k3 * dx), std::exp(logYphi + krhophi3 * dx));
 
         logYtemp1 = logY + dx / 6. * (k1 + 2. * k2 + 2. * k3 + k4);
@@ -1043,14 +1044,14 @@ namespace __SPEC_LIB_NAME__
 
         T = std::exp(x + dx / 2.);
         krhophi2 = boltzright_phi_log(T, std::exp(logY + k1 * dx / 2.), std::exp(logYphi + krhophi1 * dx / 2.));
-        sv = getAverageSigmav(T);
+        sv = AvgSvCalculator::getAverageSigmav(T);
         k2 = boltzright_log(T, sv, std::exp(logY + k1 * dx / 2.), std::exp(logYphi + krhophi1 * dx / 2.));
         krhophi3 = boltzright_phi_log(T, std::exp(logY + k2 * dx / 2.), std::exp(logYphi + krhophi2 * dx / 2.));
         k3 = boltzright_log(T, sv, std::exp(logY + k2 * dx / 2.), std::exp(logYphi + krhophi2 * dx / 2.));
 
         T = std::exp(x + dx);
         krhophi4 = boltzright_phi_log(T, std::exp(logY + k3 * dx), std::exp(logYphi + krhophi3 * dx));
-        sv = getAverageSigmav(T);
+        sv = AvgSvCalculator::getAverageSigmav(T);
         k4 = boltzright_log(T, sv, std::exp(logY + k3 * dx), std::exp(logYphi + krhophi3 * dx));
 
         logYb = logY + dx / 6. * (k1 + 2. * k2 + 2. * k3 + k4);
@@ -1061,14 +1062,14 @@ namespace __SPEC_LIB_NAME__
 
         T = std::exp(x + 1.5 * dx);
         krhophi6 = boltzright_phi_log(T, std::exp(logYb + k5 * dx / 2.), std::exp(logYphib + krhophi5 * dx / 2.));
-        sv = getAverageSigmav(T);
+        sv = AvgSvCalculator::getAverageSigmav(T);
         k6 = boltzright_log(T, sv, std::exp(logYb + k5 * dx / 2.), std::exp(logYphib + krhophi5 * dx / 2.));
         krhophi7 = boltzright_phi_log(T, std::exp(logYb + k6 * dx / 2.), std::exp(logYphib + krhophi6 * dx / 2.));
         k7 = boltzright_log(T, sv, std::exp(logYb + k6 * dx / 2.), std::exp(logYphib + krhophi6 * dx / 2.));
 
         T = std::exp(x + 2. * dx);
         krhophi8 = boltzright_phi_log(T, std::exp(logYb + k7 * dx), std::exp(logYphib + krhophi7 * dx));
-        sv = getAverageSigmav(T);
+        sv = AvgSvCalculator::getAverageSigmav(T);
         k8 = boltzright_log(T, sv, std::exp(logYb + k7 * dx), std::exp(logYphib + krhophi7 * dx));
 
         logYtemp2 = logYb + dx / 6. * (k5 + 2. * k6 + 2. * k7 + k8);

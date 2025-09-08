@@ -93,7 +93,7 @@ int main(int argc, char* argv[])
   input.refresh();
   BoltzmannSolver boltz(input);
   boltz.full_comput = true; // We want to compute the relic density with the full algorithm
-
+  boltz.solver = 2;         // Using the linear method
   auto function_to_minimize = [&](const double* parameters, [[maybe_unused]] const int size_array = 2)
   {
     // parameters in input will be

@@ -8,10 +8,9 @@
   #endif
 
   #include "RunningSM.hpp"
-  #include "advmath.hpp"
   #include "config.hpp"
   #include "correspondance.hpp"
-  #include "gsl/gsl_sf_psi.h"
+
 
 // #define DEBUG_COPY
 // #define DEBUG

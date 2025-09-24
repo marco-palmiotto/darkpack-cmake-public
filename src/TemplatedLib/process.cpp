@@ -1,4 +1,7 @@
 #include "process.hpp"
+#include "advmath.hpp"
+#include "gsl/gsl_sf_psi.h"
+
 #include "copy_to_c_struct.hpp"
 
 namespace __SPEC_LIB_NAME__

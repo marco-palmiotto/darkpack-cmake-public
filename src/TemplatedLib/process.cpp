@@ -403,6 +403,24 @@ namespace __SPEC_LIB_NAME__
     return true;
   }
 
+  bool Process2to2::set_kinematics_from_t(Param_t& input, const real_t& s, const real_t& t, real_t& p1, real_t& p3,
+                                          real_t sij[5][5]) const
+  {
+
+    real_t E1, E3;
+
+    if (!EP13calculation(input, std::sqrt(s), p1, p3, E1, E3))
+      return false;
+
+    sij[1][2] = 0.5 * (s - SQUARE(getMass(1, input)) - SQUARE(getMass(2, input)));
+    sij[1][3] = -0.5 * (t - SQUARE(getMass(1, input)) - SQUARE(getMass(3, input)));
+    sij[1][4] = 0.5 * (s + t - SQUARE(getMass(2, input)) - SQUARE(getMass(3, input)));
+    sij[2][3] = 0.5 * (s + t - SQUARE(getMass(1, input)) - SQUARE(getMass(4, input)));
+    sij[2][4] = -0.5 * (t - SQUARE(getMass(2, input)) - SQUARE(getMass(4, input)));
+    sij[3][4] = 0.5 * (s - SQUARE(getMass(3, input)) - SQUARE(getMass(4, input)));
+    return true;
+  }
+
   real_t Process2to2::getSumSquaredAmpl(Param_t& input, const real_t& sqrts, const real_t& ctheta)
   {
     // This methods returns the sum of the squared amplitude for the instance of the class.
@@ -516,6 +534,26 @@ namespace __SPEC_LIB_NAME__
     // We divide by (g_DM)^2 the result of the method get_g2_dweff_dcos
     return get_g2_dweff_dcos(input, Ecm, ctheta) / SQUARE(input.getLightestBSMdof());
   }
+
+
+  real_t Process2to2::compute_dsigma_dt(Param_t& input, const real_t& Ecm, const real_t& t)
+  {
+    if (!isRunningExternal)
+      handleRunning(input, Ecm);
+    real_t p1, p3, sij[5][5];
+    if (!set_kinematics_from_t(input, Ecm * Ecm, t, p1, p3, sij))
+      return 0.;
+    update_kinematics(input, sij);
+
+    cparam_s c_input = copy_to_c_struct(input);
+    real_t SumSquaredAmpl = sumSquaredAmpl(&c_input).real;
+
+    SumSquaredAmpl = (std::isnormal(SumSquaredAmpl)) ? SumSquaredAmpl : 0.0;
+
+    const real_t kinfact = 1.0 / combinFac / 64.0 / M_PI / Ecm / Ecm / p1 / p1;
+    return (std::isnormal(kinfact)) ? kinfact * SumSquaredAmpl : 0.0;
+  }
+
 
 
   real_t Process2to2::getDiffCrossSection(Param_t& input, const real_t& Ecm, const real_t& ctheta)

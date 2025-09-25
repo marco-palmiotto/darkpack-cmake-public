@@ -374,7 +374,7 @@ namespace __SPEC_LIB_NAME__
     if (!isRunningExternal)
       handle_running(input, m_vec[0]);
 
-    real_t sum_sq_ampl = sumSquaredAmpl(&input).real();
+    real_t sum_sq_ampl = sumSquaredAmpl(input).real();
     const auto partial_width_temp = sum_sq_ampl * p2 / m_vec[0] / m_vec[0] / 8.0 / M_PI;
     return (std::isnormal(partial_width_temp) && partial_width_temp > 0.) ? partial_width_temp : 0.;
   }

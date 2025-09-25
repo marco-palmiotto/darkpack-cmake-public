@@ -15,8 +15,9 @@
 
 	// Custom arguments to pass to the container manager when creating the container from the image
 	"runArgs": [
-		//"--userns=keep-id" // <- If you are using Podman container mannager, this  argument is needed to
+		"--userns=keep-id" // <- If you are using Podman container mannager, this  argument is needed to
 		                   //    allow podman containers to have writing permission into the host filesystem
+		                   //    If you're using Docker, and this does not work, you can try disabling this
 	//   "--memory=8g",
 	//   "--memory-swap=10g",
 	//   "--cpus=6"

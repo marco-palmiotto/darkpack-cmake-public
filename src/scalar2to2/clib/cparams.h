@@ -19,6 +19,7 @@ typedef struct cparam_s {
     creal_t V_us;
     creal_t e_em;
     creal_t s_12;
+    creal_t s_23;
     creal_t s_34;
     creal_t g_chi;
     creal_t theta_W;

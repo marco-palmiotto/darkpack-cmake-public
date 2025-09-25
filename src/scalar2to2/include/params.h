@@ -25,6 +25,7 @@ struct param_t {
     csl::InitSanitizer<real_t> V_us { "V_us" };
     csl::InitSanitizer<real_t> e_em { "e_em" };
     csl::InitSanitizer<real_t> s_12 { "s_12" };
+    csl::InitSanitizer<real_t> s_23 { "s_23" };
     csl::InitSanitizer<real_t> s_34 { "s_34" };
     csl::InitSanitizer<real_t> g_chi { "g_chi" };
     csl::InitSanitizer<real_t> theta_W { "theta_W" };

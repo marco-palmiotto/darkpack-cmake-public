@@ -1,36 +1,35 @@
-/* This is the first example file.
- * We start by including the standard files of the library
- * Then, we include all the new headers, in external_libs.h
- */
-#include "advmath.hpp"
-#include "avgsvcalculator.hpp"
-#include "boltzmann.hpp"
-#include "config.hpp"
-#include "correspondance.hpp"
-#include "leshouchesfrommarty.hpp"
-#include "process.hpp"
+#include "dp_scalar2to2/avgsvcalculator.hpp"
+#include "dp_scalar2to2/boltzmann.hpp"
+#include "dp_scalar2to2/correspondance.hpp"
+#include "dp_scalar2to2/leshouchesfrommarty.hpp"
+#include "dp_scalar2to2/process.hpp"
 #include <fstream>
 #include <iomanip>
 #include <iostream>
-
 using namespace scalar2to2;
 using namespace advmath;
 
-scalar2to2::RunningSM run;
+const std::string PATHPLOTS = std::string(OUTPATH) + "plots/"; //<- Path to the plots directory
 
-inline double sq(const double x) { return x * x; }
+RunningSM run; //<- Instance of the RunningSM class to handle running parameters
 
+inline double sq(const double x) { return x * x; } //<- Function to compute the square of a number
+
+/*
+ * @brief Computes the decay width of phi into up-type quarks only.
+ * @param input The parameters of the model
+ */
 double gamma_phi_pred_onlyup(const Param_t& input)
 {
-  const double v_h = std::pow(2., -0.25) * std::pow(input.Gfermi, -0.5);
+  const double v_h = std::pow(2., -0.25) * std::pow(input.Gfermi, -0.5); //<- Higgs vev in GeV
 
-  std::vector<int> upquarks = {corr::u, corr::c, corr::t};
-  double quarkcontrib = 0.;
+  const std::array<int, 3> upquarks = {corr::u, corr::c, corr::t}; //<- List of up-type quarks
+  double quarkcontrib = 0.; //<- Variable to accumulate the contribution from up-type quarks
 
-  for (int quark : upquarks)
+  for (const int quark : upquarks)
   {
-    double mf = input.masses_vector[quark];
-    double Y = std::sqrt(2.) * mf / v_h;
+    const double mf = input.masses_vector[quark]; //<- Mass of the current up-type quark
+    const double Y = std::sqrt(2.) * mf / v_h;    //<- Yukawa coupling of the current up-type quark
     quarkcontrib +=
         3. * sq(Y * input.g_u) * input.m_phi / 16. / M_PI * std::pow(1. - 4. * sq(mf / input.m_phi), 3. / 2.);
   }
@@ -55,7 +54,7 @@ double gamma_phi_pred(const Param_t& input)
   //
   //   std::cout << "chicontrib=" << chicontrib << std::endl;
 
-  const double strongcontrib = 0.;
+  const double strongcontrib = 0.; // This contributes at 1-loop, therefore we do not include it here
 
   return quarkcontrib + chicontrib + strongcontrib;
 }
@@ -81,6 +80,9 @@ double sum_Squaredampl_pred(Param_t& input, const double Ecm, const int Ncolors,
   return result;
 }
 
+// This function computes the contribution to dWeff/dcostheta
+// for a single process (i.e. a single SM fermion),
+// starting from the |M|^2 expression defined in DarkPACK
 double dW_dcos_pred(Param_t& input, const double Ecm, const int Ncolors, const double gf, const double mf)
 {
   run.HandleParamRunning(input, Ecm);
@@ -99,6 +101,9 @@ double dW_dcos_pred(Param_t& input, const double Ecm, const int Ncolors, const d
   return result;
 }
 
+// This function computes the contribution to dWeff/dcostheta without the global coefficient,
+// for a single process (i.e. a single SM fermion),
+// starting from the |M|^2 expression defined in DarkPACK
 double dW_dcos_pred_nocoeff(Param_t& input, const double Ecm, const int Ncolors, const double gf, const double mf)
 {
   run.HandleParamRunning(input, Ecm);
@@ -112,13 +117,13 @@ double dW_dcos_pred_nocoeff(Param_t& input, const double Ecm, const int Ncolors,
   return p12 * p34 * M2;
 }
 
-
+// This function computes the total Weff starting from the |M|^2 expression defined in DarkPACK
 double Weff_pred_fromM2(Param_t& input, const double Ecm)
 {
   run.HandleParamRunning(input, Ecm);
 
-  std::cout << "\nIn Weff_pred_fromM2, " << input.masses_vector[corr::c] << " " << input.m_c << " " << input.m_c_m_c
-            << "\n";
+  // std::cout << "\nIn Weff_pred_fromM2, " << input.masses_vector[corr::c] << " " << input.m_c << " " << input.m_c_m_c
+  //           << "\n";
 
   double sum = 0.;
 
@@ -136,16 +141,18 @@ double Weff_pred_fromM2(Param_t& input, const double Ecm)
     {
       double contrib = dW_dcos_pred(input, Ecm, part_color[i], part_gf[i], input.masses_vector[part[i]]);
       sum += contrib;
-      std::cout << "For " << singleproc.getName() << " dW/dcos(" << Ecm << ")= " << contrib << '\n';
+      // std::cout << "For " << singleproc.getName() << " dW/dcos(" << Ecm << ")= " << contrib << '\n';
       counter++;
     }
   }
 
-  std::cout << "In the sum there were " << counter << " processes.\n";
+  // std::cout << "In the sum there were " << counter << " processes.\n";
 
   return 2 * sum;
 }
 
+
+// This function computes Weff using the formula derived by hand
 double Weff_formula(Param_t& input, const double Ecm)
 {
   run.HandleParamRunning(input, Ecm);
@@ -191,7 +198,8 @@ int main(int argc, char** argv)
 
   if (argc < 2)
   {
-    std::cout << "This function requires 1 argument\n";
+    std::cout << "This function requires 1 argument:\n"
+              << " 1. The name of the input file with the parameters.\n";
     return 1;
   }
   std::cout << std::setprecision(5) << std::scientific;
@@ -202,26 +210,26 @@ int main(int argc, char** argv)
 
   input.Print(); // Printing out the input structure
 
+  // In this demo, we're comparing the results of the DarkPACK functions
+  // with the results of the formulas derived by hand, or present in literature.
+  // In order to compute the latters, we initalise the instance of the global
+  // RunningSM class.
   run.init(input);
   run.RunCharmMass(false);
 
+  std::cout << "The Higgs vev is:\n";
   std::cout << "v = " << 2 * (input.m_W * std::sin(input.theta_W) / input.e_em);
 
-  std::cout << "\nDefining setofproc\n";
-  AvgSvCalculator allproc(input);
-  allproc.setWeffcuts(false);
-  //     allproc.enablerunning(false);
-  std::cout << "Class constructed\n";
-  allproc.print();
-
-  allproc.print_procs(std::cout, true);
-
-  double T = 0.01 * input.m_chi;
+  std::cout << "\nDefining the instance of AvgSvCalculator\n";
+  AvgSvCalculator avgsvcalc(input);
+  avgsvcalc.setWeffcuts(false);
+  std::cout << "AvgSvCalculator object instantiated\n";
 
   // Computing single 2 to 2 sum of M^2
   double sqrts = 10. * input.m_chi;
-  double costheta = 0.5;
-  const std::array<int, 9> part({corr::u, corr::c, corr::t, corr::d, corr::s, corr::b, corr::e, corr::mu, corr::tau}),
+  constexpr double costheta = 0.5;
+  constexpr const std::array<int, 9> part(
+      {corr::u, corr::c, corr::t, corr::d, corr::s, corr::b, corr::e, corr::mu, corr::tau}),
       part_color({3, 3, 3, 3, 3, 3, 1, 1, 1});
   const std::array<double, 9> part_gf(
       {input.g_u, input.g_u, input.g_u, input.g_d, input.g_d, input.g_d, input.g_l, input.g_l, input.g_l});
@@ -230,57 +238,55 @@ int main(int argc, char** argv)
   for (auto i = 0; i < 9; i++)
   {
     Process2to2 singleproc({corr::chi, corr::chi, part[i], part[i]}, {false, true, false, true});
-    if (singleproc.checkExistance())
-    {
-      std::cout << '\n' << singleproc;
-      run.HandleParamRunning(input, sqrts);
-      Param_t input_m = input;
-      singleproc.setRunningData(&run);
-      singleproc.setRunningExternal();
-      double marty = singleproc.getSumSquaredAmpl(input_m, sqrts, costheta);
-      double pred = sum_Squaredampl_pred(input, sqrts, part_color[i], part_gf[i], input.masses_vector[part[i]]);
+    if (!singleproc.checkExistance())
+      continue;
 
-      double martydweff = singleproc.get_g2_dweff_dcos(input_m, sqrts, 0.5) / sq(corr::part_hel_dof[corr::chi]);
-      double predweff = dW_dcos_pred(input, sqrts, part_color[i], part_gf[i], input.masses_vector[part[i]]);
+    std::cout << '\n' << singleproc;
+    run.HandleParamRunning(input, sqrts);
+    Param_t input_m(input); //<- Copy of the input to pass to the Process2to2 instance
 
-      double dweffdcoscontrib = singleproc.getDiffW12Contrib(input_m, sqrts, 0.5);
-      double WeffContrib = singleproc.getTotalW12Contrib(input_m, sqrts);
+    // Optimisation for the running
+    singleproc.setRunningData(&run);
+    singleproc.setRunningExternal();
 
-      // Print the header row
-      std::cout << std::setw(width_field) << ".getSumSquaredAmpl" << '\t' << std::setw(width_field)
-                << "sum_Squaredampl_pred" << '\t' << std::setw(width_field) << "1/2" << '\t' << std::setw(width_field)
-                << ".get_g2_dweff_dcos/g2" << '\t' << std::setw(width_field) << "dW_dcos_pred" << '\t'
-                << std::setw(width_field) << "4/5" << '\t' << std::setw(width_field) << ".getDiffW12Contrib" << '\t'
-                << std::setw(width_field) << ".getTotalW12Contrib" << '\n';
-      std::cout << std::setw(width_field) << marty << '\t' << std::setw(width_field) << pred << '\t'
-                << std::setw(width_field) << marty / pred << '\t' << std::setw(width_field) << martydweff << '\t'
-                << std::setw(width_field) << predweff << '\t' << std::setw(width_field) << martydweff / predweff << '\t'
-                << std::setw(width_field) << dweffdcoscontrib << '\t' << std::setw(width_field) << WeffContrib << '\n';
-    }
+    const double marty = singleproc.getSumSquaredAmpl(input_m, sqrts, costheta); //<- Prediction from MARTY
+    const double pred = sum_Squaredampl_pred(input, sqrts, part_color[i], part_gf[i],
+                                             input.masses_vector[part[i]]); //<- Prediction from the formula
+
+    const double martydweff = singleproc.get_g2_dweff_dcos(input_m, sqrts, 0.5) /
+                              sq(corr::part_hel_dof[corr::chi]); //<- Prediction from DarkPACK
+    const double predweff = dW_dcos_pred(input, sqrts, part_color[i], part_gf[i],
+                                         input.masses_vector[part[i]]); //<- Prediction from the formula
+
+    // Print the header row
+    std::cout << std::setw(width_field) << ".getSumSquaredAmpl" << '\t' << std::setw(width_field)
+              << "sum_Squaredampl_pred" << '\t' << std::setw(width_field) << "ratio" << '\t' << std::setw(width_field)
+              << ".get_g2_dweff_dcos/g2" << '\t' << std::setw(width_field) << "dW_dcos_pred" << '\t'
+              << std::setw(width_field) << "ratio" << '\n';
+    std::cout << std::setw(width_field) << marty << '\t' << std::setw(width_field) << pred << '\t'
+              << std::setw(width_field) << marty / pred << '\t' << std::setw(width_field) << martydweff << '\t'
+              << std::setw(width_field) << predweff << '\t' << std::setw(width_field) << martydweff / predweff << '\n';
   }
 
   run.HandleParamRunning(input, sqrts);
-  std::cout << "dWeff/dcos = " << allproc.getdWeff_dcos(sqrts, 0.) << std::endl; // With no multithreading
-  std::cout << "2 x dWeff/dcos = " << 2. * allproc.getdWeff_dcos(sqrts, 0.) << std::endl;
-  std::cout << "Weff (num. integral) = " << allproc.getWeff(sqrts) << std::endl; // Uses multithreading
 
+  const double weff_from_darkpack =
+      avgsvcalc.getWeff(sqrts); //<- Weff computed by DarkPACK, using the numerical integration
+  std::cout << "\nWeff (DarkPACK) = " << weff_from_darkpack << std::endl; // Uses multithreading
 
-  std::cout << "Input for formula is\n" << input;
+  const double weff_formula_by_hand = Weff_formula(input, sqrts);
+  std::cout << "Weff (full formula by hand) = " << weff_formula_by_hand << std::endl;
+  const double weff_with_kinematics_by_hand = Weff_pred_fromM2(input, sqrts);
+  std::cout << "Weff (from formula with M2 from MARTY) = " << weff_with_kinematics_by_hand << std::endl;
 
-  std::cout << "From formula = " << Weff_formula(input, sqrts) << std::endl;
-  double temp = Weff_pred_fromM2(input, sqrts);
-  std::cout << "From formula M2= " << temp << std::endl;
+  std::cout << "Ratio Weff/formula  = " << weff_from_darkpack / weff_formula_by_hand << std::endl;
 
-  std::cout << "Ratio Weff/formula  = " << allproc.getWeff(sqrts) / Weff_formula(input, sqrts) << std::endl;
+  std::cout << "Defining a low temperature, to compare computed and predicted values of <σv>\n";
+  double T = 0.001 * input.m_chi;
+  const double sigmav = avgsvcalc.getAverageSigmav(T);
+  std::cout << "<σv>( " << T << " GeV) = " << sigmav << " GeV^-2\n\n";
 
-
-  //     std::cout << "\nWeff_1234 = " << allproc.getWeff_fromW12(sqrts) << std::endl;
-
-  double sigmav = allproc.getAverageSigmav(T);
-  std::cout << " - <sigma v>( " << T << " ) = " << sigmav
-            << " GeV^-2 = " << units_conversion::GeVm2_to_cm3_over_s * sigmav << " cm^3/s\n\n";
-
-
+  // Lambda function for computing the value of <σv> predicted by the literature
   auto sigmav_pred = [](const double Temp, const int Nc, const int part_l, const double gf, Param_t& input_l) mutable
   {
     run.HandleParamRunning(input_l, input_l.getLightestBSMmass());
@@ -295,116 +301,82 @@ int main(int argc, char** argv)
     return numerator / denom;
   };
 
-
+  // Computing the value according to the literature
   double sigmavpred = 0.;
 
   for (auto count_part : {corr::e, corr::mu, corr::tau})
     sigmavpred += sigmav_pred(T, 1, count_part, input.g_l, input);
 
-  std::cout << "Computed sigmav for leptons\n";
+  // std::cout << "Computed sigmav for leptons\n";
 
   for (auto count_part : {corr::d, corr::s, corr::b})
     sigmavpred += sigmav_pred(T, 3, count_part, input.g_d, input);
 
-  std::cout << "Computed sigmav for d-type\n";
+  // std::cout << "Computed sigmav for d-type\n";
 
   for (auto count_part : {corr::u, corr::c, corr::t})
     sigmavpred += sigmav_pred(T, 3, count_part, input.g_u, input);
 
-  std::cout << "Computed sigmav for u-type\n";
+  // std::cout << "Computed sigmav for u-type\n";
 
-
+  // Comparing the values
   std::cout << "The predicted sigmav is " << sigmavpred << " GeV^-2\n";
   std::cout << "The ratio is " << sigmavpred / sigmav << std::endl;
 
-  double gamma_phi_up_trial = width_phi(input).real();
-  std::cout << " Gamma_phi_up_computed = " << gamma_phi_up_trial;
-  std::cout << "\n Gamma_phi_up_pred = " << gamma_phi_pred(input);
+  // Computing the decay with of φ at the tree-level
+  const double gamma_phi_up = width_phi(input).real();
+  std::cout << "\nΓ_φ_up_computed = " << gamma_phi_up;
+  std::cout << "\nΓ_φ_up_pred = " << gamma_phi_pred(input);
 
 
-  std::ofstream fout{"Weff.out"};
+  // Let us plot W_eff
+  // Creating plot files
+  std::ofstream fout{PATHPLOTS + "Weff.out"};
   if (!fout)
   {
-    std::cerr << "Impossible to open Weff.out\n";
+    std::cerr << "Impossible to open " << PATHPLOTS + "Weff.out" << std::endl;
     exit(1);
   }
 
-  std::cout << "\n\nOpened Weff.out\n";
+  std::cout << "\n\nOpened " << PATHPLOTS << "Weff.out\n";
 
-  fout.precision(17);
-
+  fout << std::scientific << std::setprecision(5);
 
   std::vector<double> Ecmv;
-  Ecmv.reserve(allproc.getWefftabsize());
-  for (size_t i = 0; i < allproc.getWefftabsize(); i++)
+  Ecmv.reserve(avgsvcalc.getWefftabsize());
+  for (size_t i = 0; i < avgsvcalc.getWefftabsize(); i++)
   {
 
     double peff, g2_weff;
-    allproc.get_g2_WeffTabElement(i, peff, Ecmv[i], g2_weff);
+    avgsvcalc.get_g2_WeffTabElement(i, peff, Ecmv[i], g2_weff);
 
     const double Ecm = Ecmv[i];
 
     run.HandleParamRunning(input, Ecm);
 
-    fout << std::scientific << Ecm << '\t' << 0.5 * Ecm * Ecm / allproc.getMassLBSM() / allproc.getMassLBSM() - 1.
+    fout << std::scientific << Ecm << '\t' << 0.5 * Ecm * Ecm / avgsvcalc.getMassLBSM() / avgsvcalc.getMassLBSM() - 1.
          << '\t' << g2_weff / sq(corr::part_hel_dof[corr::chi]) << '\t' << Weff_formula(input, Ecm) << '\t'
-         << allproc.getWeff(Ecm) << '\n';
+         << avgsvcalc.getWeff(Ecm) << '\n'; // Here adding the top mass?
   }
 
   fout.close();
 
-  fout.open("diffWeffTop.out");
+  // Creating output file for sigmav
+  fout.open(PATHPLOTS + "scalar_sigmav_all.out");
   if (!fout)
   {
-    std::cerr << "Impossible to open diffWeffTop.out\n";
+    std::cerr << "Impossible to open " << PATHPLOTS << "scalar_sigmav_all.out\n";
     exit(1);
   }
 
-  // Testing a single process
-  Process2to2 singleproc({corr::chi, corr::chi, corr::t, corr::t}, {false, true, false, true});
-
-  for (auto Ecm : Ecmv)
-  {
-    Param_t input_m = input;
-    run.HandleParamRunning(input, Ecm);
-
-    fout << std::scientific << Ecm << '\t' << 0.5 * Ecm * Ecm / allproc.getMassLBSM() / allproc.getMassLBSM() - 1.
-         << '\t' << singleproc.get_process_dependent_contrib_dweff_dcos(input_m, Ecm, 0.) << '\t'
-         << dW_dcos_pred(input, Ecm, part_color[corr::t], input.g_u, input.masses_vector[corr::t]) << '\n';
-  }
-
-
-  fout.close();
-  double smallest_double = std::numeric_limits<double>::min();
-  double smallest_positive_double = std::numeric_limits<double>::min() * std::numeric_limits<double>::epsilon();
-
-  std::cout << "\nSmallest double: " << smallest_double << std::endl;
-  std::cout << "Absolute value of the smallest positive double: " << smallest_positive_double << std::endl;
-
-
-
-  fout.open("scalarsigmav.out");
-  if (!fout)
-  {
-    std::cerr << "Impossible to open scalarsigmav.out\n";
-    exit(1);
-  }
-
-  std::cout << "\nOpened scalarsigmav.out\n";
+  std::cout << "\nOpened " << PATHPLOTS << "scalar_sigmav_all.out\n";
 
 
   for (T = 1.0e-3; T <= 100. * input.getLightestBSMmass(); T *= 1.1)
   {
-    fout << std::scientific << T / input.getLightestBSMmass() << '\t' << allproc.getAverageSigmav_coan_hightemp(T)
-         << '\t' << allproc.getAverageSigmav_coan_lowtemp(T) << '\t';
+    fout << std::scientific << T / input.getLightestBSMmass() << '\t' << avgsvcalc.getAverageSigmav_coan_hightemp(T)
+         << '\t' << avgsvcalc.getAverageSigmav_coan_lowtemp(T) << '\t';
 
-    //       sigmavpred = 0.;
-    //       for( auto count_part : {corr::u, corr::c, corr::t, corr::d, corr::s, corr::b}) sigmavpred +=
-    //       sigmav_pred(T, 3, count_part, input);
-    //
-    //       for( auto count_part : {corr::e, corr::mu, corr::tau} ) sigmavpred +=sigmav_pred(T, 1, count_part,
-    //       input);
-    //
     sigmavpred = 0.;
     for (auto count_part : {corr::e, corr::mu, corr::tau})
       sigmavpred += sigmav_pred(T, 1, count_part, input.g_l, input);
@@ -413,16 +385,14 @@ int main(int argc, char** argv)
     for (auto count_part : {corr::u, corr::c, corr::t})
       sigmavpred += sigmav_pred(T, 3, count_part, input.g_u, input);
 
-
     fout << sigmavpred << '\n';
   }
 
   fout.close();
 
 
-  // Computing derivatives of Weff
-
-  allproc.print_coefficients();
+  // Low temperature behaviour: let us print out the Taylor coefficients for the <σv> expansion
+  avgsvcalc.print_coefficients();
 
   sigmavpred = 0.;
   T = 1.;
@@ -432,27 +402,18 @@ int main(int argc, char** argv)
     sigmavpred += sigmav_pred(T, 3, count_part, input.g_d, input);
   for (auto count_part : {corr::u, corr::c, corr::t})
     sigmavpred += sigmav_pred(T, 3, count_part, input.g_u, input);
-  ;
+
 
   std::cout << "Taylor_pred_1 =  " << sigmavpred * input.getLightestBSMmass() << '\n'
             << "Ratio ourTaylor/FormulaTaylor  = "
-            << allproc.get_TaylorCoeffSVT(1) / (sigmavpred * input.getLightestBSMmass()) << '\n';
+            << avgsvcalc.get_TaylorCoeffSVT(1) / (sigmavpred * input.getLightestBSMmass()) << '\n';
 
 
+  // Let us now compute the relic density
+  BoltzmannSolver boltz(avgsvcalc);
 
-  fout.open("YYeq.dat");
-  if (!fout)
-  {
-    std::cerr << "Impossible to open YYeq.dat\n";
-    exit(1);
-  }
-
-
-  BoltzmannSolver boltz(allproc);
-
-
-
-  fout.close();
+  const double relic_density = boltz.relic_density();
+  std::cout << "The relic density is: " << relic_density << '\n';
 
   return 0;
 }

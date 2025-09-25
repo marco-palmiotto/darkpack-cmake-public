@@ -14,7 +14,7 @@ namespace __SPEC_LIB_NAME__
     p_ptr = std::make_shared<std::vector<Process2to2>>();
     total_sigma_v = 0;
     find_annihilation_processes();
-    sigma_v(&p_ptr);
+    sigma_v(*p_ptr);
   };
 
   // Indirectparam_t::~Indirectparam_t() = default;
@@ -109,7 +109,7 @@ namespace __SPEC_LIB_NAME__
 
     std::vector<Process_1to2> proc_list;
 
-    for (auto& it : corr::squaredampl_1_to_2)
+    for (auto& it : corr::squaredampl_1to2)
     {
       const auto current_process = it.first;
       std::array<Insertion, 3> particle_list;
@@ -171,12 +171,12 @@ namespace __SPEC_LIB_NAME__
     for (size_t i = 0; i < proc_list.size(); i++)
     {
       Process_1to2 proc = proc_list[i];
-      auto branching_ratio = get_branching_ratio(proc);
+      auto branching_ratio = proc.get_branching_ratio(input);
       auto sigma_v_new = sigma_v * branching_ratio;
 
       // Arrays to store the fields, masses and energies of the final state particles
-      std::array<int, 2> final_fields = {proc.getField(3), proc.getField(4)};
-      std::array<real_t, 2> final_masses = {proc.getMass(3, input), proc.getMass(4, input)};
+      std::array<int, 2> final_fields = {proc.get_field(3), proc.get_field(4)};
+      std::array<real_t, 2> final_masses = {proc.get_mass(3, input), proc.get_mass(4, input)};
       std::array<real_t, 2> final_energies = {
           0.5 * (sqrt_s + (SQUARE(final_masses[0]) - SQUARE(final_masses[1])) / sqrt_s),
           sqrt_s - 0.5 * (sqrt_s + (SQUARE(final_masses[0]) - SQUARE(final_masses[1])) / sqrt_s)};
@@ -227,7 +227,7 @@ namespace __SPEC_LIB_NAME__
         else
         {
           // Called recursively to handle subsequent decays
-          handle_1to2_decays(sigma_v_new, final_fields[j]);
+          handle_1to2_decays(sigma_v_new, final_fields[j], final_energies[j]);
         }
       }
     }

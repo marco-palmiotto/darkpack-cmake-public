@@ -3,8 +3,8 @@
   #define __cplusplus
 #endif
 
-#ifndef RELICPARAM__SPEC_LIB_NAME__
-  #define RELICPARAM__SPEC_LIB_NAME__
+#ifndef INDIRECT__SPEC_LIB_NAME__
+  #define INDIRECT__SPEC_LIB_NAME__
 
   #include "RunningSM.hpp"
   #include "advmath.hpp"
@@ -64,7 +64,7 @@ public:
      * @param particle The field number for the initial state particle
      *
      */
-    std::vector<Process_1to2> Indirectparam_t::find_decay_processes(int particle);
+    std::vector<Process_1to2> find_decay_processes(int particle);
 
     /**
      * @brief Handles the decay processes for particles whose hadronization spectrum changes in the model.

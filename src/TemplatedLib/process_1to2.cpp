@@ -18,18 +18,18 @@ namespace __SPEC_LIB_NAME__
   #define GEVTOCM3S 1.1673288750358198e-05
 #endif
 
-  bool decays(int particle)
-  {
-    for (const auto& it : squaredampl_1_to_2)
-    {
-      const auto& current_process = it.first;
-      if (current_process.size() < 3)
-        continue;
-      if (current_process[0] == EMPTYCHAR + particle || current_process[1] == EMPTYCHAR + particle)
-        return true;
-    }
-    return false;
-  }
+  // bool decays(int particle)
+  //{
+  // for (const auto& it : corr::squaredampl_1to2)
+  //{
+  // const auto& current_process = it.first;
+  // if (current_process.size() < 3)
+  // continue;
+  // if (current_process[0] == EMPTYCHAR + particle || current_process[1] == EMPTYCHAR + particle)
+  // return true;
+  //}
+  // return false;
+  //}
 
 #define BASIC_INITIALISATION                                                                                           \
   for (int i = 0; i < 3; i++)                                                                                          \
@@ -67,11 +67,11 @@ namespace __SPEC_LIB_NAME__
       delete runptr;
   }
 
-  std::string Process_1to2::findKey()
+  std::string Process_1to2::find_key()
   {
     std::string key;
     using namespace corr;
-    if (!isComplete())
+    if (!is_complete())
     {
 #ifdef DEBUG
       std::cout << "Process is not complete\n";
@@ -88,8 +88,8 @@ namespace __SPEC_LIB_NAME__
         key.push_back(ANTICHAR);
       key.push_back(EMPTYCHAR + p[i]);
     }
-    auto it = squaredampl.find(key);
-    if (it != squaredampl.end())
+    auto it = squaredampl_1to2.find(key);
+    if (it != squaredampl_1to2.end())
     {
 #ifdef DEBUG
       std::cout << "Found key\n";
@@ -106,8 +106,8 @@ namespace __SPEC_LIB_NAME__
         key.push_back(ANTICHAR);
       key.push_back(EMPTYCHAR + p[i]);
     }
-    it = squaredampl.find(key);
-    if (it != squaredampl.end())
+    it = squaredampl_1to2.find(key);
+    if (it != squaredampl_1to2.end())
     {
 #ifdef DEBUG
       std::cout << "Found key swapping p0 and p1\n";
@@ -131,8 +131,8 @@ namespace __SPEC_LIB_NAME__
         key.push_back(ANTICHAR);
       key.push_back(EMPTYCHAR + p[i]);
     }
-    it = squaredampl.find(key);
-    if (it != squaredampl.end())
+    it = squaredampl_1to2.find(key);
+    if (it != squaredampl_1to2.end())
     {
 #ifdef DEBUG
       std::cout << "Found key swapping p0 and p2\n";
@@ -147,93 +147,94 @@ namespace __SPEC_LIB_NAME__
 #endif
       return key;
     }
-  }
+
 
 #ifdef DEBUG
-  std::cout << "Key not found: the process does not exist\n";
+    std::cout << "Key not found: the process does not exist\n";
 #endif
 
-  Exists = false;
-  key.clear();
-  key.push_back(EMPTYCHAR);
-  return key;
-} // namespace __SPEC_LIB_NAME__
+    Exists = false;
+    key.clear();
+    key.push_back(EMPTYCHAR);
+    return key;
+  }
 
-void Process2to2::handleSetup()
-{
-  if (isComplete())
+  void Process_1to2::handle_setup()
   {
-    Exists = true;
-    Key = findKey();
-
-    if (Exists)
+    if (is_complete())
     {
-#ifdef DEBUG
-      std::cout << "Setting Sf34\n";
-#endif
-      Sf34 = (p[1] == p[2] && ((ap[1] && ap[2]) || (!ap[1] && !ap[2]))) ? 2 : 1;
-#ifdef DEBUG
-      std::cout << "Assigning values...";
-#endif
-      auto it = corr::squaredampl.find(Key);
-#ifdef DEBUG
-      std::cout << "... squaredamp";
-#endif
-      sumSquaredAmpl = std::get<0>(it->second);
-#ifdef DEBUG
-      std::cout << "... combfac";
-#endif
-      combinFac = std::get<1>(it->second);
-#ifdef DEBUG
-      std::cout << "... cpfac";
-#endif
-      CPfac = std::get<2>(it->second);
+      Exists = true;
+      Key = find_key();
 
-#ifdef DEBUG
-      std::cout << "... runptr, extdata, extrunning,";
-#endif
-      runptr = nullptr;
-      isRunDataExternal = false;
-      isRunningExternal = false;
-#ifdef DEBUG
-      std::cout << "... helicity dofs are \n";
-#endif
-
-      for (size_t i = 0; i < 4; i++)
+      if (Exists)
       {
-        part_g[i] = corr::part_hel_dof[p[i]];
 #ifdef DEBUG
-        std::cout << part_g[i] << ' ';
+        std::cout << "Setting Sf34\n";
 #endif
+        Sf34 = (p[1] == p[2] && ((ap[1] && ap[2]) || (!ap[1] && !ap[2]))) ? 2 : 1;
+#ifdef DEBUG
+        std::cout << "Assigning values...";
+#endif
+        auto it = corr::squaredampl_1to2.find(Key);
+#ifdef DEBUG
+        std::cout << "... squaredamp";
+#endif
+        sumSquaredAmpl = std::get<0>(it->second);
+#ifdef DEBUG
+        std::cout << "... combfac";
+#endif
+        combinFac = std::get<1>(it->second);
+#ifdef DEBUG
+        std::cout << "... cpfac";
+#endif
+        CPfac = std::get<2>(it->second);
+
+#ifdef DEBUG
+        std::cout << "... runptr, extdata, extrunning,";
+#endif
+        runptr = nullptr;
+        isRunDataExternal = false;
+        isRunningExternal = false;
+#ifdef DEBUG
+        std::cout << "... helicity dofs are \n";
+#endif
+
+        for (size_t i = 0; i < 4; i++)
+        {
+          part_g[i] = corr::part_hel_dof[p[i]];
+#ifdef DEBUG
+          std::cout << part_g[i] << ' ';
+#endif
+        }
+
+#ifdef DEBUG
+        std::cout << "\nExiting handleSetup of " << get_name() << "\n";
+#endif
+        return;
       }
-
+      else
+      {
 #ifdef DEBUG
-      std::cout << "\nExiting handleSetup of " << get_name() << "\n";
+        std::cout << "Process does not exist: resetting variables\n";
 #endif
-      return;
-    }
-    else
-    {
-#ifdef DEBUG
-      std::cout << "Process does not exist: resetting variables\n";
-#endif
-      Sf34 = 0;
-      sumSquaredAmpl = nullptr;
-      combinFac = 0;
-      CPfac = 0;
+        Sf34 = 0;
+        sumSquaredAmpl = nullptr;
+        combinFac = 0;
+        CPfac = 0;
 
-      runptr = nullptr;
-      isRunDataExternal = false;
-      isRunningExternal = false;
-      return;
+        runptr = nullptr;
+        isRunDataExternal = false;
+        isRunningExternal = false;
+        return;
+      }
     }
+#ifdef DEBUG
+    std::cout << "Process is not complete\n";
+#endif
   }
-#ifdef DEBUG
-  std::cout << "Process is not complete\n";
-#endif
 
 
-  Process_1to2::Process_1to2(const std::array<int, 3>& ip, const std::array<bool, 3>& iap)
+  Process_1to2::Process_1to2(const std::array<int, 3>& field, const std::array<bool, 3>& is_particle)
   {
 #ifdef DEBUG
     std::cout << "Constructor called\n";
@@ -244,13 +245,13 @@ void Process2to2::handleSetup()
 #endif
     for (int i = 0; i < 3; i++)
     {
-      p[i] = ip[i];
-      ap[i] = iap[i];
+      p[i] = field[i];
+      ap[i] = is_particle[i];
     }
 #ifdef DEBUG
     std::cout << "Data pushed back\n";
 #endif
-    handleSetup();
+    handle_setup();
   }
 
   Process_1to2::Process_1to2(const std::array<Insertion, 3>& v)
@@ -270,7 +271,7 @@ void Process2to2::handleSetup()
 #ifdef DEBUG
     std::cout << "Pushing back values\n";
 #endif
-    handleSetup();
+    handle_setup();
   }
 
   short int Process_1to2::set(short int n, const int& ip, const bool iap)
@@ -287,7 +288,7 @@ void Process2to2::handleSetup()
 #ifdef DEBUG
     std::cout << "Calling handleSetup()\n";
 #endif
-    handleSetup();
+    handle_setup();
 #ifdef DEBUG
     std::cout << "Exiting set()\n";
 #endif
@@ -341,11 +342,11 @@ void Process2to2::handleSetup()
     return name;
   }
 
-  bool Process_1to2::set_kinematics(Param_t & input, real_t sij[5][5], real_t m_vec[3], real_t & E1, real_t & E2,
-                                    real_t & p2) const
+  bool Process_1to2::set_kinematics(Param_t& input, real_t s_ij[5][5], real_t m_vec[3], real_t& E1, real_t& E2,
+                                    real_t& p2) const
   {
     // The following function assumes that running is already taken care of
-    if (!Exists || !is_allowed_at_zero_momentum(const Param_t& input))
+    if (!Exists || !is_allowed_at_zero_momentum(input))
       return false;
 
     for (size_t i = 1; i < 4; i++)
@@ -362,7 +363,7 @@ void Process2to2::handleSetup()
     return true;
   }
 
-  real_t Process_1to2::get_partial_width(Param_t & input) const
+  real_t Process_1to2::get_partial_width(Param_t& input)
   {
     real_t s_ij[5][5];
     real_t m_vec[3];
@@ -371,20 +372,21 @@ void Process2to2::handleSetup()
     if (!set_kinematics(input, s_ij, m_vec, E1, E2, p2))
       return 0.;
     if (!isRunningExternal)
-      handleRunning(input, m_vec[0]);
+      handle_running(input, m_vec[0]);
 
-    const auto partial_width_temp = sumSquaredAmpl(input) * p2 / m_vec[0] / m_vec[0] / 8.0 / M_PI;
+    real_t sum_sq_ampl = sumSquaredAmpl(&input).real();
+    const auto partial_width_temp = sum_sq_ampl * p2 / m_vec[0] / m_vec[0] / 8.0 / M_PI;
     return (std::isnormal(partial_width_temp) && partial_width_temp > 0.) ? partial_width_temp : 0.;
   }
 
-  real_t Process_1to2::get_branching_ratio(Param_t & input) const
+  real_t Process_1to2::get_branching_ratio(Param_t& input)
   {
     real_t s_ij[5][5];
     real_t m_vec[3];
     real_t E1, E2, p2;
 
     real_t partial_width = get_partial_width(input);
-    real_t total_width = input.widths_vector(get_field(0));
+    real_t total_width = input.widths_vector[get_field(0)];
 
     return (std::isnormal(total_width) && total_width > 0.) ? partial_width / total_width : 0.;
   }
@@ -396,7 +398,7 @@ void Process2to2::handleSetup()
   Process_1to2& Process_1to2::operator=(const Process_1to2& other)
   {
 #ifdef DEBUG_COPY
-    std::cout << "Called Process2to2::operator=\n";
+    std::cout << "Called Process_1to2::operator=\n";
 #endif
     if (this == &other)
       return *this;
@@ -423,9 +425,24 @@ void Process2to2::handleSetup()
 
     return *this;
   }
+  // Copy constructor
+  Process_1to2::Process_1to2(const Process_1to2& other)
+          : Key(other.Key), Exists(other.Exists), sumSquaredAmpl(other.sumSquaredAmpl), Sf34(other.Sf34),
+            CPfac(other.CPfac), combinFac(other.combinFac), runptr(nullptr), isRunDataExternal(false),
+            isRunningExternal(false), haveToFreerunptr(false)
+  {
+    // I need to deep copy the C-style vectors
+    for (int i = 0; i < 3; i++)
+    {
+      p[i] = other.p[i];
+      ap[i] = other.ap[i];
+      part_g[i] = other.part_g[i];
+    }
+  }
 
 
 
 #undef BASIC_INITIALISATION
-
-} // end of namespace __SPEC_LIB_NAME__
+} // namespace __SPEC_LIB_NAME__
+  // namespace __SPEC_LIB_NAME__
+  // end of namespace __SPEC_LIB_NAME__

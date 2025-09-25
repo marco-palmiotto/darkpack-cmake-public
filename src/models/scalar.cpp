@@ -190,16 +190,6 @@ int main()
   setShow = false;
   std::cout << "Creating the library\n";
   mty::Library lib(LIBNAME);
-  /*
-  #ifdef MARTYPATH
-    std::cout << "Importing LHA module from MARTY's source code path\n";
-    lib.importLHAModule(MARTYPATH);
-  #endif
-  */
-  /*
-  std::cout << "Adding the flag for using posix threads in the C++ files in the library\n";
-  lib.addLibrary("-lpthread");
-  */
 
   std::cout << "\nListing all the Physical particles\n";
   std::vector<Particle> part_0 = scalar.getPhysicalParticles([&](Particle p) { return p->isPhysical(); });
@@ -297,6 +287,7 @@ int main()
   }
 
   std::vector<Process2to2ToCompute> list_of_processes;
+  std::vector<Process2to2ToCompute> list_of_processes_1to2;
 
   /*
   Our list is formed by all the processes of the kind Chibar Chi -> Fbar F
@@ -332,7 +323,19 @@ int main()
     list_of_processes.push_back(proc_c);
   }
 
-  computeAndAddToLibFromList(scalar, lib, list_of_processes, "smBsm.hpp");
+  for (auto field : part)
+  {
+    Process2to2ToCompute proc_c;
+
+    proc_c.process = {Incoming(scalar.getParticle("h")), Outgoing(AntiPart(field)), Outgoing(field)};
+    proc_c.order = mty::Order::TreeLevel;
+    proc_c.leading_order = false;
+    proc_c.Wgauge = mty::gauge::Type::Feynman;
+
+    list_of_processes_1to2.push_back(proc_c);
+  }
+
+  computeAndAddToLibFromList(scalar, lib, list_of_processes, list_of_processes_1to2, "smBsm.hpp");
 
   // Computation of the widths at the three TreeLevel
   Expr width_h = scalar.computeWidth(Order::TreeLevel, "h");
@@ -344,6 +347,10 @@ int main()
 
   std::cout << "\n\n" << Evaluated(width_phi, eval::abbreviation) << std::endl << std::endl;
 
+  /*
+  We construct a vector of expressions to expand
+  NOTE: this prevents hardcoding some quantities in the library
+  */
   std::vector<Expr> expr_to_expand = {width_h, width_W, width_Z, width_t, width_phi};
 
   for (Expr expression : expr_to_expand)

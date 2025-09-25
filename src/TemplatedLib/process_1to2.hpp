@@ -12,6 +12,7 @@
   #include "config.hpp"
   #include "correspondance.hpp"
   #include "gsl/gsl_sf_psi.h"
+  #include "process.hpp"
 
 // #define DEBUG_COPY
 // #define DEBUG
@@ -20,7 +21,7 @@ namespace __SPEC_LIB_NAME__
   /**
    * @brief Checks whether there are decaying processes for a given particle in corr::squaredampl_1to2
    */
-  bool decays(int particle);
+  // bool decays(int particle);
 
   class Process_1to2
   {
@@ -61,12 +62,12 @@ private:
      *
      * @return The key for the process in the hash table.
      */
-    std::string findKey();
+    std::string find_key();
 
     /**
      * @brief Performs the setup of the process.
      */
-    void handleSetup();
+    void handle_setup();
 
 public:
     /**
@@ -87,7 +88,7 @@ public:
      * @param field The fields of the particles in the process.
      * @param isParticle True if the particle is a particle, false if it is an antiparticle.
      */
-    Process_1to2(const std::array<int, 3>& field, const std::array<bool, 3>& isParticle);
+    Process_1to2(const std::array<int, 3>& field, const std::array<bool, 3>& is_particle);
 
     /**
      * @brief Construct a new Process_1to2 object from an array of Insertion objects.
@@ -111,7 +112,7 @@ public:
      *
      * @param other
      */
-    Process_1to2(const Process2to2& other);
+    Process_1to2(const Process_1to2& other);
 
     /**
      * @brief Comparison operator for the Process_1to2 class.
@@ -119,7 +120,7 @@ public:
      * @return true if the processes have the same key
      * @return false otherwise
      */
-    bool operator==(const Process_1to2&) const;
+    bool operator==(const Process_1to2& other) const;
 
     /**
      * @brief Comparison operator for the Process_1to2 class.
@@ -127,7 +128,7 @@ public:
      * @return true if the processes have different keys
      * @return false otherwise
      */
-    bool operator!=(const Process_1to2&) const;
+    bool operator!=(const Process_1to2& other) const;
 
     /**
      * @brief Assignment operator for the Process_1to2 class. Constructs a new Process2to2 object, with the same key
@@ -142,6 +143,18 @@ public:
         @return True if the process exists, false otherwise.
     */
     inline bool check_existance() const { return Exists; };
+
+    /**
+     * @brief Returns true if the process is complete, i.e. all the particles are defined.
+     *
+     */
+    inline bool is_complete() const
+    {
+      for (int i = 0; i < 3; i++)
+        if (p[i] < 0)
+          return false;
+      return true;
+    };
 
     /**
      * @brief Get the Field object corresponding to the i-th particle in the process.
@@ -207,8 +220,21 @@ public:
       return (get_mass(2, input) + get_mass(3, input)) <= get_mass(1, input);
     };
 
-    bool Process_1to2::set_kinematics(Param_t& input, real_t sij[5][5], real_t m_vec[3], real_t& E1, real_t& E2,
-                                      real_t& p2) const;
+    bool set_kinematics(Param_t& input, real_t sij[5][5], real_t m_vec[3], real_t& E1, real_t& E2, real_t& p2) const;
+
+    inline void handle_running(Param_t& input, const real_t& Ecm)
+    {
+      if (runptr == nullptr)
+      {
+        runptr = new RunningSM(input);
+        haveToFreerunptr = true;
+      }
+      runptr->HandleParamRunning(input, Ecm);
+  #ifdef DEBUG
+      std::cout << "parameter running handled: input is \n";
+      input.Print();
+  #endif
+    };
 
     /**
      * @brief Calculates the partial width associated with the process.
@@ -227,7 +253,7 @@ public:
      * @return real_t Branching ratio for the instance of the class.
      */
     real_t get_branching_ratio(Param_t& input);
-  } // end of class Process_1to2
+  }; // end of class Process_1to2
 
 } // end of namespace __SPEC_LIB_NAME__
 

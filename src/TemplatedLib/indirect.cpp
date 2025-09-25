@@ -7,7 +7,7 @@ template <typename T> static inline T SQRT(const T x) { return pow(x, 0.5); }
 
 namespace __SPEC_LIB_NAME__
 {
-  Indirectparam_t::Indirectparam_t(const Param_t& input) : input(input), run(input)
+  Indirectparam_t::Indirectparam_t(const Param_t& input_in) : input(input_in), run(input_in)
   {
     // This constructor assumes that the Param_t object input has been refreshed
     // for a proper assignment of the masses vector

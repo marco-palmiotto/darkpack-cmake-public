@@ -65,16 +65,16 @@ struct param_t {
 
     void reset()
     {
-        using real_params = std::array<csl::InitSanitizer<real_t>*, 30>;
+        using real_params = std::array<csl::InitSanitizer<real_t>*, 31>;
         using complex_params = std::array<csl::InitSanitizer<complex_t>*, 5>;
 
         for (auto &par : real_params{
                 &pi, &g_d, &g_l, &g_u, &V_cb, 
-                &V_tb, &V_ud, &V_us, &e_em, &s_12, &s_34, 
-                &g_chi, &theta_W, &reg_prop, &Gamma_phi, &g_s, &m_W, 
-                &m_Z, &m_b, &m_c, &m_d, &m_e, &m_h, 
-                &m_s, &m_t, &m_u, &m_mu, &m_chi, &m_phi, 
-                &m_tau, })
+                &V_tb, &V_ud, &V_us, &e_em, &s_12, &s_23, 
+                &s_34, &g_chi, &theta_W, &reg_prop, &Gamma_phi, &g_s, 
+                &m_W, &m_Z, &m_b, &m_c, &m_d, &m_e, 
+                &m_h, &m_s, &m_t, &m_u, &m_mu, &m_chi, 
+                &m_phi, &m_tau, })
         {
             par->reset();
         }
@@ -87,18 +87,18 @@ struct param_t {
 
     void print(std::ostream &out = std::cout) const
     {
-        using real_params = std::array<csl::InitSanitizer<real_t> const*, 30>;
+        using real_params = std::array<csl::InitSanitizer<real_t> const*, 31>;
         using complex_params = std::array<csl::InitSanitizer<complex_t> const*, 5>;
 
         out << "param_t struct:\n";
         out << "Real parameters\n";
         for (auto const &par : real_params{
                 &pi, &g_d, &g_l, &g_u, &V_cb, 
-                &V_tb, &V_ud, &V_us, &e_em, &s_12, &s_34, 
-                &g_chi, &theta_W, &reg_prop, &Gamma_phi, &g_s, &m_W, 
-                &m_Z, &m_b, &m_c, &m_d, &m_e, &m_h, 
-                &m_s, &m_t, &m_u, &m_mu, &m_chi, &m_phi, 
-                &m_tau, })
+                &V_tb, &V_ud, &V_us, &e_em, &s_12, &s_23, 
+                &s_34, &g_chi, &theta_W, &reg_prop, &Gamma_phi, &g_s, 
+                &m_W, &m_Z, &m_b, &m_c, &m_d, &m_e, 
+                &m_h, &m_s, &m_t, &m_u, &m_mu, &m_chi, 
+                &m_phi, &m_tau, })
         {
             out << "  -> " << par->getName() << ": ";
             if (par->hasValue()) {
@@ -135,6 +135,7 @@ struct param_t {
         {"V_us", &V_us},
         {"e_em", &e_em},
         {"s_12", &s_12},
+        {"s_23", &s_23},
         {"s_34", &s_34},
         {"g_chi", &g_chi},
         {"theta_W", &theta_W},

@@ -12,7 +12,7 @@
 namespace scalar2to2 {
 
 
-extern const std::array<Callable<complex_t, param_t>, 14> f_G;
+extern const std::array<Callable<complex_t, param_t>, 26> f_G;
 extern const std::map<std::string, Callable<complex_t, param_t>> fmap_G;
 
 }

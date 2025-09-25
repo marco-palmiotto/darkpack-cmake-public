@@ -8,9 +8,10 @@
   #endif
 
   #include "RunningSM.hpp"
+  #include "advmath.hpp"
   #include "config.hpp"
   #include "correspondance.hpp"
-
+  #include "gsl/gsl_sf_psi.h"
 
 // #define DEBUG_COPY
 // #define DEBUG
@@ -39,15 +40,19 @@ namespace __SPEC_LIB_NAME__
      * @param b True if the particle is a particle, false if it is an antiparticle
      */
     Insertion(const int i, const bool b) : field(i), part(b) {}
+
+    /**
+     * @brief Default constructor for Insertion
+     */
+    Insertion() = default;
   };
 
   class Process2to2
   {
     // Data of the class
 private:
-    std::array<csl::InitSanitizer<int>, 4> p; //!< Array of particle fields in the process.
-    std::array<csl::InitSanitizer<bool>, 4>
-        ap; //!< Array of boolean flags indicating if each particle is an antiparticle.
+    csl::InitSanitizer<int> p[4];   //!< Array of particle fields in the process.
+    csl::InitSanitizer<bool> ap[4]; //!< Array of boolean flags indicating if each particle is an antiparticle.
 
     csl::InitSanitizer<std::string> Key; //!< Key matching this process in the hash table.
     csl::InitSanitizer<bool> Exists;     //!< Flag indicating if the process exists in the library.
@@ -118,22 +123,6 @@ private:
      */
     bool setKinematics(Param_t& input, const real_t& sqrts, const real_t& ctheta, real_t& p1, real_t& p3,
                        real_t sij[5][5]) const;
-
-    /**
-     * @brief Set the kinematical variables for the process.
-     *
-     * @param input The numerical parameters.
-     * @param s The value of the Mandelstam variable s.
-     * @param t The value of the Mandelstam variable t.
-     * @param p1 The momentum of particle 1.
-     * @param p3 The momentum of particle 3.
-     * @param sigdfj Matrix containing the scalar products of the momenta of the particles in the process, in the for
-     * s_ij = p_i * p_j.
-     * @return true If the process is kinematically allowed and the calculation was successful.
-     * @return false Otherwise.
-     */
-    bool set_kinematics_from_t(Param_t& input, const real_t& s, const real_t& t, real_t& p1, real_t& p3,
-                               real_t sij[5][5]) const;
 
     // Constructors
 public:
@@ -460,17 +449,6 @@ public:
        @return real_t Differential cross-section.
      */
     real_t getDiffCrossSection(Param_t& input, const real_t& sqrts, const real_t& ctheta);
-
-
-    /**
-     @brief Computes the differential cross-section at the given centre-of-mass energy Ecm and \f$t\f$.
-
-     @param input Param_t object containing numerical inputs.
-     @param sqrts Centre of mass energy.
-     @param t Value of the Mandelstam variable t.
-     @return real_t Differential cross-section.
-   */
-    real_t compute_dsigma_dt(Param_t& input, const real_t& sqrts, const real_t& t);
 
     /**
        @brief Computes the total cross-section at the given centre-of-mass energy Ecm.

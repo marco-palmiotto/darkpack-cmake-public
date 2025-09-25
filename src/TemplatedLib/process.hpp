@@ -124,6 +124,9 @@ private:
     bool setKinematics(Param_t& input, const real_t& sqrts, const real_t& ctheta, real_t& p1, real_t& p3,
                        real_t sij[5][5]) const;
 
+    bool set_kinematics_from_t(Param_t& input, const real_t& s, const real_t& t, real_t& p1, real_t& p3,
+                               real_t sij[5][5]) const;
+
     // Constructors
 public:
     /**
@@ -449,6 +452,8 @@ public:
        @return real_t Differential cross-section.
      */
     real_t getDiffCrossSection(Param_t& input, const real_t& sqrts, const real_t& ctheta);
+
+    real_t compute_dsigma_dt(Param_t& input, const real_t& Ecm, const real_t& t);
 
     /**
        @brief Computes the total cross-section at the given centre-of-mass energy Ecm.

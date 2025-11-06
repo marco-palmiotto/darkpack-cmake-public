@@ -14,6 +14,9 @@
   #include "process_1to2.hpp"
   #include <array>
   #include <vector>
+  #include <fstream>
+  #include <sstream>
+  #include <iostream>
 
 namespace __SPEC_LIB_NAME__
 {
@@ -30,6 +33,8 @@ private:
     std::vector<real_t> sigma_v_process; //!< Vector for the thermally averaged cross section of each process
     real_t total_sigma_v; //!< Value of the total thermally averaged cross section to evaluate the no. of d.o.f.
     real_t dof;           //!< Number of degrees of freedom (processes for which sigma_v is at least 1% of the total)
+    std::array<std::array<std::vector<real_t>>>(62) PPPC4DMID; //!< Data from the PPPC4DMID
+    std::vector<real_t> DM_masses;                               //!< List of DM masses in PPPC4DMID
 
 public:
     /**
@@ -79,7 +84,57 @@ public:
      *
      */
     void fill_spectrum(std::vector<Process2to2> processes, std::vector<real_t> sigma_v_vector, double sqrt_s);
-  };
+
+    /**
+     * @brief Fills the spectra for the different annihilation channels.
+     *
+     * @param sqrtS The center-of-mass energy.
+     *
+     */
+    void fill_spectrum(std::vector<Process2to2> processes, std::vector<real_t> sigma_v_vector, double sqrt_s);
+
+    /**
+     * @brief Reads an n-column data file. Returns a vector of vectors, one for each column.
+     *
+     * @param filename The name of the file to be read.
+     * 
+     * @param ncol The number of columns in the file
+     *
+     */
+    std::vector<std::vector<double>> read_file(std::string filename, int ncol);
+
+    /**
+     * @brief Creates a list of masses from a data file.
+     *
+     * @param filename The name of the file to be read.
+     * 
+     * @param ncol The number of columns in the file
+     *
+     */
+    void fetch_pppc4dmid_data(std::string filename, int ncol);
+
+    /**
+     * @brief Adapts the spectrum of gamma rays to the energy bins used by Fermi-LAT.
+     * 
+     * @param mass The mass of the dark matter particle.
+     * 
+     * @param tab The tabulated spectrum to be adapted.
+     */
+    std::array<std::vector<real_t>> fermi_energy_bins(real_t mass, std::array<std::vector<real_t>> tab);
+
+     /**
+     * @brief Interpolates the spectrum of gamma rays for any value of the dark matter mass.
+     *
+     * @param mass The mass of the dark matter particle.
+     * 
+     */
+    std::array<std::vector<real_t>> interpolate_spectrum_gamma(real_t mass);
+
+    
+
+  }; // class Indirectparam_t
+
+
 
 
 }; // namespace __SPEC_LIB_NAME__

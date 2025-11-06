@@ -304,5 +304,141 @@ namespace __SPEC_LIB_NAME__
     }
   };
 
+  std::vector<std::vector<double>> Indirectparam_t::read_file(std::string filename, int ncol)
+  {
+    std::vector<std::vector<double>> data;
+    std::fstream file;
+    file.open(filename);
+
+    if(!file.is_open())
+    {
+      std::cout << "Could not open read_file " << filename << "\n";
+      exit(1);
+    }
+
+    std::vector<std::vector<double>> data(ncol);
+    while(std::getline(file, line))
+    {
+      double val;
+      int count=0;
+      std::vector<double> values(ncol);
+      std::stringstream ss(line);
+      while(ss >> val)
+      {
+        values.push_back(val);
+        count++;
+      }
+
+      if(count == ncol){
+        data.push_back(values);
+      }
+      else continue;
+
+    }
+
+  }
+
+  void Indirectparam_t::fetch_pppc4dmid_data(std::string filename, int ncol)
+  {
+    auto data = read_file(filename, ncol);
+
+    size_t n_rows = data.size();
+    size_t n_cols = data[0].size();
+
+    for (size_t i=0; i<PPPC4DMID.size(); i++) 
+    {
+      PPPC4DMID[i].resize(n_rows);
+      for(size_t j = 0; j < n_rows; j++)
+      {
+        for(size_t k = 1; k < n_cols; k++) // Skip first column (DM mass)
+        {
+          PPPC4DMID[i][j].push_back(data[j][k]);
+        }
+      }
+    }
+
+    std::vector<real_t> dm_masses; // Temporary vector to store DM masses
+    for(size_t i = 0; i < n_rows; i++)
+    {
+      dm_masses.push_back(data[i][0]);
+    }
+    int index = 0;
+
+    while(index<n_rows)
+    {
+      DM_masses.push_back(dm_masses[index]);
+      // Counts the number of rows with the same value of the DM mass
+      index += std::count(dm_masses.begin()+index,dm_masses.end(), dm_masses[index])
+    }
+  }
+
+
+  std::array<std::vector<real_t>> Indirectparam_t::fermi_energy_bins(real_t mass, std::array<std::vector<real_t>> tab)
+  {
+    size_t n_rows = PPPC4DMID[0].size();
+    size_t n_cols = PPPC4DMID[0][0].size();
+    size_t n_masses = DM_masses.size();
+
+    std::array<std::vector<real_t>> final_spec(n_cols);
+    
+    for (int i=0; i<25; i++) 
+    {
+      final_spec[i][0]=pow(10.,log10(500)+(log10(500000)-log10(500))/24*i)*0.001; // 24 energy bins logarithmically spaced between 500 and 500000 MeV
+
+      if (final_spec[i][0]>mass) for(j=0; j<n_cols-1; j++) energy_bins[i][j]=0;
+
+      else
+      {
+        size_t index = 0;
+
+        while(pow(10., tab[index][0]*mass)<=final_spec[i][0] && index < tab.size()) index++;
+
+        real_t K0 = pow(10., tab[index-1][0]*mass);
+        real_t K1 = pow(10., tab[index][0]*mass);
+        real_t interpolation_factor = (final_spec[i][0]-K0)/(K1-K0);
+
+        for (j=1; j<n_cols; j++) 
+        {
+          final_spec[i][j]=tab[index-1][j]+(tab[index][j] - tab[index-1][j])*interpolation_factor;
+        }
+      }
+    return final_spec;
+
+    }
+  }
+
+  std::array<std::vector<real_t>> Indirectparam_t::interpolate_spectrum_gamma(real_t mass)
+  {
+    size_t n_rows = PPPC4DMID[0].size();
+    size_t n_cols = PPPC4DMID[0][0].size();
+    size_t n_masses = DM_masses.size();
+
+    std::array<std::vector<real_t>> interpolated_spectrum(n_cols);// First column is log10(K/m)
+    size_t index=0;
+
+    while(mass<DM_masses[index] && index<n_masses) index++;
+
+    if(DM_masses[index] == mass) interpolated_spectrum = fermi_energy_bins(mass, PPPC4DMID[index]);
+
+    else if(DM_masses[index] > mass)
+    {
+        // Linear interpolation
+        std::array<std::vector<real_t>> spec_low = fermi_energy_bins(DM_masses[index-1], PPPC4DMID[index-1]);
+        std::array<std::vector<real_t>> spec_high = fermi_energy_bins(DM_masses[index], PPPC4DMID[index]);
+        real_t interpolation_factor = (mass - DM_masses[index-1])/(DM_masses[index]-DM_masses[index-1]);
+
+        for(size_t i=0; i<spec_low.size(); i++)
+        {
+          for(size_t j=0; j<spec_low[0].size(); j++)
+          {
+            real_t y = spec_low[i][j] + (spec_high[i][j]-spec_low[i][j])*interpolation_factor;
+            interpolated_spectrum[i].push_back(y);
+          }
+        }
+    }
+      
+    
+    return interpolated_spectrum;
+  }
 
 }; // namespace __SPEC_LIB_NAME__

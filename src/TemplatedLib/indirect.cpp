@@ -13,8 +13,8 @@ namespace __SPEC_LIB_NAME__
     // for a proper assignment of the masses vector
     p_ptr = std::make_shared<std::vector<Process2to2>>();
     total_sigma_v = 0;
-    find_annihilation_processes();
-    sigma_v(*p_ptr);
+    // find_annihilation_processes();
+    // sigma_v(*p_ptr);
   };
 
   // Indirectparam_t::~Indirectparam_t() = default;
@@ -304,141 +304,259 @@ namespace __SPEC_LIB_NAME__
     }
   };
 
-  std::vector<std::vector<double>> Indirectparam_t::read_file(std::string filename, int ncol)
+  void Indirectparam_t::read_file(std::string filename, int ncol, std::vector<std::vector<real_t>>& data)
   {
-    std::vector<std::vector<double>> data;
+    data.reserve(ncol);
     std::fstream file;
     file.open(filename);
 
-    if(!file.is_open())
+    if (!file.is_open())
     {
       std::cout << "Could not open read_file " << filename << "\n";
       exit(1);
     }
 
-    std::vector<std::vector<double>> data(ncol);
-    while(std::getline(file, line))
+    std::string line;
+    while (std::getline(file, line))
     {
-      double val;
-      int count=0;
-      std::vector<double> values(ncol);
+      if (line.at(0) == '#')
+        continue; // Skip comment lines
+      real_t val;
+      int count = 0;
+      std::vector<real_t> values(ncol);
       std::stringstream ss(line);
-      while(ss >> val)
+      while (ss >> val)
       {
         values.push_back(val);
         count++;
       }
 
-      if(count == ncol){
-        data.push_back(values);
-      }
-      else continue;
-
-    }
-
-  }
-
-  void Indirectparam_t::fetch_pppc4dmid_data(std::string filename, int ncol)
-  {
-    auto data = read_file(filename, ncol);
-
-    size_t n_rows = data.size();
-    size_t n_cols = data[0].size();
-
-    for (size_t i=0; i<PPPC4DMID.size(); i++) 
-    {
-      PPPC4DMID[i].resize(n_rows);
-      for(size_t j = 0; j < n_rows; j++)
+      if (count == ncol)
       {
-        for(size_t k = 1; k < n_cols; k++) // Skip first column (DM mass)
-        {
-          PPPC4DMID[i][j].push_back(data[j][k]);
-        }
+        data.emplace_back(values);
+      }
+      else
+      {
+        int ind_start = count - ncol;
+        data.emplace_back(values.begin() + ind_start, values.end());
       }
     }
+  }
 
-    std::vector<real_t> dm_masses; // Temporary vector to store DM masses
-    for(size_t i = 0; i < n_rows; i++)
+  void Indirectparam_t::fetch_pppc4dmid_data()
+  {
+    int ind_matrix = 0;
+    for (const auto& file : std::filesystem::directory_iterator(FILEPATH_PPPC4DMID))
     {
-      dm_masses.push_back(data[i][0]);
-    }
-    int index = 0;
+      std::string filename = file.path().string();
 
-    while(index<n_rows)
-    {
-      DM_masses.push_back(dm_masses[index]);
-      // Counts the number of rows with the same value of the DM mass
-      index += std::count(dm_masses.begin()+index,dm_masses.end(), dm_masses[index])
+      read_file(filename, 15, PPPC4DMID.at(ind_matrix));
+      DM_masses.emplace_back(std::stod(file.path().stem().string())); // Extract mass from filename
+      ind_matrix++;
     }
   }
 
 
-  std::array<std::vector<real_t>> Indirectparam_t::fermi_energy_bins(real_t mass, std::array<std::vector<real_t>> tab)
+  void Indirectparam_t::fermi_energy_bins(const real_t& mass, const std::vector<std::vector<real_t>>& tab,
+                                          std::vector<std::vector<real_t>>& final_spec)
   {
-    size_t n_rows = PPPC4DMID[0].size();
-    size_t n_cols = PPPC4DMID[0][0].size();
-    size_t n_masses = DM_masses.size();
+    size_t n_cols = PPPC4DMID.at(0).at(0).size();
 
-    std::array<std::vector<real_t>> final_spec(n_cols);
-    
-    for (int i=0; i<25; i++) 
+
+    final_spec.reserve(n_cols);
+
+
+    for (int i = 0; i < 25; i++)
     {
-      final_spec[i][0]=pow(10.,log10(500)+(log10(500000)-log10(500))/24*i)*0.001; // 24 energy bins logarithmically spaced between 500 and 500000 MeV
+      final_spec.at(i).at(0) = pow(10., log10(500) + (log10(500000) - log10(500)) / 24 * i) *
+                               0.001; // 24 energy bins logarithmically spaced between 500 and 500000 MeV
 
-      if (final_spec[i][0]>mass) for(j=0; j<n_cols-1; j++) energy_bins[i][j]=0;
+      if (final_spec.at(i).at(0) > mass)
+        for (size_t j = 1; j < n_cols; j++)
+          final_spec.at(i).at(j) = 0;
 
       else
       {
         size_t index = 0;
 
-        while(pow(10., tab[index][0]*mass)<=final_spec[i][0] && index < tab.size()) index++;
+        while (pow(10., tab[index][0] * mass) <= final_spec[i][0] && index < tab.size())
+          index++;
 
-        real_t K0 = pow(10., tab[index-1][0]*mass);
-        real_t K1 = pow(10., tab[index][0]*mass);
-        real_t interpolation_factor = (final_spec[i][0]-K0)/(K1-K0);
+        real_t K0 = pow(10., tab[index - 1][0] * mass);
+        real_t K1 = pow(10., tab[index][0] * mass);
+        real_t interpolation_factor = (final_spec[i][0] - K0) / (K1 - K0);
 
-        for (j=1; j<n_cols; j++) 
+        for (size_t j = 1; j < n_cols; j++)
         {
-          final_spec[i][j]=tab[index-1][j]+(tab[index][j] - tab[index-1][j])*interpolation_factor;
+          final_spec.at(i).at(j) =
+              tab.at(index - 1).at(j) + (tab.at(index).at(j) - tab.at(index - 1).at(j)) * interpolation_factor;
         }
       }
-    return final_spec;
-
     }
   }
 
-  std::array<std::vector<real_t>> Indirectparam_t::interpolate_spectrum_gamma(real_t mass)
+  void Indirectparam_t::interpolate_spectrum_gamma(const real_t& mass,
+                                                   std::vector<std::vector<real_t>>& interpolated_spectrum)
   {
-    size_t n_rows = PPPC4DMID[0].size();
-    size_t n_cols = PPPC4DMID[0][0].size();
+    size_t n_cols = PPPC4DMID.at(0).at(0).size();
     size_t n_masses = DM_masses.size();
 
-    std::array<std::vector<real_t>> interpolated_spectrum(n_cols);// First column is log10(K/m)
-    size_t index=0;
+    interpolated_spectrum.reserve(n_cols); // First column is log10(K/m)
+    size_t index = 0;
 
-    while(mass<DM_masses[index] && index<n_masses) index++;
+    while (mass < DM_masses.at(index) && index < n_masses)
+      index++;
 
-    if(DM_masses[index] == mass) interpolated_spectrum = fermi_energy_bins(mass, PPPC4DMID[index]);
+    if (DM_masses.at(index) == mass)
+      fermi_energy_bins(mass, PPPC4DMID[index], interpolated_spectrum);
 
-    else if(DM_masses[index] > mass)
+    else if (DM_masses.at(index) > mass)
     {
-        // Linear interpolation
-        std::array<std::vector<real_t>> spec_low = fermi_energy_bins(DM_masses[index-1], PPPC4DMID[index-1]);
-        std::array<std::vector<real_t>> spec_high = fermi_energy_bins(DM_masses[index], PPPC4DMID[index]);
-        real_t interpolation_factor = (mass - DM_masses[index-1])/(DM_masses[index]-DM_masses[index-1]);
+      // Linear interpolation
+      std::vector<std::vector<real_t>> spec_low, spec_high;
+      fermi_energy_bins(DM_masses.at(index - 1), PPPC4DMID.at(index - 1), spec_low);
+      fermi_energy_bins(DM_masses.at(index), PPPC4DMID.at(index), spec_high);
+      real_t interpolation_factor = (mass - DM_masses.at(index - 1)) / (DM_masses.at(index) - DM_masses.at(index - 1));
 
-        for(size_t i=0; i<spec_low.size(); i++)
+      for (size_t i = 0; i < spec_low.size(); i++)
+      {
+        for (size_t j = 0; j < spec_low.at(0).size(); j++)
         {
-          for(size_t j=0; j<spec_low[0].size(); j++)
-          {
-            real_t y = spec_low[i][j] + (spec_high[i][j]-spec_low[i][j])*interpolation_factor;
-            interpolated_spectrum[i].push_back(y);
-          }
+          real_t y = spec_low.at(i).at(j) + (spec_high.at(i).at(j) - spec_low.at(i).at(j)) * interpolation_factor;
+          interpolated_spectrum.at(i).push_back(y);
         }
+      }
     }
-      
-    
-    return interpolated_spectrum;
   }
+
+  void Indirectparam_t::spectrum_at_production(std::vector<std::vector<real_t>>& production_spectrum)
+  {
+    production_spectrum.reserve(25); // 24 energy bins
+
+    std::vector<std::vector<real_t>> tab; // To store the intermediate spectrum
+    for (size_t iene = 0; iene < energy_table.size(); iene++)
+    {
+      real_t energy = energy_table.at(iene);
+      interpolate_spectrum_gamma(energy, tab);
+
+      size_t row_index = 0;
+      for (auto& row : production_spectrum)
+      {
+        row.reserve(2);                      // First column is energy, second is dN/dE
+        row.at(0) = tab.at(row_index).at(0); // Energy of the bin
+        for (size_t col_index = 1; col_index < tab.at(0).size(); col_index++)
+        {
+          row.at(1) += tab.at(row_index).at(col_index) / row.at(0) * sigma_v_table.at(iene).at(col_index - 1) /
+                       2.; // dN/dE value
+        }
+        row_index++;
+      }
+    }
+  }
+
+  real_t Indirectparam_t::integrate_spectrum(const std::vector<std::vector<real_t>>& spectrum, const real_t& e_min,
+                                             const real_t& e_max)
+  {
+    real_t integral = 0.0;
+    size_t n_bins = spectrum.size();
+
+    for (size_t i = 0; i < n_bins - 1; i++)
+    {
+      real_t e_low = spectrum[i][0];
+      real_t e_high = spectrum[i + 1][0];
+
+      if (e_high < e_min || e_low > e_max)
+        continue; // Skip bins outside the integration range
+
+      // Determine the effective bin edges within the integration range
+      real_t bin_start = std::max(e_low, e_min);
+      real_t bin_end = std::min(e_high, e_max);
+
+      // Linear interpolation of dN/dE at the bin edges
+      real_t dN_dE_start;
+      real_t dN_dE_end;
+      if (bin_start == e_low)
+        dN_dE_start = spectrum[i][1] * spectrum[i][0];
+      else
+        dN_dE_start = spectrum[i][1] * spectrum[i][0] +
+                      bin_start * (spectrum[i + 1][1] - spectrum[i][1]) * (bin_start - e_low) / (e_high - e_low);
+      if (bin_end == e_high)
+        dN_dE_end = spectrum[i + 1][1] * spectrum[i + 1][0];
+      else
+        dN_dE_end = spectrum[i][1] * spectrum[i][0] +
+                    bin_end * (spectrum[i + 1][1] - spectrum[i][1]) * (bin_end - e_low) / (e_high - e_low);
+
+      // Trapezoidal rule for integration over the bin
+      integral += 0.5 * (dN_dE_start + dN_dE_end) * (bin_end - bin_start);
+    }
+
+    return integral;
+  }
+
+  void Indirectparam_t::read_fermi_data()
+  {
+    std::string path = "/workspaces/darkpack-cmake/src/fermi_data/";
+    int i = 0;
+    for (const auto& file : std::filesystem::directory_iterator(path))
+    {
+      if (i == 0)
+      {
+        read_file(file.path().string(), 4, logJ_factors);
+        i++;
+      }
+      else
+      {
+        fermi_data.at(i - 1).clear();
+        read_file(file.path().string(), 4, fermi_data.at(i));
+        i++;
+      }
+    }
+  }
+
+  real_t Indirectparam_t::interpolate_likelihood(const int& dsph, const int& bin, const real_t& flux)
+  {
+    const auto data = fermi_data.at(dsph);
+    auto total_size = static_cast<int>(data.size());
+    int ind_flux = bin * 25; // Each energy bin has 25 flux values
+    while (ind_flux < (bin + 1) * 25 - 1 && data.at(ind_flux).at(3) < flux && ind_flux < total_size)
+      ind_flux++;
+
+    real_t res = data.at(ind_flux - 1).at(3) + (data.at(ind_flux).at(3) - data.at(ind_flux - 1).at(2)) /
+                                                   (data.at(ind_flux).at(1) - data.at(ind_flux).at(1)) *
+                                                   (flux - data.at(ind_flux - 1).at(1));
+
+    return res;
+  }
+
+  real_t Indirectparam_t::likelihood_one_dsph(const int& dsph, const real_t& logJ)
+  {
+    real_t logJ_obs = logJ_factors.at(dsph).at(0);
+    real_t sigma_j = logJ_factors.at(dsph).at(1);
+    real_t J_obs = pow(10., logJ_obs);
+    real_t J = (logJ != 0.0) ? pow(10., logJ) : 0.0;
+
+    int DM_candidate = input.getLightestBSMpart();
+    real_t DM_mass = input.masses_vector.at(DM_candidate);
+
+    real_t log_like = 0.0;
+    std::vector<std::vector<real_t>> production_spectrum;
+    spectrum_at_production(production_spectrum);
+    for (size_t bin = 0; bin < 24; bin++)
+    {
+      real_t e_min = fermi_data.at(dsph).at(bin * 25).at(0);
+      real_t e_max = fermi_data.at(dsph).at((bin + 1) * 25 - 1).at(0);
+      real_t flux = integrate_spectrum(production_spectrum, e_min, e_max) / (4 * M_PI) / pow(DM_mass, 2.0);
+      log_like += interpolate_likelihood(dsph, bin, flux);
+
+      if (J != 0.0)
+      {
+        real_t logJ_term = -0.5 * pow((logJ - logJ_obs) / sigma_j, 2.0);
+        log_like += logJ_term;
+      }
+    }
+    return log_like;
+  }
+
+
 
 }; // namespace __SPEC_LIB_NAME__

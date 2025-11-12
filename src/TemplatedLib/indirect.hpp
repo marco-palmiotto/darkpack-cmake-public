@@ -1,10 +1,13 @@
 #pragma once
-#ifndef __cplusplus
-  #define __cplusplus
-#endif
+
 
 #ifndef INDIRECT__SPEC_LIB_NAME__
   #define INDIRECT__SPEC_LIB_NAME__
+
+  #ifndef __cplusplus
+    #define __cplusplus
+  #endif
+
 
   #include "RunningSM.hpp"
   #include "advmath.hpp"
@@ -13,14 +16,18 @@
   #include "process.hpp"
   #include "process_1to2.hpp"
   #include <array>
-  #include <vector>
+  #include <filesystem>
   #include <fstream>
-  #include <sstream>
   #include <iostream>
+  #include <sstream>
+  #include <vector>
 
 namespace __SPEC_LIB_NAME__
 {
-  class Process_1to2;   //< Forward declaration of Process_1to2 class
+  class Process_1to2;        //< Forward declaration of Process_1to2 class
+  class Propagation_param_t; //< Forward declaration of Propagation_param_t class
+
+
   class Indirectparam_t //< Class containing the parameters and methods for indirect detection
   {
 private:
@@ -33,8 +40,10 @@ private:
     std::vector<real_t> sigma_v_process; //!< Vector for the thermally averaged cross section of each process
     real_t total_sigma_v; //!< Value of the total thermally averaged cross section to evaluate the no. of d.o.f.
     real_t dof;           //!< Number of degrees of freedom (processes for which sigma_v is at least 1% of the total)
-    std::array<std::array<std::vector<real_t>>>(62) PPPC4DMID; //!< Data from the PPPC4DMID
+    std::array<std::vector<std::vector<real_t>>, 62> PPPC4DMID;  //!< Data from the PPPC4DMID
     std::vector<real_t> DM_masses;                               //!< List of DM masses in PPPC4DMID
+    std::array<std::vector<std::vector<real_t>>, 47> fermi_data; //!< Fermi-LAT binned data
+    std::vector<std::vector<real_t>> logJ_factors;               //!< Log J-factors for the 47 dSphs
 
 public:
     /**
@@ -42,7 +51,7 @@ public:
      *
      * @param input Param_t object containing numerical inputs.
      */
-    Indirectparam_t(const Param_t& input);
+    Indirectparam_t(const Param_t& input_in);
 
     /**
      * @brief Destructor for the Indirectparam_t class.
@@ -77,16 +86,13 @@ public:
      */
     void handle_1to2_decays(real_t sigma_v, int particle, real_t sqrt_s);
 
-    /**
-     * @brief Fills the spectra for the different annihilation channels.
-     *
-     * @param sqrtS The center-of-mass energy.
-     *
-     */
-    void fill_spectrum(std::vector<Process2to2> processes, std::vector<real_t> sigma_v_vector, double sqrt_s);
 
     /**
      * @brief Fills the spectra for the different annihilation channels.
+     *
+     * @param processes The list of 2 to 2 processes.
+     *
+     * @param sigma_v_vector The vector containing the thermally averaged cross sections for each process.
      *
      * @param sqrtS The center-of-mass energy.
      *
@@ -97,45 +103,90 @@ public:
      * @brief Reads an n-column data file. Returns a vector of vectors, one for each column.
      *
      * @param filename The name of the file to be read.
-     * 
+     *
      * @param ncol The number of columns in the file
      *
+     * @param data The vector of vectors to store the data.
+     *
      */
-    std::vector<std::vector<double>> read_file(std::string filename, int ncol);
+    void read_file(std::string filename, int ncol, std::vector<std::vector<real_t>>& data);
 
     /**
-     * @brief Creates a list of masses from a data file.
-     *
-     * @param filename The name of the file to be read.
-     * 
-     * @param ncol The number of columns in the file
+     * @brief Fetches the data from the PPPC4DMID data file.
      *
      */
-    void fetch_pppc4dmid_data(std::string filename, int ncol);
+    void fetch_pppc4dmid_data();
 
     /**
      * @brief Adapts the spectrum of gamma rays to the energy bins used by Fermi-LAT.
-     * 
+     *
      * @param mass The mass of the dark matter particle.
-     * 
+     *
      * @param tab The tabulated spectrum to be adapted.
+     *
+     * @param final_spec The adapted spectrum.
      */
-    std::array<std::vector<real_t>> fermi_energy_bins(real_t mass, std::array<std::vector<real_t>> tab);
+    void fermi_energy_bins(const real_t& mass, const std::vector<std::vector<real_t>>& tab,
+                           std::vector<std::vector<real_t>>& final_spec);
 
-     /**
+    /**
      * @brief Interpolates the spectrum of gamma rays for any value of the dark matter mass.
      *
      * @param mass The mass of the dark matter particle.
-     * 
+     *
+     * @param interpolated_spectrum The interpolated spectrum.
      */
-    std::array<std::vector<real_t>> interpolate_spectrum_gamma(real_t mass);
+    void interpolate_spectrum_gamma(const real_t& mass, std::vector<std::vector<real_t>>& interpolated_spectrum);
 
-    
+    /**
+     * @brief Obtains the spectrum of gamma rays at production from the PPPC4DMID data.
+     *
+     * @param production_spectrum The spectrum at production.
+     *
+     */
+    void spectrum_at_production(std::vector<std::vector<real_t>>& production_spectrum);
+
+    /**
+     * @brief Obtains the spectrum of gamma rays at production from the PPPC4DMID data.
+     *
+     * @param production_spectrum The spectrum at production.
+     *
+     */
+    real_t integrate_spectrum(const std::vector<std::vector<real_t>>& spectrum, const real_t& e_min,
+                              const real_t& e_max);
+
+    /**
+     * @brief Reads dSph data from the Fermi-LAT experiment.
+     *
+     */
+    void read_fermi_data();
+
+    /**
+     * @brief Interpolates the log likelihood for a given dSph, energy bin and flux value.
+     *
+     * @param dsph The index of the dSph.
+     *
+     * @param bin The index of the energy bin.
+     *
+     * @param flux The value of the energy flux.
+     *
+     */
+    real_t interpolate_likelihood(const int& dsph, const int& bin, const real_t& flux);
+
+    /**
+     * @brief Obtains the spectrum of gamma rays at production from the PPPC4DMID data.
+     *
+     * @param production_spectrum The spectrum at production.
+     *
+     */
+    real_t likelihood_one_dsph(const int& dsph, const real_t& logJ);
+
+    inline std::vector<std::vector<real_t>> get_logJ() { return logJ_factors; };
+
+
 
   }; // class Indirectparam_t
 
-
-
-
 }; // namespace __SPEC_LIB_NAME__
-#endif // RELICPARAM__SPEC_LIB_NAME__
+
+#endif // INDIRECT__SPEC_LIB_NAME__

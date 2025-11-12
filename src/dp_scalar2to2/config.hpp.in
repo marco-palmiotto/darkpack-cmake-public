@@ -7,5 +7,12 @@
 #define __SPEC_LIB_NAME__VERSION_MINOR  ${${PROJECT_NAME}_VERSION_MINOR}
 #include "@__SPEC_LIB_NAME__@.h"
 constexpr const char * OUTPATH = "@__OUTPATH__@";
+constexpr const char * PROJECTPATH = "@CMAKE_SOURCE_DIR@";
+constexpr const char * FILEPATH_PPPC4DMID = "@__PPPC4DMID__@";
+constexpr const char * FILENAME_H_ON_H = "@__HONH__@";
+constexpr const char * FILENAME_HE_ON_H = "@__HEONH__@";
+constexpr const char * FILENAME_HE_ON_HE = "@__HEONHE__@";
+constexpr const char * FILENAME_H_ON_HE = "@__HONHE__@";
+
 
 #endif // CONFIG_HPP__SPEC_LIB_NAME__

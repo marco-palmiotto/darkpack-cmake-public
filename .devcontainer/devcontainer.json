@@ -21,7 +21,7 @@
 	//   "--memory=8g",
 	//   "--memory-swap=10g",
 	//   "--cpus=6"
-	],
+	//],
 
 	"customizations": {
 		"vscode": {

@@ -7,5 +7,6 @@
 #define __SPEC_LIB_NAME__VERSION_MINOR  ${${PROJECT_NAME}_VERSION_MINOR}
 #include "@__SPEC_LIB_NAME__@.h"
 constexpr const char * OUTPATH = "@__OUTPATH__@";
+constexpr const char * PROJECTPATH = "@CMAKE_SOURCE_DIR@";
 
 #endif // CONFIG_HPP__SPEC_LIB_NAME__

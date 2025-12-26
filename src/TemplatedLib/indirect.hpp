@@ -39,11 +39,13 @@ private:
         sigma_v_table; //!< Table containing the values of &sigma;*v for each channel at different energies
     std::vector<real_t> sigma_v_process; //!< Vector for the thermally averaged cross section of each process
     real_t total_sigma_v; //!< Value of the total thermally averaged cross section to evaluate the no. of d.o.f.
-    real_t dof;           //!< Number of degrees of freedom (processes for which sigma_v is at least 1% of the total)
+    real_t dof; //!< Number of degrees of freedom (processes for which sigma_v is at least 1% of the total annihilation
+                //!< cross section)
     std::array<std::vector<std::vector<real_t>>, 62> PPPC4DMID;  //!< Data from the PPPC4DMID
     std::vector<real_t> DM_masses;                               //!< List of DM masses in PPPC4DMID
     std::array<std::vector<std::vector<real_t>>, 47> fermi_data; //!< Fermi-LAT binned data
-    std::vector<std::vector<real_t>> logJ_factors;               //!< Log J-factors for the 47 dSphs
+    std::array<real_t, 24> fermi_eflux;            //!< Integrated energy fluxes of gamma rays for each energy bin
+    std::vector<std::vector<real_t>> logJ_factors; //!< Log J-factors for the 47 dSphs
 
 public:
     /**
@@ -173,13 +175,35 @@ public:
      */
     real_t interpolate_likelihood(const int& dsph, const int& bin, const real_t& flux);
 
+    void compute_fluxes(std::vector<std::vector<real_t>>& production_spectrum);
+
     /**
-     * @brief Obtains the spectrum of gamma rays at production from the PPPC4DMID data.
+     * @brief Obtains the log-likelihood for one dwarf spheroidal galaxy.
      *
-     * @param production_spectrum The spectrum at production.
+     * @param dsph The index of the dSph in the Fermi-LAT database.
+     *
+     * @param logJ Logarithm of the true value of the J-factor.
      *
      */
     real_t likelihood_one_dsph(const int& dsph, const real_t& logJ);
+
+    real_t logx_interpol(const std::vector<std::vector<real_t>>& spect, real_t logx);
+
+    inline real_t get_total_sigma_v() { return total_sigma_v; };
+
+    inline real_t get_dof() { return dof; };
+
+    inline std::vector<Process2to2> get_processes() { return *p_ptr; };
+
+    inline std::vector<real_t> get_energy_table() { return energy_table; };
+
+    inline std::array<std::vector<real_t>, 14> get_sigma_v_table() { return sigma_v_table; };
+
+    inline std::vector<real_t> get_sigma_v_process() { return sigma_v_process; };
+
+    inline std::vector<real_t> get_DM_masses() { return DM_masses; };
+
+    inline std::array<std::vector<std::vector<real_t>>, 47> get_fermi_data() { return fermi_data; };
 
     inline std::vector<std::vector<real_t>> get_logJ() { return logJ_factors; };
 

@@ -314,6 +314,43 @@ namespace advmath
     } while (true);
   }
 
+  real_t find_zero_secant(real_t xmin, real_t xmax, std::function<real_t(real_t)> f, real_t tol)
+  {
+    if (xmax < xmin)
+      std::swap(xmin, xmax);
+
+    real_t fmin = f(xmin);
+    real_t fmax = f(xmax);
+    real_t xnew, fnew;
+    const int MAXITER = 1000;
+    int iter = 0;
+
+    if (fmin * fmax > 0.)
+    { // No zero crossing
+      return NAN;
+    }
+
+    while (iter < MAXITER)
+    {
+      xnew = xmax - fmax * (xmax - xmin) / (fmax - fmin);
+      fnew = f(xnew);
+
+      if (std::abs(fnew) < tol)
+        return xnew;
+
+      if (fnew * fmax < 0.)
+      {
+        xmin = xmax;
+        fmin = fmax;
+      }
+
+      xmax = xnew;
+      fmax = fnew;
+
+      iter++;
+    }
+  }
+
   complex_floating_t digamma(complex_floating_t z)
   {
 
@@ -638,5 +675,101 @@ namespace advmath
     return K0exp_numdenom(num_x, num_z, denom) + 2. / num_x * denom * K1exp_numdenom(num_x, num_z, denom);
   }
 
+  real_t besselj0(real_t x)
+  /* Bessel function J0 */
+  {
+    real_t P1 = 1.e0;
+    real_t P2 = -.1098628627e-2;
+    real_t P3 = .2734510407e-4;
+    real_t P4 = -.2073370639e-5;
+    real_t P5 = .2093887211e-6;
 
+    real_t Q1 = -.1562499995e-1;
+    real_t Q2 = .1430488765e-3;
+    real_t Q3 = -.6911147651e-5;
+    real_t Q4 = .7621095161e-6;
+    real_t Q5 = -.934945152e-7;
+
+    real_t R1 = 57568490574.e0;
+    real_t R2 = -13362590354.e0;
+    real_t R3 = 651619640.7e0;
+    real_t R4 = -11214424.18e0;
+    real_t R5 = 77392.33017e0;
+    real_t R6 = -184.9052456e0;
+
+    real_t S1 = 57568490411.e0;
+    real_t S2 = 1029532985.e0;
+    real_t S3 = 9494680.718e0;
+    real_t S4 = 59272.64853e0;
+    real_t S5 = 267.8532712e0;
+    real_t S6 = 1.e0;
+    real_t ax, xx, y, z, result;
+    ax = (x < 0) ? -x : x;
+
+    if (ax < 8.0)
+    {
+      y = x * x;
+      result = (R1 + y * (R2 + y * (R3 + y * (R4 + y * (R5 + y * R6))))) /
+               (S1 + y * (S2 + y * (S3 + y * (S4 + y * (S5 + y * S6)))));
+      return result;
+    }
+    else
+    {
+      z = 8. / ax;
+      y = z * z;
+      xx = ax - .785398164;
+      result = sqrt(.636619772 / ax) * (cos(xx) * (P1 + y * (P2 + y * (P3 + y * (P4 + y * P5)))) -
+                                        z * sin(xx) * (Q1 + y * (Q2 + y * (Q3 + y * (Q4 + y * Q5)))));
+      return result;
+    }
+  }
+  real_t besselj1(real_t x)
+  /* Bessel function J1 */
+  {
+    real_t P1 = 1.e0;
+    real_t P2 = .183105e-2;
+    real_t P3 = -.3516396496e-4;
+    real_t P4 = .2457520174e-5;
+    real_t P5 = -.240337019e-6;
+
+    real_t Q1 = .04687499995e0;
+    real_t Q2 = -.2002690873e-3;
+    real_t Q3 = .8449199096e-5;
+    real_t Q4 = -.88228987e-6;
+    real_t Q5 = .105787412e-6;
+
+    real_t R1 = 72362614232.e0;
+    real_t R2 = -7895059235.e0;
+    real_t R3 = 242396853.1e0;
+    real_t R4 = -2972611.439e0;
+    real_t R5 = 15704.48260e0;
+    real_t R6 = -30.16036606e0;
+
+    real_t S1 = 144725228442.e0;
+    real_t S2 = 2300535178.e0;
+    real_t S3 = 18583304.74e0;
+    real_t S4 = 99447.43394e0;
+    real_t S5 = 376.9991397e0;
+    real_t S6 = 1.e0;
+    real_t ax, xx, y, z, signe, resultat;
+    ax = (x < 0) ? -x : x;
+    signe = (x < 0) ? -1. : 1.;
+
+    if (ax < 8.0)
+    {
+      y = x * x;
+      resultat = x * (R1 + y * (R2 + y * (R3 + y * (R4 + y * (R5 + y * R6))))) /
+                 (S1 + y * (S2 + y * (S3 + y * (S4 + y * (S5 + y * S6)))));
+      return resultat;
+    }
+    else
+    {
+      z = 8. / ax;
+      y = z * z;
+      xx = ax - 2.356194491;
+      resultat = sqrt(.636619772 / ax) * (cos(xx) * (P1 + y * (P2 + y * (P3 + y * (P4 + y * P5)))) -
+                                          z * sin(xx) * (Q1 + y * (Q2 + y * (Q3 + y * (Q4 + y * Q5)))));
+      return (signe * resultat);
+    }
+  }
 } // end of namespace advmath

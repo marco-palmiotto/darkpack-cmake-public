@@ -12,6 +12,9 @@ set(__HEONH__ "${CMAKE_SOURCE_DIR}/src/antiprotons/cross_section/DSPBAR_SUR_DEPB
 set(__HEONHE__ "${CMAKE_SOURCE_DIR}/src/antiprotons/cross_section/DSPBAR_SUR_DEPBAR_HE_on_HE_high_energy.txt")
 set(__HONHE__ "${CMAKE_SOURCE_DIR}/src/antiprotons/cross_section/DSPBAR_SUR_DEPBAR_H_on_HE_high_energy.txt")
 
+set(__XSECTION_ERRORS__ "${CMAKE_SOURCE_DIR}/src/antiprotons/source_term_error_MDGS/bestband_convolutionall_totpp_def200.dat")
+set(__PRIMARY_SOURCES__ "${CMAKE_SOURCE_DIR}/src/antiprotons/FluxSourceAntip")
+
 function(print)
     foreach(var ${ARGN})
         message("${var} = ${${var}}")

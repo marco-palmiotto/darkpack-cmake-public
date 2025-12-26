@@ -13,8 +13,8 @@ namespace __SPEC_LIB_NAME__
     // for a proper assignment of the masses vector
     p_ptr = std::make_shared<std::vector<Process2to2>>();
     total_sigma_v = 0;
-    // find_annihilation_processes();
-    // sigma_v(*p_ptr);
+    find_annihilation_processes();
+    sigma_v(*p_ptr);
   };
 
   // Indirectparam_t::~Indirectparam_t() = default;
@@ -192,46 +192,65 @@ namespace __SPEC_LIB_NAME__
         }
         size_t energy_index = distance(energy_table.begin(), it);
 
-        if (final_fields[j] == corr::e)
-          sigma_v_table[energy_index][0] += 0.5 * sigma_v_new;
-        else if (final_fields[j] == corr::mu)
-          sigma_v_table[energy_index][1] += 0.5 * sigma_v_new;
-        else if (final_fields[j] == corr::tau)
-          sigma_v_table[energy_index][2] += 0.5 * sigma_v_new;
-        else if (final_fields[j] == corr::u)
-          sigma_v_table[energy_index][3] += 0.5 * sigma_v_new;
-        else if (final_fields[j] == corr::d)
-          sigma_v_table[energy_index][3] += 0.5 * sigma_v_new;
-        else if (final_fields[j] == corr::s)
-          sigma_v_table[energy_index][3] += 0.5 * sigma_v_new;
-        else if (final_fields[j] == corr::c)
-          sigma_v_table[energy_index][4] += 0.5 * sigma_v_new;
-        else if (final_fields[j] == corr::b)
-          sigma_v_table[energy_index][5] += 0.5 * sigma_v_new;
-        else if (final_fields[j] == corr::t)
-          sigma_v_table[energy_index][6] += 0.5 * sigma_v_new;
-        else if (final_fields[j] == corr::W)
-          sigma_v_table[energy_index][7] += 0.5 * sigma_v_new;
-        else if (final_fields[j] == corr::Z)
-          sigma_v_table[energy_index][8] += 0.5 * sigma_v_new;
-        else if (final_fields[j] == corr::G)
-          sigma_v_table[energy_index][9] += 0.5 * sigma_v_new;
-        else if (final_fields[j] == corr::A)
-          sigma_v_table[energy_index][10] += 0.5 * sigma_v_new;
-        else if (final_fields[j] == corr::nu_e)
-          sigma_v_table[energy_index][11] += 0.5 * sigma_v_new;
-        else if (final_fields[j] == corr::nu_mu)
-          sigma_v_table[energy_index][12] += 0.5 * sigma_v_new;
-        else if (final_fields[j] == corr::nu_tau)
-          sigma_v_table[energy_index][13] += 0.5 * sigma_v_new;
-        else
+        switch (final_fields[j])
         {
-          // Called recursively to handle subsequent decays
-          handle_1to2_decays(sigma_v_new, final_fields[j], final_energies[j]);
+        case (corr::e):
+          sigma_v_table[energy_index][0] += 0.5 * sigma_v;
+          break;
+        case (corr::mu):
+          sigma_v_table[energy_index][1] += 0.5 * sigma_v;
+          break;
+        case (corr::tau):
+          sigma_v_table[energy_index][2] += 0.5 * sigma_v;
+          break;
+        case (corr::u):
+          sigma_v_table[energy_index][3] += 0.5 * sigma_v;
+          break;
+        case (corr::d):
+          sigma_v_table[energy_index][3] += 0.5 * sigma_v;
+          break;
+        case (corr::s):
+          sigma_v_table[energy_index][3] += 0.5 * sigma_v;
+          break;
+        case (corr::c):
+          sigma_v_table[energy_index][4] += 0.5 * sigma_v;
+          break;
+        case (corr::b):
+          sigma_v_table[energy_index][5] += 0.5 * sigma_v;
+          break;
+        case (corr::t):
+          sigma_v_table[energy_index][6] += 0.5 * sigma_v;
+          break;
+        case (corr::W):
+          sigma_v_table[energy_index][7] += 0.5 * sigma_v;
+          break;
+        case (corr::Z):
+          sigma_v_table[energy_index][8] += 0.5 * sigma_v;
+          break;
+        case (corr::G):
+          sigma_v_table[energy_index][9] += 0.5 * sigma_v;
+          break;
+        case (corr::A):
+          sigma_v_table[energy_index][10] += 0.5 * sigma_v;
+          break;
+        case (corr::nu_e):
+          sigma_v_table[energy_index][11] += 0.5 * sigma_v;
+          break;
+        case (corr::nu_mu):
+          sigma_v_table[energy_index][12] += 0.5 * sigma_v;
+          break;
+        case (corr::nu_tau):
+          sigma_v_table[energy_index][13] += 0.5 * sigma_v;
+          break;
+        default:
+        {
+          // Calling to handle decays
+          handle_1to2_decays(sigma_v, final_fields[j], final_energies[j]);
+        }
         }
       }
     }
-  }
+  };
 
   void Indirectparam_t::fill_spectrum(std::vector<Process2to2> processes, std::vector<real_t> sigma_v_vector,
                                       real_t sqrt_s)
@@ -263,50 +282,69 @@ namespace __SPEC_LIB_NAME__
         }
         size_t energy_index = distance(energy_table.begin(), it);
 
-        if (final_fields[j] == corr::e)
+        switch (final_fields[j])
+        {
+        case (corr::e):
           sigma_v_table[energy_index][0] += 0.5 * sigma_v;
-        else if (final_fields[j] == corr::mu)
+          break;
+        case (corr::mu):
           sigma_v_table[energy_index][1] += 0.5 * sigma_v;
-        else if (final_fields[j] == corr::tau)
+          break;
+        case (corr::tau):
           sigma_v_table[energy_index][2] += 0.5 * sigma_v;
-        else if (final_fields[j] == corr::u)
+          break;
+        case (corr::u):
           sigma_v_table[energy_index][3] += 0.5 * sigma_v;
-        else if (final_fields[j] == corr::d)
+          break;
+        case (corr::d):
           sigma_v_table[energy_index][3] += 0.5 * sigma_v;
-        else if (final_fields[j] == corr::s)
+          break;
+        case (corr::s):
           sigma_v_table[energy_index][3] += 0.5 * sigma_v;
-        else if (final_fields[j] == corr::c)
+          break;
+        case (corr::c):
           sigma_v_table[energy_index][4] += 0.5 * sigma_v;
-        else if (final_fields[j] == corr::b)
+          break;
+        case (corr::b):
           sigma_v_table[energy_index][5] += 0.5 * sigma_v;
-        else if (final_fields[j] == corr::t)
+          break;
+        case (corr::t):
           sigma_v_table[energy_index][6] += 0.5 * sigma_v;
-        else if (final_fields[j] == corr::W)
+          break;
+        case (corr::W):
           sigma_v_table[energy_index][7] += 0.5 * sigma_v;
-        else if (final_fields[j] == corr::Z)
+          break;
+        case (corr::Z):
           sigma_v_table[energy_index][8] += 0.5 * sigma_v;
-        else if (final_fields[j] == corr::G)
+          break;
+        case (corr::G):
           sigma_v_table[energy_index][9] += 0.5 * sigma_v;
-        else if (final_fields[j] == corr::A)
+          break;
+        case (corr::A):
           sigma_v_table[energy_index][10] += 0.5 * sigma_v;
-        else if (final_fields[j] == corr::nu_e)
+          break;
+        case (corr::nu_e):
           sigma_v_table[energy_index][11] += 0.5 * sigma_v;
-        else if (final_fields[j] == corr::nu_mu)
+          break;
+        case (corr::nu_mu):
           sigma_v_table[energy_index][12] += 0.5 * sigma_v;
-        else if (final_fields[j] == corr::nu_tau)
+          break;
+        case (corr::nu_tau):
           sigma_v_table[energy_index][13] += 0.5 * sigma_v;
-        else
+          break;
+        default:
         {
           // Calling to handle decays
           handle_1to2_decays(sigma_v, final_fields[j], final_energies[j]);
         }
+        }
       }
-    }
-  };
+    };
+  }
 
   void Indirectparam_t::read_file(std::string filename, int ncol, std::vector<std::vector<real_t>>& data)
   {
-    data.reserve(ncol);
+    data.resize(ncol);
     std::fstream file;
     file.open(filename);
 
@@ -343,6 +381,7 @@ namespace __SPEC_LIB_NAME__
     }
   }
 
+
   void Indirectparam_t::fetch_pppc4dmid_data()
   {
     int ind_matrix = 0;
@@ -363,7 +402,7 @@ namespace __SPEC_LIB_NAME__
     size_t n_cols = PPPC4DMID.at(0).at(0).size();
 
 
-    final_spec.reserve(n_cols);
+    final_spec.resize(n_cols);
 
 
     for (int i = 0; i < 25; i++)
@@ -401,7 +440,7 @@ namespace __SPEC_LIB_NAME__
     size_t n_cols = PPPC4DMID.at(0).at(0).size();
     size_t n_masses = DM_masses.size();
 
-    interpolated_spectrum.reserve(n_cols); // First column is log10(K/m)
+    interpolated_spectrum.resize(n_cols); // First column is log10(K/m)
     size_t index = 0;
 
     while (mass < DM_masses.at(index) && index < n_masses)
@@ -431,7 +470,7 @@ namespace __SPEC_LIB_NAME__
 
   void Indirectparam_t::spectrum_at_production(std::vector<std::vector<real_t>>& production_spectrum)
   {
-    production_spectrum.reserve(25); // 24 energy bins
+    production_spectrum.resize(25); // 24 energy bins
 
     std::vector<std::vector<real_t>> tab; // To store the intermediate spectrum
     for (size_t iene = 0; iene < energy_table.size(); iene++)
@@ -442,7 +481,7 @@ namespace __SPEC_LIB_NAME__
       size_t row_index = 0;
       for (auto& row : production_spectrum)
       {
-        row.reserve(2);                      // First column is energy, second is dN/dE
+        row.resize(2);                       // First column is energy, second is dN/dE
         row.at(0) = tab.at(row_index).at(0); // Energy of the bin
         for (size_t col_index = 1; col_index < tab.at(0).size(); col_index++)
         {
@@ -499,14 +538,14 @@ namespace __SPEC_LIB_NAME__
     int i = 0;
     for (const auto& file : std::filesystem::directory_iterator(path))
     {
-      if (i == 0)
+      std::string filepath = file.path().string();
+      if (filepath == "/workspaces/darkpack-cmake/src/fermi_data/dSphs_list.dat")
       {
-        read_file(file.path().string(), 4, logJ_factors);
-        i++;
+        read_file(file.path().string(), 5, logJ_factors);
       }
       else
       {
-        fermi_data.at(i - 1).clear();
+        fermi_data.at(i).clear();
         read_file(file.path().string(), 4, fermi_data.at(i));
         i++;
       }
@@ -528,6 +567,25 @@ namespace __SPEC_LIB_NAME__
     return res;
   }
 
+  void Indirectparam_t::compute_fluxes(std::vector<std::vector<real_t>>& production_spectrum)
+  {
+    spectrum_at_production(production_spectrum);
+
+    int DM_candidate = input.getLightestBSMpart();
+    real_t DM_mass = input.masses_vector.at(DM_candidate);
+
+    for (int bin = 0; bin < 24; bin++)
+    {
+      real_t logE_min = fermi_data.at(0).at(bin * 25).at(0);
+      real_t logE_max = fermi_data.at(0).at(bin * 25).at(1);
+
+      real_t e_min = pow(10., logE_min);
+      real_t e_max = pow(10., logE_max);
+
+      fermi_eflux.at(bin) = integrate_spectrum(production_spectrum, e_min, e_max) / (4 * M_PI) / pow(DM_mass, 2.0);
+    }
+  }
+
   real_t Indirectparam_t::likelihood_one_dsph(const int& dsph, const real_t& logJ)
   {
     real_t logJ_obs = logJ_factors.at(dsph).at(0);
@@ -535,18 +593,12 @@ namespace __SPEC_LIB_NAME__
     real_t J_obs = pow(10., logJ_obs);
     real_t J = (logJ != 0.0) ? pow(10., logJ) : 0.0;
 
-    int DM_candidate = input.getLightestBSMpart();
-    real_t DM_mass = input.masses_vector.at(DM_candidate);
 
     real_t log_like = 0.0;
-    std::vector<std::vector<real_t>> production_spectrum;
-    spectrum_at_production(production_spectrum);
     for (size_t bin = 0; bin < 24; bin++)
     {
-      real_t e_min = fermi_data.at(dsph).at(bin * 25).at(0);
-      real_t e_max = fermi_data.at(dsph).at((bin + 1) * 25 - 1).at(0);
-      real_t flux = integrate_spectrum(production_spectrum, e_min, e_max) / (4 * M_PI) / pow(DM_mass, 2.0);
-      log_like += interpolate_likelihood(dsph, bin, flux);
+      real_t flux_J = J * fermi_eflux.at(bin);
+      log_like += interpolate_likelihood(dsph, bin, flux_J);
 
       if (J != 0.0)
       {
@@ -557,6 +609,25 @@ namespace __SPEC_LIB_NAME__
     return log_like;
   }
 
+  real_t Indirectparam_t::logx_interpol(const std::vector<std::vector<real_t>>& spect, real_t logx)
+  /* Interpolates the value of a spectrum at an energy log10(E)=logx using the spectrum tabulated in energy spect */
+  {
+    int n1 = spect.size();
+    if (logx < spect[0][0] || logx > spect[n1 - 1][0])
+    {
+      printf("logx out of range, %e %e %e\n", logx, spect[0][0], spect[n1 - 1][0]);
+      exit(EXIT_FAILURE);
+    }
+
+    int index = 0;
+    while (spect[index][0] <= logx && index < n1)
+      index++;
+    index--;
+
+    real_t fact = (logx - spect[index][0]) / (spect[index + 1][0] - spect[index][0]);
+
+    return (1. - fact) * spect[index][1] + fact * spect[index + 1][1];
+  }
 
 
 }; // namespace __SPEC_LIB_NAME__

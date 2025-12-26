@@ -1,4 +1,4 @@
-T_proton_MIN = 1.00e+00 [GeV/n] 	 T_proton_MAX = 1.00e+06 [GeV/n] 	 DIM_TAB_PROTON = 500 	 T_PBAR_MIN = 1.00e-01 [GeV/n] 	 T_PBAR_MAX = 1.00e+05 [GeV/n] 	 DIM_TAB_PBAR = 300 
+#T_proton_MIN = 1.00e+00 [GeV/n] 	 T_proton_MAX = 1.00e+06 [GeV/n] 	 DIM_TAB_PROTON = 500 	 T_PBAR_MIN = 1.00e-01 [GeV/n] 	 T_PBAR_MAX = 1.00e+05 [GeV/n] 	 DIM_TAB_PBAR = 300 
 
 0.00000e+00 	 0.00000e+00 
 0.00000e+00 	 0.00000e+00 

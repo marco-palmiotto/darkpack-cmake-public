@@ -47,6 +47,8 @@ namespace advmath
   real_t integrate_trap(real_t xmin, real_t xmax, std::function<real_t(real_t)> f, real_t maxdiscrepancy = -1.0e-3,
                         real_t* discr = nullptr);
 
+  real_t find_zero_secant(real_t xmin, real_t xmax, std::function<real_t(real_t)> f, real_t tol);
+
   complex_floating_t digamma(complex_floating_t z);
 
   real_t I0(real_t x);
@@ -66,6 +68,8 @@ namespace advmath
   real_t K0exp_numdenom(real_t num_x, real_t num_z, real_t denom);
   real_t K1exp_numdenom(real_t num_x, real_t num_z, real_t denom);
   real_t K2exp_numdenom(real_t num_x, real_t num_z, real_t denom);
+  real_t besselj0(real_t x);
+  real_t besselj1(real_t x);
 
 
 

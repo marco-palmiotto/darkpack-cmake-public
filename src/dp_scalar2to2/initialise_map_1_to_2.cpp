@@ -1,6 +1,6 @@
 #include "correspondance.hpp"
 namespace scalar2to2::corr{
-const std::unordered_map<std::string, Entry_t_1to2> squaredampl_1_to_2{ 
+const std::unordered_map<std::string, Entry_t_1to2> squaredampl_1to2{ 
 { {EMPTYCHAR+corr::h,ANTICHAR,EMPTYCHAR+corr::W,EMPTYCHAR+corr::W},{  &sumSqAmpl_h_to_anti_W_W, 1,1} },
 { {EMPTYCHAR+corr::h,ANTICHAR,EMPTYCHAR+corr::h,EMPTYCHAR+corr::h},{  &sumSqAmpl_h_to_anti_h_h, 2,1} },
 { {EMPTYCHAR+corr::h,ANTICHAR,EMPTYCHAR+corr::Z,EMPTYCHAR+corr::Z},{  &sumSqAmpl_h_to_anti_Z_Z, 2,1} },

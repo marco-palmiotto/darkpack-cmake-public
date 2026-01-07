@@ -12,6 +12,9 @@ endfunction()
 
 # Find Doxygen package
 find_package(Doxygen QUIET)
+
+find_package(GTest REQUIRED)
+
 # Define a cache variable for enabling/disabling documentation
 option(BUILD_DOCUMENTATION "Generate documentation with Doxygen" ${DOXYGEN_FOUND})
 
@@ -117,7 +120,6 @@ endforeach()
 # Create a custom target for headers installation
 add_custom_target(install_headers_all ALL DEPENDS ${LISTS_COMMANDS_TO_INSTALL_HEADERS_ONLY})
 
-add_subdirectory(src/Test)
 
 # Options to be applied to the dp_ libraries and the executables
 # Appending CMA-ES to the list of external libs to be linked 
@@ -162,6 +164,7 @@ else()
     message(STATUS "Documentation generation is disabled.")
 endif()
 
+add_subdirectory(src/Unit_tests)
 
 # Add a custom target to run clang-format on all source files
 find_program(CLANG_FORMAT_BIN clang-format)

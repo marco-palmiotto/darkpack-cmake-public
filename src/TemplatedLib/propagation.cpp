@@ -1828,7 +1828,7 @@ namespace __SPEC_LIB_NAME__
 
   //-----------------------------------Cosmic ray collision cross sections--------------------------//
 
-  real_t sigma_inelastic_pH_TAN_and_NG(real_t E_proton)
+  real_t Propagation_param_t::sigma_inelastic_pH_TAN_and_NG(real_t E_proton)
   /* sigma_inelastic_pH_TAN_and_NG is the inelastic scattering cross section in [cm^{2}] of a cosmic-ray proton on a
      hydrogen atom at rest. TAN and NG note this quantity \sigma^{i}_{p}. */
   {
@@ -2556,7 +2556,7 @@ namespace __SPEC_LIB_NAME__
     return 2 * likelihood_all_dwarfs();
   }
 
-  // Propagation_param_t::~Propagation_param_t() = default;
+  Propagation_param_t::~Propagation_param_t() = default;
 
 
 

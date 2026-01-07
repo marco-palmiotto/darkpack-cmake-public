@@ -17,7 +17,7 @@ namespace __SPEC_LIB_NAME__
     sigma_v(*p_ptr);
   };
 
-  // Indirectparam_t::~Indirectparam_t() = default;
+  Indirectparam_t::~Indirectparam_t() = default;
 
   void Indirectparam_t::find_annihilation_processes()
   {
@@ -344,7 +344,8 @@ namespace __SPEC_LIB_NAME__
 
   void Indirectparam_t::read_file(std::string filename, int ncol, std::vector<std::vector<real_t>>& data)
   {
-    data.resize(ncol);
+    data.clear();
+
     std::fstream file;
     file.open(filename);
 
@@ -357,12 +358,18 @@ namespace __SPEC_LIB_NAME__
     std::string line;
     while (std::getline(file, line))
     {
-      if (line.at(0) == '#')
+      if (line.empty() || line[0] == '#')
         continue; // Skip comment lines
       real_t val;
       int count = 0;
-      std::vector<real_t> values(ncol);
+      std::vector<real_t> values;
+      values.clear();
       std::stringstream ss(line);
+      if (!std::isdigit(line[0]) && line[0] != '-' && line[0] != '+')
+      {
+        std::string dummy;
+        ss >> dummy; // Skip non-numeric starting values
+      }
       while (ss >> val)
       {
         values.push_back(val);
@@ -372,6 +379,7 @@ namespace __SPEC_LIB_NAME__
       if (count == ncol)
       {
         data.emplace_back(values);
+        continue;
       }
       else
       {
@@ -541,12 +549,13 @@ namespace __SPEC_LIB_NAME__
       std::string filepath = file.path().string();
       if (filepath == "/workspaces/darkpack-cmake/src/fermi_data/dSphs_list.dat")
       {
-        read_file(file.path().string(), 5, logJ_factors);
+        logJ_factors.clear();
+        read_file(filepath, 5, logJ_factors);
       }
       else
       {
         fermi_data.at(i).clear();
-        read_file(file.path().string(), 4, fermi_data.at(i));
+        read_file(filepath, 4, fermi_data.at(i));
         i++;
       }
     }

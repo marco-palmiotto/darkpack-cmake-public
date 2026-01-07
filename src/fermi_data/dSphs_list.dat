@@ -1,5 +1,5 @@
 #dwarf tabulated likelihood files	#log10(J-factor) [log10(GeV2 cm−5)] #delta log10(J-factor) [log10(GeV2 cm−5)] #sample (-1=conservative, 0=nominal, 1=inclusive)
-					#log10(D-factor) [log10(GeV cm−2)] #delta log10(D-factor)
+#log10(D-factor) [log10(GeV cm−2)] #delta log10(D-factor)
 #kinematically confirmed galaxies
 like_bootes_I.txt		18.2	0.4	-1	17.25 	0.32
 like_bootes_II.txt		18.9	-1	-1	-1	-1

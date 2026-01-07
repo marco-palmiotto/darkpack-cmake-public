@@ -16,6 +16,7 @@
   #include "process.hpp"
   #include "process_1to2.hpp"
   #include <array>
+  #include <cctype>
   #include <filesystem>
   #include <fstream>
   #include <iostream>

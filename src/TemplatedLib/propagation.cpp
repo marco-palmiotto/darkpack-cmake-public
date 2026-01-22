@@ -180,10 +180,10 @@ namespace __SPEC_LIB_NAME__
   {
     // Auxiliary function to be used in the maximization of the likelihood (needed redefinition to make the optimization
     // compatible with both fermi-LAT and AMS-02)
-    real_t sigma_j = xtra[0];
-    auto dsph = static_cast<int>(xtra[1]);
+    real_t sigma_j = xtra.at(0);
+    auto dsph = static_cast<int>(xtra.at(1));
 
-    real_t logJ0 = logJ[0];
+    real_t logJ0 = logJ.at(0);
 
     return ind_param.likelihood_one_dsph(dsph, logJ0);
   }
@@ -195,13 +195,13 @@ namespace __SPEC_LIB_NAME__
     real_t sigma_j = logJ_factors.at(dsph).at(1);
 
     std::vector<real_t> logJ_opt;
-    logJ_opt.reserve(1);
+    logJ_opt.resize(1);
     real_t lhmax;
 
     std::vector<real_t> xtra;
-    xtra.reserve(2);
-    xtra[0] = sigma_j;
-    xtra[1] = dsph;
+    xtra.resize(2);
+    xtra.at(0) = sigma_j;
+    xtra.at(1) = dsph;
 
     std::vector<real_t> xlim_min = {1.0e-3};
     std::vector<real_t> xlim_max = {logJ_obs + 10. * sigma_j};
@@ -242,41 +242,41 @@ namespace __SPEC_LIB_NAME__
         }
       }
 
-      tmp = max_likelihood_one_dsph(i, logJ_factors) - logL_noDM[i];
+      tmp = max_likelihood_one_dsph(i, logJ_factors) - logL_noDM.at(i);
 
       auto sample = (int)logJ_factors.at(i).at(2);
 
       switch (sample)
       {
       case (-1):
-        l[0] += tmp;
-        l[1] += tmp;
-        l[2] += tmp; // Conservative
+        l.at(0) += tmp;
+        l.at(1) += tmp;
+        l.at(2) += tmp; // Conservative
         break;
       case (0):
-        l[1] += tmp;
-        l[2] += tmp; // Standard
+        l.at(1) += tmp;
+        l.at(2) += tmp; // Standard
         break;
       default:
-        l[2] += tmp; // Stringent
+        l.at(2) += tmp; // Stringent
       }
     }
 
 
     for (int i = 1; i <= 2; i++)
     {
-      if (l[i] < l[0])
+      if (l.at(i) < l.at(0))
       {
-        tmp = l[0];
-        l[0] = l[i];
-        l[i] = tmp;
+        tmp = l.at(0);
+        l.at(0) = l.at(i);
+        l.at(i) = tmp;
       }
     }
-    if (l[2] < l[1])
+    if (l.at(2) < l.at(1))
     {
-      tmp = l[1];
-      l[1] = l[2];
-      l[2] = tmp;
+      tmp = l.at(1);
+      l.at(1) = l.at(2);
+      l.at(2) = tmp;
     }
 
     real_t res;
@@ -284,13 +284,13 @@ namespace __SPEC_LIB_NAME__
     switch (sample_option)
     {
     case (-1):
-      res = l[2];
+      res = l.at(2);
       break;
     case (0):
-      res = l[1];
+      res = l.at(1);
       break;
     default:
-      res = l[0];
+      res = l.at(0);
     }
 
 
@@ -389,10 +389,10 @@ namespace __SPEC_LIB_NAME__
           weight_SIMPSON = (1. + (real_t)(i_int % 2)) * 2. / 3.;
         }
 
-        sum += weight_SIMPSON * f_PSRD(u) * besselj0(alpha_i[i] * u) * u * du;
+        sum += weight_SIMPSON * f_PSRD(u) * besselj0(alpha_i.at(i) * u) * u * du;
         u += du;
       }
-      q_i[i] = coefficient * sum / pow(besselj1(alpha_i[i]), 2); // [cm^{-2}]
+      q_i.at(i) = coefficient * sum / pow(besselj1(alpha_i.at(i)), 2); // [cm^{-2}]
     }
   }
 
@@ -538,7 +538,7 @@ namespace __SPEC_LIB_NAME__
     real_t impulsion_nucleon, v_nucleon, K_proton, K_helium;
     real_t production_E_proton, Si_P, Ai_P;
     real_t production_E_helium, Si_He, Ai_He;
-    real_t e_diffus = equation_parameters[2];
+    real_t e_diffus = equation_parameters.at(2);
     real_t v_conv = equation_parameters[3];
 
     bessel_coef_proton.resize(N_BESSEL + 1);
@@ -553,16 +553,16 @@ namespace __SPEC_LIB_NAME__
 
     for (i = 1; i <= N_BESSEL; i++)
     {
-      Si_P = sqrt(pow(2.0 * alpha_i[i] / R_GAL, 2) + pow(v_conv * CM_PAR_KPC / K_helium, 2));
+      Si_P = sqrt(pow(2.0 * alpha_i.at(i) / R_GAL, 2) + pow(v_conv * CM_PAR_KPC / K_helium, 2));
 
       /* Ai est exprime en [cm s^{-1}]. */
       Ai_P = v_conv;
       Ai_P += 2.0 * E_DISC * CM_PAR_KPC * (pow(1.0, 2.2 / 3.) * sigma_total_pH(E_nucleon) * v_nucleon * DENSITE_H_DISC);
       Ai_P += K_proton * Si_P / CM_PAR_KPC / tanh(Si_P * e_diffus / 2.);
 
-      bessel_coef_proton[i] = q_i[i] / Ai_P; /* expressed in [s^{+1} cm^{-3}]. */
+      bessel_coef_proton.at(i) = q_i.at(i) / Ai_P; /* expressed in [s^{+1} cm^{-3}]. */
       /* Si is in [kpc^{-1}]. */
-      Si_He = sqrt(pow(2.0 * alpha_i[i] / R_GAL, 2) + pow(v_conv * CM_PAR_KPC / K_helium, 2));
+      Si_He = sqrt(pow(2.0 * alpha_i.at(i) / R_GAL, 2) + pow(v_conv * CM_PAR_KPC / K_helium, 2));
 
       /* Ai est exprime en [cm s^{-1}]. */
       Ai_He = v_conv;
@@ -570,7 +570,7 @@ namespace __SPEC_LIB_NAME__
           2.0 * E_DISC * CM_PAR_KPC * (pow(4.0, 2.2 / 3.) * sigma_total_pH(E_nucleon) * v_nucleon * DENSITE_HE_DISC);
       Ai_He += K_helium * Si_He / CM_PAR_KPC / tanh(Si_He * e_diffus / 2.);
 
-      bessel_coef_helium[i] = q_i[i] / Ai_He; /* expressed in [s^{+1} cm^{-3}]. */
+      bessel_coef_helium.at(i) = q_i.at(i) / Ai_He; /* expressed in [s^{+1} cm^{-3}]. */
     }
 
     production_E_proton = flux_proton_EXP(E_nucleon) / GENERIC_FLUX(r_earth, 0., E_nucleon, MASSE_PROTON, 1.,
@@ -580,8 +580,8 @@ namespace __SPEC_LIB_NAME__
                                        bessel_coef_helium); /* expressed in  [helions s^{-1} (GeV/nucleon)^{-1}] */
     for (i = 1; i <= N_BESSEL; i++)
     {
-      bessel_coef_proton[i] *= production_E_proton; /* expressed now in [protons cm^{-3} GeV^{-1}]. */
-      bessel_coef_helium[i] *= production_E_helium; /* Expressed now in [helions cm^{-3} (GeV/nucleon)^{-1}]. */
+      bessel_coef_proton.at(i) *= production_E_proton; /* expressed now in [protons cm^{-3} GeV^{-1}]. */
+      bessel_coef_helium.at(i) *= production_E_helium; /* Expressed now in [helions cm^{-3} (GeV/nucleon)^{-1}]. */
     }
   }
 
@@ -600,8 +600,8 @@ namespace __SPEC_LIB_NAME__
       calcul_method_B_BESSEL_i(E_nuc, bessel_coef_proton, bessel_coef_helium);
       for (int i = 1; i <= N_BESSEL; i++)
       {
-        bessel_coef_proton_i[i_nuc][i] = bessel_coef_proton[i];
-        bessel_coef_helium_i[i_nuc][i] = bessel_coef_helium[i];
+        bessel_coef_proton_i[i_nuc].at(i) = bessel_coef_proton.at(i);
+        bessel_coef_helium_i[i_nuc].at(i) = bessel_coef_helium.at(i);
       }
     }
   }
@@ -615,7 +615,7 @@ namespace __SPEC_LIB_NAME__
   {
     real_t T_pbar, E_pbar, impulsion_pbar, v_pbar, K_pbar;
     real_t Si, Abar_i;
-    real_t e_diffus = equation_parameters[2];
+    real_t e_diffus = equation_parameters.at(2);
     real_t v_conv = equation_parameters[3];
 
     real_t x_vert, z_vert, dx_vert, weight_SIMPSON_vert;
@@ -634,7 +634,7 @@ namespace __SPEC_LIB_NAME__
     {
       for (int i = 0; i <= N_BESSEL; i++)
       {
-        bessel_pri_pbar_spec[i_pbar][i] = 0.0;
+        bessel_pri_pbar_spec[i_pbar].at(i) = 0.0;
       }
     }
 
@@ -672,18 +672,18 @@ namespace __SPEC_LIB_NAME__
             weight_SIMPSON_rad = (1. + (real_t)(i_rad % 2)) * 2. / 3.;
           }
 
-          q_pbar_primary_i_z[i_vert] += (x_rad * dx_rad * weight_SIMPSON_rad) * besselj0(alpha_i[i] * x_rad) *
+          q_pbar_primary_i_z[i_vert] += (x_rad * dx_rad * weight_SIMPSON_rad) * besselj0(alpha_i.at(i) * x_rad) *
                                         pow(halo_profile(r_rad, z_vert), 2.0); //[NO UNIT].
 
           x_rad += dx_rad;
         }
-        q_pbar_primary_i_z[i_vert] *= 2. / pow(besselj1(alpha_i[i]), 2.0); /* [NO UNIT]. */
+        q_pbar_primary_i_z[i_vert] *= 2. / pow(besselj1(alpha_i.at(i)), 2.0); /* [NO UNIT]. */
 
         x_vert += dx_vert;
       }
 
       /* Loop over antiproton energy containing a loop over the vertical coordinate,
-         allowing us to calculate calculer bessel_pri_pbar_spec[i_pbar][i]. */
+         allowing us to calculate calculer bessel_pri_pbar_spec[i_pbar].at(i). */
       for (int i_pbar = 0; i_pbar <= DIM_TAB_PBAR; i_pbar++)
       {
         T_pbar = T_PBAR_MIN * pow((T_PBAR_MAX / T_PBAR_MIN), ((real_t)i_pbar / (real_t)DIM_TAB_PBAR));
@@ -693,7 +693,7 @@ namespace __SPEC_LIB_NAME__
         K_pbar = K_space_diffusion(E_pbar, MASSE_PROTON, 1.0);
 
 
-        Si = sqrt(pow(2.0 * alpha_i[i] / R_GAL, 2) +
+        Si = sqrt(pow(2.0 * alpha_i.at(i) / R_GAL, 2) +
                   pow(v_conv * CM_PAR_KPC / K_pbar, 2)); /* Si is expressed in [kpc^{-1}]. */
 
         Abar_i = v_conv; /* Abar_i is expressed in [cm s^{-1}]. */
@@ -702,13 +702,13 @@ namespace __SPEC_LIB_NAME__
                    v_pbar * (DENSITE_H_DISC + pow(4., (2. / 3.)) * 1.0 * DENSITE_HE_DISC));
         Abar_i += K_pbar * Si / CM_PAR_KPC / tanh(Si * e_diffus / 2.);
 
-        table_abar[i_pbar][i] = Abar_i;
+        table_abar[i_pbar].at(i) = Abar_i;
 
 
         /* Integration over the vertical variable x_vert and over the radial variable x_rad. */
         dx_vert = 1. / (real_t)(2 * n_vert);
         x_vert = 0.;
-        bessel_pri_pbar_spec[i_pbar][i] = 0.0;
+        bessel_pri_pbar_spec[i_pbar].at(i) = 0.0;
         for (int i_vert = 0; i_vert <= (2 * n_vert); i_vert++)
         {
           z_vert = e_diffus * x_vert;
@@ -722,14 +722,14 @@ namespace __SPEC_LIB_NAME__
             weight_SIMPSON_vert = (1. + (real_t)(i_vert % 2)) * 2. / 3.;
           }
 
-          bessel_pri_pbar_spec[i_pbar][i] +=
+          bessel_pri_pbar_spec[i_pbar].at(i) +=
               (dx_vert * weight_SIMPSON_vert) * q_pbar_primary_i_z[i_vert] * primary_source_term[i_pbar] *
               exp(-v_conv * z_vert * CM_PAR_KPC / (2. * K_pbar)) * sinh((Si / 2.) * (e_diffus - z_vert)) /
               sinh((Si / 2.) * e_diffus); //[antiprotons cm^{-3} s^{-1} GeV^{-1}].
 
           x_vert += dx_vert;
         }
-        bessel_pri_pbar_spec[i_pbar][i] *=
+        bessel_pri_pbar_spec[i_pbar].at(i) *=
             2. * e_diffus * CM_PAR_KPC / Abar_i; /* expressed in [antiprotons cm^{-3} GeV^{-1}]. */
       }
     }
@@ -923,7 +923,7 @@ namespace __SPEC_LIB_NAME__
 
     for (int i = 0; i <= DIM_TAB_PBAR; i++)
     {
-      PBAR_SPECTRUM[i].resize(2);
+      PBAR_SPECTRUM.at(i).resize(2);
     }
 
 
@@ -937,9 +937,9 @@ namespace __SPEC_LIB_NAME__
     {
       for (int i = 0; i <= N_BESSEL; i++)
       {
-        bessel_pri_pbar_spec[i_pbar][i] = 0.0;
-        bessel_sec_pbar_spec[i_pbar][i] = 0.0;
-        bessel_ter_pbar_spec[i_pbar][i] = 0.0;
+        bessel_pri_pbar_spec[i_pbar].at(i) = 0.0;
+        bessel_sec_pbar_spec[i_pbar].at(i) = 0.0;
+        bessel_ter_pbar_spec[i_pbar].at(i) = 0.0;
       }
     }
 
@@ -966,14 +966,14 @@ namespace __SPEC_LIB_NAME__
     for (int i_pbar = 0; i_pbar <= DIM_TAB_PBAR; i_pbar++)
     {
       T_pbar_IS = T_PBAR_MIN * pow((T_PBAR_MAX / T_PBAR_MIN), ((real_t)i_pbar / (real_t)DIM_TAB_PBAR));
-      PBAR_SPECTRUM[i_pbar][0] = log10(T_pbar_IS);
+      PBAR_SPECTRUM[i_pbar].at(0) = log10(T_pbar_IS);
       E_pbar_IS = T_pbar_IS + MASSE_PROTON;
       for (int i = 1; i <= N_BESSEL; i++)
       {
-        BESSEL_PBARi.push_back(bessel_tot_pbar_spec[i_pbar][i]);
+        BESSEL_PBARi.push_back(bessel_tot_pbar_spec[i_pbar].at(i));
       }
       flux_antiproton_IS = GENERIC_FLUX_04(r_earth, 0., E_pbar_IS, MASSE_PROTON, 1., BESSEL_PBARi);
-      PBAR_SPECTRUM[i_pbar][1] = flux_antiproton_IS * 1.0e+4 / 3.e-26;
+      PBAR_SPECTRUM[i_pbar].at(1) = flux_antiproton_IS * 1.0e+4 / 3.e-26;
     }
   }
 
@@ -991,7 +991,7 @@ namespace __SPEC_LIB_NAME__
     weight_SIMSPON.resize(DIM_TAB_PROTON + 1);
 
 
-    real_t e_diffus = equation_parameters[2];
+    real_t e_diffus = equation_parameters.at(2);
     real_t v_conv = equation_parameters[3];
 
     for (int i_pbar = 0; i_pbar <= DIM_TAB_PBAR; i_pbar++)
@@ -999,7 +999,7 @@ namespace __SPEC_LIB_NAME__
     {
       for (int i = 0; i <= N_BESSEL; i++)
       {
-        bessel_sec_pbar_spec[i_pbar][i] = 0.0;
+        bessel_sec_pbar_spec[i_pbar].at(i) = 0.0;
       }
     }
 
@@ -1034,43 +1034,43 @@ namespace __SPEC_LIB_NAME__
       for (int i = 1; i <= N_BESSEL; i++)
       {
         /* Si is in [kpc^{-1}]. */
-        Si = sqrt(pow(2.0 * alpha_i[i] / R_GAL, 2) + pow(v_conv * CM_PAR_KPC / K_pbar, 2));
+        Si = sqrt(pow(2.0 * alpha_i.at(i) / R_GAL, 2) + pow(v_conv * CM_PAR_KPC / K_pbar, 2));
         /* Abar_i in [cm s^{-1}]. */
         Abar_i = v_conv;
         Abar_i += 2.0 * E_DISC * CM_PAR_KPC *
                   ((sigma_inelastic_pbarH_TAN_and_NG(E_pbar) - sigma_inelastic_NOANN_pbarH_TAN_and_NG(E_pbar)) *
                    v_pbar * (DENSITE_H_DISC + pow(4., (2. / 3.)) * 1.0 * DENSITE_HE_DISC));
         Abar_i += K_pbar * Si / CM_PAR_KPC / tanh(Si * e_diffus / 2.);
-        table_abar[i_pbar][i] = Abar_i;
+        table_abar[i_pbar].at(i) = Abar_i;
 
 
         for (int i_proton = 0; i_proton <= DIM_TAB_PROTON; i_proton++)
         {
           /* CONTRIBUTION H ON H */
-          bessel_sec_pbar_spec[i_pbar][i] += h_on_h_xsection[i_pbar][i_proton] * bessel_coef_proton_i[i_proton][i] *
-                                             DENSITE_H_DISC * impulsion_proton[i_proton] * CELERITY_LIGHT *
-                                             weight_SIMSPON[i_proton] *
-                                             dlog_E_proton; // [antiprotons GeV^{-1} s^{-1} cm^{-3}]
+          bessel_sec_pbar_spec[i_pbar].at(i) += h_on_h_xsection[i_pbar][i_proton] *
+                                                bessel_coef_proton_i[i_proton].at(i) * DENSITE_H_DISC *
+                                                impulsion_proton[i_proton] * CELERITY_LIGHT * weight_SIMSPON[i_proton] *
+                                                dlog_E_proton; // [antiprotons GeV^{-1} s^{-1} cm^{-3}]
 
           /* CONTRIBUTION H ON HE */
-          bessel_sec_pbar_spec[i_pbar][i] += h_on_he_xsection[i_pbar][i_proton] * bessel_coef_proton_i[i_proton][i] *
-                                             DENSITE_HE_DISC * impulsion_proton[i_proton] * CELERITY_LIGHT *
-                                             weight_SIMSPON[i_proton] *
-                                             dlog_E_proton; // [antiprotons GeV^{-1} s^{-1} cm^{-3}]
+          bessel_sec_pbar_spec[i_pbar].at(i) += h_on_he_xsection[i_pbar][i_proton] *
+                                                bessel_coef_proton_i[i_proton].at(i) * DENSITE_HE_DISC *
+                                                impulsion_proton[i_proton] * CELERITY_LIGHT * weight_SIMSPON[i_proton] *
+                                                dlog_E_proton; // [antiprotons GeV^{-1} s^{-1} cm^{-3}]
 
           /* CONTRIBUTION HE ON H */
-          bessel_sec_pbar_spec[i_pbar][i] += he_on_h_xsection[i_pbar][i_proton] * bessel_coef_helium_i[i_proton][i] *
-                                             DENSITE_H_DISC * impulsion_proton[i_proton] * CELERITY_LIGHT *
-                                             weight_SIMSPON[i_proton] *
-                                             dlog_E_proton; // [antiprotons GeV^{-1} s^{-1} cm^{-3}]
+          bessel_sec_pbar_spec[i_pbar].at(i) += he_on_h_xsection[i_pbar][i_proton] *
+                                                bessel_coef_helium_i[i_proton].at(i) * DENSITE_H_DISC *
+                                                impulsion_proton[i_proton] * CELERITY_LIGHT * weight_SIMSPON[i_proton] *
+                                                dlog_E_proton; // [antiprotons GeV^{-1} s^{-1} cm^{-3}]
 
           /* CONTRIBUTION HE ON HE */
-          bessel_sec_pbar_spec[i_pbar][i] += he_on_he_xsection[i_pbar][i_proton] * bessel_coef_helium_i[i_proton][i] *
-                                             DENSITE_HE_DISC * impulsion_proton[i_proton] * CELERITY_LIGHT *
-                                             weight_SIMSPON[i_proton] *
-                                             dlog_E_proton; //[antiprotons GeV^{-1} s^{-1} cm^{-3}]
+          bessel_sec_pbar_spec[i_pbar].at(i) += he_on_he_xsection[i_pbar][i_proton] *
+                                                bessel_coef_helium_i[i_proton].at(i) * DENSITE_HE_DISC *
+                                                impulsion_proton[i_proton] * CELERITY_LIGHT * weight_SIMSPON[i_proton] *
+                                                dlog_E_proton; //[antiprotons GeV^{-1} s^{-1} cm^{-3}]
         }
-        bessel_sec_pbar_spec[i_pbar][i] *= 2. * E_DISC * CM_PAR_KPC / Abar_i;
+        bessel_sec_pbar_spec[i_pbar].at(i) *= 2. * E_DISC * CM_PAR_KPC / Abar_i;
         /* expressed in [antiprotons cm^{-3} GeV^{-1}]. */
       }
     }
@@ -1083,10 +1083,10 @@ namespace __SPEC_LIB_NAME__
     {
       for (int i = 0; i <= N_BESSEL; i++)
       {
-        bessel_pri_pbar_spec[i_pbar][i] = 0.0;
-        bessel_sec_pbar_spec[i_pbar][i] = 0.0;
-        bessel_ter_pbar_spec[i_pbar][i] = 0.0;
-        bessel_tot_pbar_spec[i_pbar][i] = 0.0;
+        bessel_pri_pbar_spec[i_pbar].at(i) = 0.0;
+        bessel_sec_pbar_spec[i_pbar].at(i) = 0.0;
+        bessel_ter_pbar_spec[i_pbar].at(i) = 0.0;
+        bessel_tot_pbar_spec[i_pbar].at(i) = 0.0;
       }
     }
 
@@ -1111,12 +1111,12 @@ namespace __SPEC_LIB_NAME__
       E_pbar_IS = T_pbar_IS + MASSE_PROTON;
       for (int i = 1; i <= N_BESSEL; i++)
       {
-        BESSEL_PBARi.push_back(bessel_tot_pbar_spec[i_pbar][i]);
+        BESSEL_PBARi.push_back(bessel_tot_pbar_spec[i_pbar].at(i));
       }
       flux_antiproton_IS = GENERIC_FLUX_04(r_earth, 0., E_pbar_IS, MASSE_PROTON, 1., BESSEL_PBARi);
 
-      xs_uncertainties[i_pbar][0] = (T_pbar_IS);
-      xs_uncertainties[i_pbar][1] = flux_antiproton_IS * 1.0e4; /* [#pbar cm^{-2} sr^{-1} s^{-1} GeV^{-1}] */
+      xs_uncertainties[i_pbar].at(0) = (T_pbar_IS);
+      xs_uncertainties[i_pbar].at(1) = flux_antiproton_IS * 1.0e4; /* [#pbar cm^{-2} sr^{-1} s^{-1} GeV^{-1}] */
     }
 
     /* PBAR_IS_spectrum_II_MAX is filled */
@@ -1132,11 +1132,11 @@ namespace __SPEC_LIB_NAME__
       E_pbar_IS = T_pbar_IS + MASSE_PROTON;
       for (int i = 1; i <= N_BESSEL; i++)
       {
-        BESSEL_PBARi[i] = bessel_tot_pbar_spec[i_pbar][i];
+        BESSEL_PBARi.at(i) = bessel_tot_pbar_spec[i_pbar].at(i);
       }
       flux_antiproton_IS = GENERIC_FLUX_04(r_earth, 0., E_pbar_IS, MASSE_PROTON, 1., BESSEL_PBARi);
 
-      xs_uncertainties[i_pbar][2] = flux_antiproton_IS * 1.0e+4; /* [#pbar cm^{-2} sr^{-1} s^{-1} GeV^{-1}] */
+      xs_uncertainties[i_pbar].at(2) = flux_antiproton_IS * 1.0e+4; /* [#pbar cm^{-2} sr^{-1} s^{-1} GeV^{-1}] */
     }
 
     return;
@@ -1167,9 +1167,9 @@ namespace __SPEC_LIB_NAME__
       for (int i_pbar = 0; i_pbar < DIM_TAB_PBAR_MFGS; i_pbar++)
       {
 
-        T_pbar = temp_errors[i_pbar][0];
-        q_pbar = temp_errors[i_pbar][1];
-        q_pbar_sec_moins = temp_errors[i_pbar][2];
+        T_pbar = temp_errors[i_pbar].at(0);
+        q_pbar = temp_errors[i_pbar].at(1);
+        q_pbar_sec_moins = temp_errors[i_pbar].at(2);
         q_pbar_sec_plus = temp_errors[i_pbar][3];
 
         ENERGY[i_pbar] = T_pbar;
@@ -1183,7 +1183,7 @@ namespace __SPEC_LIB_NAME__
 
         int j_mem = -1;
 
-        if (Energie_pbar < ENERGY[0])
+        if (Energie_pbar < ENERGY.at(0))
         {
           j_mem = 0;
         }
@@ -1197,7 +1197,7 @@ namespace __SPEC_LIB_NAME__
           for (j = 0; j < DIM_TAB_PBAR_MFGS; j++)
           {
 
-            if (Energie_pbar >= ENERGY[j] && Energie_pbar <= ENERGY[j + 1])
+            if (Energie_pbar >= ENERGY.at(j) && Energie_pbar <= ENERGY.at(j + 1))
             {
               j_mem = j;
             }
@@ -1212,14 +1212,14 @@ namespace __SPEC_LIB_NAME__
         {
           if (option == -1)
           {
-            bessel_sec_pbar_spec[i_pbar][i] *=
+            bessel_sec_pbar_spec[i_pbar].at(i) *=
                 ((F_Q_PBAR_SEC_MOINS[j_mem + 1] - F_Q_PBAR_SEC_MOINS[j_mem]) / (ENERGY[j_mem + 1] - ENERGY[j_mem]) *
                      (Energie_pbar - ENERGY[j_mem]) +
                  F_Q_PBAR_SEC_MOINS[j_mem]);
           }
           if (option == 1)
           {
-            bessel_sec_pbar_spec[i_pbar][i] *=
+            bessel_sec_pbar_spec[i_pbar].at(i) *=
                 ((F_Q_PBAR_SEC_PLUS[j_mem + 1] - F_Q_PBAR_SEC_PLUS[j_mem]) / (ENERGY[j_mem + 1] - ENERGY[j_mem]) *
                      (Energie_pbar - ENERGY[j_mem]) +
                  F_Q_PBAR_SEC_PLUS[j_mem]);
@@ -1246,31 +1246,31 @@ namespace __SPEC_LIB_NAME__
     real_t result_down, result_up;
     for (size_t i = 0; i < n; i++)
     {
-      result[i].resize(2);
-      Et = pow(10., logE[i]);
-      while (!(xs_uncertainties[j][0] <= Et && xs_uncertainties[j + 1][0] >= Et) && j < (N - 1))
+      result.at(i).resize(2);
+      Et = pow(10., logE.at(i));
+      while (!(xs_uncertainties.at(j).at(0) <= Et && xs_uncertainties.at(j + 1).at(0) >= Et) && j < (N - 1))
         j++;
 
       if (j == N - 1)
       {
         printf("Error in function background_spectAMS: energy out of range");
-        printf("%e %e %e\n", xs_uncertainties[j][0], Et, xs_uncertainties[j + 1][0]);
+        printf("%e %e %e\n", xs_uncertainties.at(j).at(0), Et, xs_uncertainties.at(j + 1).at(0));
         return 0;
       }
       else
       {
-        result_down = (xs_uncertainties[j][1] * xs_uncertainties[j + 1][0] -
-                       xs_uncertainties[j][0] * xs_uncertainties[j + 1][1]) /
-                          (xs_uncertainties[j + 1][0] - xs_uncertainties[j][0]) +
-                      (xs_uncertainties[j + 1][1] - xs_uncertainties[j][1]) /
-                          (xs_uncertainties[j + 1][0] - xs_uncertainties[j][0]) * Et;
-        result_up = (xs_uncertainties[j][2] * xs_uncertainties[j + 1][0] -
-                     xs_uncertainties[j][0] * xs_uncertainties[j + 1][2]) /
-                        (xs_uncertainties[j + 1][0] - xs_uncertainties[j][0]) +
-                    (xs_uncertainties[j + 1][2] - xs_uncertainties[j][2]) /
-                        (xs_uncertainties[j + 1][0] - xs_uncertainties[j][0]) * Et;
-        result[i][0] = logE[i];
-        result[i][1] = result_down + A * (result_up - result_down);
+        result_down = (xs_uncertainties.at(j).at(1) * xs_uncertainties.at(j + 1).at(0) -
+                       xs_uncertainties.at(j).at(0) * xs_uncertainties.at(j + 1).at(1)) /
+                          (xs_uncertainties.at(j + 1).at(0) - xs_uncertainties.at(j).at(0)) +
+                      (xs_uncertainties.at(j + 1).at(1) - xs_uncertainties.at(j).at(1)) /
+                          (xs_uncertainties.at(j + 1).at(0) - xs_uncertainties.at(j).at(0)) * Et;
+        result_up = (xs_uncertainties.at(j).at(2) * xs_uncertainties.at(j + 1).at(0) -
+                     xs_uncertainties.at(j).at(0) * xs_uncertainties.at(j + 1).at(2)) /
+                        (xs_uncertainties.at(j + 1).at(0) - xs_uncertainties.at(j).at(0)) +
+                    (xs_uncertainties.at(j + 1).at(2) - xs_uncertainties.at(j).at(2)) /
+                        (xs_uncertainties.at(j + 1).at(0) - xs_uncertainties.at(j).at(0)) * Et;
+        result.at(i).at(0) = logE.at(i);
+        result.at(i).at(1) = result_down + A * (result_up - result_down);
       }
     }
 
@@ -1286,7 +1286,7 @@ namespace __SPEC_LIB_NAME__
 
     real_t dlog_T_pbar, T_pbar, E_pbar, impulsion_pbar, v_pbar;
     static std::vector<real_t> S_inel_NOANN_fois_v_pbar;
-    S_inel_NOANN_fois_v_pbar.reserve(DIM_TAB_PBAR + 1);
+    S_inel_NOANN_fois_v_pbar.resize(DIM_TAB_PBAR + 1);
     real_t Abar_i, SUM;
 
     for (int i_pbar = 0; i_pbar <= DIM_TAB_PBAR; i_pbar++)
@@ -1306,7 +1306,7 @@ namespace __SPEC_LIB_NAME__
     {
       for (int i = 0; i <= N_BESSEL; i++)
       {
-        bessel_ter_pbar_spec[i_pbar][i] = 0.0;
+        bessel_ter_pbar_spec[i_pbar].at(i) = 0.0;
       }
     }
 
@@ -1317,14 +1317,15 @@ namespace __SPEC_LIB_NAME__
       SUM = 0.0;
       for (int i_pbar = DIM_TAB_PBAR; i_pbar >= 0; i_pbar--)
       {
-        Abar_i = table_abar[i_pbar][i]; /* Abar_i is in [cm s^{-1}]. */
+        Abar_i = table_abar[i_pbar].at(i); /* Abar_i is in [cm s^{-1}]. */
 
-        SUM += dlog_T_pbar * S_inel_NOANN_fois_v_pbar[i_pbar] * bessel_tot_pbar_spec[i_pbar][i];
+        SUM += dlog_T_pbar * S_inel_NOANN_fois_v_pbar[i_pbar] * bessel_tot_pbar_spec[i_pbar].at(i);
 
-        bessel_ter_pbar_spec[i_pbar][i] = SUM - S_inel_NOANN_fois_v_pbar[i_pbar] * bessel_tot_pbar_spec[i_pbar][i];
+        bessel_ter_pbar_spec[i_pbar].at(i) =
+            SUM - S_inel_NOANN_fois_v_pbar[i_pbar] * bessel_tot_pbar_spec[i_pbar].at(i);
         /* expressed in [antiprotons GeV^{-1} s^{-1}]. */
 
-        bessel_ter_pbar_spec[i_pbar][i] *=
+        bessel_ter_pbar_spec[i_pbar].at(i) *=
             2. * E_DISC * CM_PAR_KPC * (DENSITE_H_DISC + pow(4., (2. / 3.)) * 1.0 * DENSITE_HE_DISC) / Abar_i;
         /* expressed now in [antiprotons cm^{-3} GeV^{-1}]. */
       }
@@ -1345,8 +1346,8 @@ namespace __SPEC_LIB_NAME__
     {
       for (long int i = 1; i <= N_BESSEL; i++)
       {
-        bessel_tot_pbar_spec[i_pbar][i] =
-            bessel_pri_pbar_spec[i_pbar][i] + bessel_sec_pbar_spec[i_pbar][i] + bessel_ter_pbar_spec[i_pbar][i];
+        bessel_tot_pbar_spec[i_pbar].at(i) = bessel_pri_pbar_spec[i_pbar].at(i) + bessel_sec_pbar_spec[i_pbar].at(i) +
+                                             bessel_ter_pbar_spec[i_pbar].at(i);
       }
     }
   }
@@ -1365,21 +1366,21 @@ namespace __SPEC_LIB_NAME__
     result.resize(size);
     for (size_t i = 0; i < size; i++)
     {
-      result[i].resize(2);
-      K = pow(10., spectrum[i][0]);
+      result.at(i).resize(2);
+      K = pow(10., spectrum.at(i).at(0));
       K_ = K + e * phi_f * Z / A;
       logK_ = log10(K_);
 
-      if (fabs(logK_ - spectrum[size - 1][0]) < 1.e-4)
-        logK_ = spectrum[size - 1][0];
+      if (fabs(logK_ - spectrum[size - 1].at(0)) < 1.e-4)
+        logK_ = spectrum[size - 1].at(0);
 
-      if (logK_ >= spectrum[0][0] && logK_ <= spectrum[size - 1][0])
+      if (logK_ >= spectrum.at(0).at(0) && logK_ <= spectrum[size - 1].at(0))
       {
-        result[i][0] = spectrum[i][0];
-        result[i][1] = ind_param.logx_interpol(spectrum, logK_) * (2. * m * K + K * K) / (2. * m * K_ + K_ * K_);
+        result.at(i).at(0) = spectrum.at(i).at(0);
+        result.at(i).at(1) = ind_param.logx_interpol(spectrum, logK_) * (2. * m * K + K * K) / (2. * m * K_ + K_ * K_);
       }
       else
-        result[i][0] = result[i][1] = 0;
+        result.at(i).at(0) = result.at(i).at(1) = 0;
     }
   }
 
@@ -1399,7 +1400,7 @@ namespace __SPEC_LIB_NAME__
     az = std::abs(z);
     resultat = 0.0;
 
-    real_t e_diffus = equation_parameters[2];
+    real_t e_diffus = equation_parameters.at(2);
     real_t v_conv = equation_parameters[3];
 
     if (az >= e_diffus || x >= 1.0)
@@ -1415,8 +1416,8 @@ namespace __SPEC_LIB_NAME__
       for (long int i = 1; i <= N_BESSEL; i++)
       {
         /* Si is expressed in [kpc^{-1}]. */
-        Si = sqrt(pow(2.0 * alpha_i[i] / R_GAL, 2) + pow(v_conv * CM_PAR_KPC / K, 2));
-        resultat += BESSEL_COEFFICIENTi[i] * besselj0(alpha_i[i] * x) * exp(v_conv * az * CM_PAR_KPC / (2. * K)) *
+        Si = sqrt(pow(2.0 * alpha_i.at(i) / R_GAL, 2) + pow(v_conv * CM_PAR_KPC / K, 2));
+        resultat += BESSEL_COEFFICIENTi.at(i) * besselj0(alpha_i.at(i) * x) * exp(v_conv * az * CM_PAR_KPC / (2. * K)) *
                     sinh((Si / 2.) * (e_diffus - az)) / sinh((Si / 2.) * e_diffus);
       }
       resultat *= (1. / 4. / M_PI) * velocity;
@@ -1438,7 +1439,7 @@ namespace __SPEC_LIB_NAME__
     az = std::abs(z);
     resultat = 0.0;
 
-    real_t e_diffus = equation_parameters[2];
+    real_t e_diffus = equation_parameters.at(2);
     real_t v_conv = equation_parameters[3];
 
     if (az >= e_diffus || x >= 1.0)
@@ -1455,7 +1456,7 @@ namespace __SPEC_LIB_NAME__
       for (long int i = 1; i <= N_BESSEL; i++)
       {
         /* Si est exprime en [kpc^{-1}]. */
-        Si = sqrt(pow(2.0 * alpha_i[i] / R_GAL, 2) + pow(v_conv * CM_PAR_KPC / K, 2));
+        Si = sqrt(pow(2.0 * alpha_i.at(i) / R_GAL, 2) + pow(v_conv * CM_PAR_KPC / K, 2));
         switch (i)
         {
         case (N_BESSEL - 15):
@@ -1508,7 +1509,7 @@ namespace __SPEC_LIB_NAME__
           break;
         }
 
-        resultat += coefficient_torsten * BESSEL_COEFFICIENTi[i] * besselj0(alpha_i[i] * x) *
+        resultat += coefficient_torsten * BESSEL_COEFFICIENTi.at(i) * besselj0(alpha_i.at(i) * x) *
                     exp(v_conv * az * CM_PAR_KPC / (2. * K)) * sinh((Si / 2.) * (e_diffus - az)) /
                     sinh((Si / 2.) * e_diffus);
       }
@@ -1536,7 +1537,7 @@ namespace __SPEC_LIB_NAME__
   x[i_pbar] = log(T_pbar/T_PBAR_MIN) so that x[i_pbar] = DELTA_x * (real_t)i_pbar
   with DELTA_x = log(T_PBAR_MAX/T_PBAR_MIN) / (real_t)DIM_TAB_PBAR.
 
-  Then, we define u[i_pbar] = BESSEL_PBAR_TOT_Epbar_i[i_pbar][i] for a given BESSEL
+  Then, we define u[i_pbar] = BESSEL_PBAR_TOT_Epbar_i[i_pbar].at(i) for a given BESSEL
   order i. By making it discontinuous, we modify the differential equation to be
   solved into an algebraic relation [A] * [u] = [r]. The matrix [A] is tridiagonal
   so that inversion is a straightforward BUT SOMETIMES HAZARDOUS process! */
@@ -1545,7 +1546,7 @@ namespace __SPEC_LIB_NAME__
     std::array<real_t, DIM_TAB_PBAR + 2> a_coeff;
     std::array<real_t, DIM_TAB_PBAR + 1> b_coeff, vec_a, vec_b, vec_c, vec_r, vec_u;
 
-    /* We compute the coefficients a_{j-1/2} = a_coeff[j] with j = i_pbar. */
+    /* We compute the coefficients a_{j-1/2} = a_coeff.at(j) with j = i_pbar. */
     for (long int i_pbar = 0; i_pbar <= DIM_TAB_PBAR + 1; i_pbar++)
     {
       T_pbar = T_PBAR_MIN * pow((T_PBAR_MAX / T_PBAR_MIN), ((-0.5 + (real_t)i_pbar) / (real_t)DIM_TAB_PBAR));
@@ -1553,7 +1554,7 @@ namespace __SPEC_LIB_NAME__
       a_coeff[i_pbar] = D_energy_diffusion(E_pbar, MASSE_PROTON, 1.0) / T_pbar; /* in [GeV s^{-1}]. */
     }
 
-    /* We compute the coefficients b_{j} = b_coeff[j] with j = i_pbar. */
+    /* We compute the coefficients b_{j} = b_coeff.at(j) with j = i_pbar. */
     for (long int i_pbar = 0; i_pbar <= DIM_TAB_PBAR; i_pbar++)
     {
       T_pbar = T_PBAR_MIN * pow((T_PBAR_MAX / T_PBAR_MIN), ((real_t)i_pbar / (real_t)DIM_TAB_PBAR));
@@ -1566,7 +1567,7 @@ namespace __SPEC_LIB_NAME__
     {
       for (long int i = 0; i <= N_BESSEL; i++)
       {
-        bessel_tot_pbar_spec[i_pbar][i] = 0.0;
+        bessel_tot_pbar_spec[i_pbar].at(i) = 0.0;
       }
     }
 
@@ -1579,22 +1580,22 @@ namespace __SPEC_LIB_NAME__
     {
       for (long int i_pbar = 0; i_pbar <= DIM_TAB_PBAR; i_pbar++)
       {
-        vec_r[i_pbar] =
-            bessel_pri_pbar_spec[i_pbar][i] + bessel_sec_pbar_spec[i_pbar][i] + bessel_ter_pbar_spec[i_pbar][i];
+        vec_r[i_pbar] = bessel_pri_pbar_spec[i_pbar].at(i) + bessel_sec_pbar_spec[i_pbar].at(i) +
+                        bessel_ter_pbar_spec[i_pbar].at(i);
 
-        Abar_i = table_abar[i_pbar][i]; /* in [cm s^{-1}]. */
+        Abar_i = table_abar[i_pbar].at(i); /* in [cm s^{-1}]. */
         T_pbar = T_PBAR_MIN * pow((T_PBAR_MAX / T_PBAR_MIN), ((real_t)i_pbar / (real_t)DIM_TAB_PBAR));
         grand_C_cal = 2. * E_DISC * CM_PAR_KPC / T_pbar / Abar_i;
 
         /* Fill the tridiagonal matrix before computing the inverse. */
         if (i_pbar == 0)
         {
-          vec_a[0] = 0.0;
-          vec_b[0] = 1.0;
-          vec_b[0] -= grand_C_cal * b_coeff[0] / DELTA_x;
-          vec_b[0] += grand_C_cal * (a_coeff[1] - a_coeff[0]) / pow(DELTA_x, 2);
-          vec_c[0] = grand_C_cal * b_coeff[1] / DELTA_x;
-          vec_c[0] -= grand_C_cal * (a_coeff[1] - a_coeff[0]) / pow(DELTA_x, 2);
+          vec_a.at(0) = 0.0;
+          vec_b.at(0) = 1.0;
+          vec_b.at(0) -= grand_C_cal * b_coeff.at(0) / DELTA_x;
+          vec_b.at(0) += grand_C_cal * (a_coeff.at(1) - a_coeff.at(0)) / pow(DELTA_x, 2);
+          vec_c.at(0) = grand_C_cal * b_coeff.at(1) / DELTA_x;
+          vec_c.at(0) -= grand_C_cal * (a_coeff.at(1) - a_coeff.at(0)) / pow(DELTA_x, 2);
         }
         else if (i_pbar == DIM_TAB_PBAR)
         {
@@ -1615,7 +1616,7 @@ namespace __SPEC_LIB_NAME__
       inversion_tridiagonal(vec_a, vec_b, vec_c, vec_r, vec_u);
       for (int i_pbar = 0; i_pbar <= DIM_TAB_PBAR; i_pbar++)
       {
-        bessel_tot_pbar_spec[i_pbar][i] = vec_u[i_pbar];
+        bessel_tot_pbar_spec[i_pbar].at(i) = vec_u[i_pbar];
       }
     }
   }
@@ -1633,20 +1634,20 @@ namespace __SPEC_LIB_NAME__
     real_t bet;
     std::array<real_t, DIM_TAB_PBAR + 1> gam;
 
-    if (b[0] == 0.0)
+    if (b.at(0) == 0.0)
     {
       printf(" PROBLEM IN THE TRIDIAGONAL MATRIX INVERSION\n"
-             " b[0] = %.5e \n",
-             b[0]);
+             " b.at(0) = %.5e \n",
+             b.at(0));
       return;
     }
 
-    bet = b[0];
-    u[0] = r[0] / bet;
+    bet = b.at(0);
+    u.at(0) = r.at(0) / bet;
     for (long int j = 1; j <= DIM_TAB_PBAR; j++)
     {
-      gam[j] = c[j - 1] / bet;
-      bet = b[j] - a[j] * gam[j];
+      gam.at(j) = c[j - 1] / bet;
+      bet = b.at(j) - a.at(j) * gam.at(j);
       if (bet == 0.0)
       {
         printf(" PROBLEM IN THE TRIDIAGONAL MATRIX INVERSION \n"
@@ -1654,11 +1655,11 @@ namespace __SPEC_LIB_NAME__
                j, bet);
         return;
       }
-      u[j] = (r[j] - a[j] * u[j - 1]) / bet;
+      u.at(j) = (r.at(j) - a.at(j) * u[j - 1]) / bet;
     }
     for (int j = DIM_TAB_PBAR - 1; j >= 0; j--)
     {
-      u[j] = u[j] - gam[j + 1] * u[j + 1];
+      u.at(j) = u.at(j) - gam.at(j + 1) * u.at(j + 1);
     }
   }
 
@@ -1684,11 +1685,11 @@ namespace __SPEC_LIB_NAME__
     Delta_delta = 0.14;
     s = 0.04;
 
-    K = equation_parameters[0] * beta * pow(rigidity, equation_parameters[1]) /
+    K = equation_parameters.at(0) * beta * pow(rigidity, equation_parameters.at(1)) /
         pow(1 + pow((rigidity * inv_Rb), (Delta_delta / (real_t)s)), s);
 
 #else
-    K = equation_parameters[0] * beta * pow(rigidity, equation_parameters[1]); /* [cm^{2} s^{-1}] */
+    K = equation_parameters.at(0) * beta * pow(rigidity, equation_parameters.at(1)); /* [cm^{2} s^{-1}] */
 #endif
 
     return K;
@@ -1711,8 +1712,8 @@ namespace __SPEC_LIB_NAME__
     momentum = sqrt(pow(energy, 2) - pow(mass, 2)); /* [GeV]        */
     beta = momentum / energy;                       /* NO DIMENSION */
 
-    real_t delta = equation_parameters[1];   /* PUISSANCE_COEFF_DIFF */
-    real_t v_alpha = equation_parameters[4]; /* [cm s^{-1}] */
+    real_t delta = equation_parameters.at(1); /* PUISSANCE_COEFF_DIFF */
+    real_t v_alpha = equation_parameters[4];  /* [cm s^{-1}] */
 #ifdef DR_energy_drift
     D_EE = 4.0 / 3.0 * pow(v_alpha, 2.0) / K_space_diffusion(energy, mass, Z_em) * pow(beta, 2.0) *
            pow(momentum, 2.0);                                 // [GeV^{2} s^{-1}]
@@ -1990,7 +1991,7 @@ namespace __SPEC_LIB_NAME__
 
     srand((unsigned int)time(NULL));
     std::vector<real_t> x0;
-    x0.reserve(nmax);
+    x0.resize(nmax);
     int i;
 
     real_t factor = 0.;
@@ -2000,7 +2001,7 @@ namespace __SPEC_LIB_NAME__
       factor = -1.;
 
     for (i = 0; i < n; i++)
-      x0[i] = (xlim_min[i] + xlim_max[i]) / 2.;
+      x0.at(i) = (xlim_min.at(i) + xlim_max.at(i)) / 2.;
     int test = IDpowellaux(n, func, xtra, spect, x0, xlim_min, xlim_max, fmin, xmin, ftol, factor);
     if (option != "max")
       *fmin = -*fmin;
@@ -2024,55 +2025,58 @@ namespace __SPEC_LIB_NAME__
     int ITMAX = 500;
     int nmax = 5;
 
-    int i, j, iter;
     std::vector<std::vector<real_t>> vect; // set of vectors
-    vect.reserve(nmax);
+    vect.resize(nmax);
 
     /* initializes set of vectors */
-    for (i = 0; i < n; i++)
+    for (int i = 0; i < n; i++)
     {
-      vect[i].reserve(nmax);
-      for (j = 0; j < n; j++)
+      vect.at(i).resize(nmax);
+      for (int j = 0; j < n; j++)
       {
         if (i == j)
-          vect[i][j] = 1;
+          vect.at(i).at(j) = 1;
         else
-          vect[i][j] = 0;
+          vect.at(i).at(j) = 0;
       }
     }
 
-    for (j = 0; j < n; j++)
-      xmin[j] = x0[j]; // initializes minimum position
+
+
+    for (int j = 0; j < n; j++)
+      xmin.at(j) = x0.at(j); // initializes minimum position
 
     std::vector<real_t> vecti; // current vector in the iteration
-    vecti.reserve(nmax);
+    vecti.resize(nmax);
     real_t fmintemp;
     int imax;
     real_t fdeltamax;
     *fmin = factor * (this->*func)(x0, xtra, spect);
+
     real_t fiter;
     std::vector<real_t> xiter;
-    xiter.reserve(nmax);
+    xiter.resize(nmax);
     int testbrent;
 
     std::vector<real_t> meanvect, xextrapol;
-    meanvect.reserve(nmax);
-    xextrapol.reserve(nmax);
+    meanvect.resize(nmax);
+    xextrapol.resize(nmax);
 
     real_t fextrapol;
     real_t t;
 
-    for (iter = 0; iter <= ITMAX; iter++)
+    for (int iter = 0; iter <= ITMAX; iter++)
     {
 
       fiter = *fmin;
-      for (j = 0; j < n; j++)
-        xiter[j] = xmin[j];
+      for (int j = 0; j < n; j++)
+        xiter.at(j) = xmin.at(j);
+
       fdeltamax = 0;
-      for (i = 0; i < n; i++)
+      for (int i = 0; i < n; i++)
       {
-        for (j = 0; j < n; j++)
-          vecti[j] = vect[j][i];
+        for (int j = 0; j < n; j++)
+          vecti.at(j) = vect.at(j).at(i);
         fmintemp = *fmin;
         testbrent = IDbrentmethod(n, func, xtra, spect, xmin, vecti, xlim_min, xlim_max, fmin, factor);
         if (testbrent == 0)
@@ -2102,12 +2106,14 @@ namespace __SPEC_LIB_NAME__
         return 0;
       }
 
-      for (j = 0; j < n; j++)
+      for (int j = 0; j < n; j++)
       {
         // check if it is worth to keep the mean deplacement vector
-        meanvect[j] = xmin[j] - xiter[j];
-        xextrapol[j] = xmin[j] + meanvect[j];
+        meanvect.at(j) = xmin.at(j) - xiter.at(j);
+        xextrapol.at(j) = xmin.at(j) + meanvect.at(j);
       }
+
+
 
       fextrapol = factor * (this->*func)(xextrapol, xtra, spect);
       if (fextrapol < fiter)
@@ -2115,11 +2121,14 @@ namespace __SPEC_LIB_NAME__
         t = 2. * (fiter - 2. * (*fmin) + fextrapol) * pow(fiter - (*fmin) - fdeltamax, 2.) -
             fdeltamax * pow(fiter - fextrapol, 2.);
 
+
         if (t < 0.)
         {
           IDbrentmethod(n, func, xtra, spect, xmin, meanvect, xlim_min, xlim_max, fmin, factor);
-          vect[j][imax] = vect[j][n];
-          vect[j][n] = meanvect[j];
+          for (int j = 0; j < n; j++)
+          {
+            vect.at(j).at(imax) = meanvect.at(j);
+          }
         }
       }
     }
@@ -2139,14 +2148,14 @@ namespace __SPEC_LIB_NAME__
   {
     real_t a0, b0, x0, xmin1d;
     std::vector<real_t> xitemp;
-    xitemp.reserve(n);
+    xitemp.resize(n);
     int i;
 
     IDbraket(n, func, xtra, spect, &a0, &x0, &b0, xmin, xi, xlim_min, xlim_max, factor);
 
     int test = IDbrentmethod1D(func, xtra, spect, a0, x0, b0, fmin, &xmin1d, factor, xmin, xi, n);
     for (i = 0; i < n; i++)
-      xmin[i] = xmin[i] + xmin1d * xi[i];
+      xmin.at(i) = xmin.at(i) + xmin1d * xi.at(i);
 
     return test;
   }
@@ -2161,9 +2170,9 @@ namespace __SPEC_LIB_NAME__
   {
     int i;
     std::vector<real_t> xitemp;
-    xitemp.reserve(n);
+    xitemp.resize(n);
     for (i = 0; i < n; i++)
-      xitemp[i] = xmini[i] + x * xi[i];
+      xitemp.at(i) = xmini.at(i) + x * xi.at(i);
 
     return (this->*func)(xitemp, xtra, spect);
   }
@@ -2177,9 +2186,8 @@ namespace __SPEC_LIB_NAME__
     int brent_iter_max = 1000;
     real_t ZEPS = 1.0e-70;
     real_t CGOLD = 0.1;
-    real_t tol = 1.0e-3;
+    real_t tol = 1.0e-8;
 
-    real_t tol1, tol2;
     real_t a, b;
 
     if (a0 < b0)
@@ -2205,6 +2213,9 @@ namespace __SPEC_LIB_NAME__
     x = w = v = x0;
     fx = fw = fv = factor * IDbrentmethod1Dfunc(func, xtra, spect, x0, xmini, xi, n);
     xm = 0.5 * (a + b);
+
+    real_t tol1 = tol * fabs(x) + ZEPS;
+    real_t tol2 = e * tol1;
 
     while (iter < brent_iter_max && fabs(x - xm) + 0.5 * (b - a) > 2 * tol1)
     {
@@ -2295,6 +2306,21 @@ namespace __SPEC_LIB_NAME__
 
       xm = 0.5 * (a + b);
 
+#ifdef DEBUG
+      std::vector<real_t> xtemp, utemp;
+      xtemp.resize(n);
+      utemp.resize(n);
+      for (int i = 0; i < n; i++)
+      {
+        utemp.at(i) = xmini.at(i) + u * xi.at(i);
+        xtemp.at(i) = xmini.at(i) + x * xi.at(i);
+      }
+
+      std::cout << "Brent iteration " << iter << ": x = " << x << " f(x) = " << fx << " u = " << u << " f(u) = " << fu
+                << "\n";
+
+#endif
+
       iter++;
     }
 
@@ -2328,19 +2354,19 @@ namespace __SPEC_LIB_NAME__
 
     real_t xr, frand;
     std::vector<real_t> xrand, xa, xb;
-    xrand.reserve(nmax);
-    xa.reserve(nmax);
-    xb.reserve(nmax);
+    xrand.resize(nmax);
+    xa.resize(nmax);
+    xb.resize(nmax);
     real_t fa, fb, fmin;
 
     int afirst = 1;
     int bfirst = 1;
     for (i = 0; i < n; i++)
     {
-      if (xi[i] != 0)
+      if (xi.at(i) != 0)
       {
-        a0tmp = (xlim_min[i] - xinit[i]) / xi[i];
-        b0tmp = (xlim_max[i] - xinit[i]) / xi[i];
+        a0tmp = (xlim_min.at(i) - xinit.at(i)) / xi.at(i);
+        b0tmp = (xlim_max.at(i) - xinit.at(i)) / xi.at(i);
 
         if (a0tmp > *a0 || afirst)
         {
@@ -2355,49 +2381,49 @@ namespace __SPEC_LIB_NAME__
       }
     }
 
-    if (*a0 > *b0)
+
+
+    while (*a0 > *b0)
     {
-      *a0 = 0;
-      *b0 = 0;
+      a0tmp = *a0;
+      *a0 = *b0;
+      *b0 = a0tmp;
       *x0 = 0;
+    }
+    for (i = 0; i < n; i++)
+    {
+      xa.at(i) = xinit.at(i) + *a0 * xi.at(i);
+      xb.at(i) = xinit.at(i) + *b0 * xi.at(i);
+    }
+    fa = factor * (this->*func)(xa, xtra, spect);
+    fb = factor * (this->*func)(xb, xtra, spect);
+    if (fa < fb)
+    {
+      *x0 = *a0;
+      fmin = fa;
     }
     else
     {
-      for (i = 0; i < n; i++)
-      {
-        xa[i] = xinit[i] + *a0 * xi[i];
-        xb[i] = xinit[i] + *b0 * xi[i];
-      }
-      fa = factor * (this->*func)(xa, xtra, spect);
-      fb = factor * (this->*func)(xb, xtra, spect);
-      if (fa < fb)
-      {
-        *x0 = *a0;
-        fmin = fa;
-      }
-      else
-      {
-        *x0 = *b0;
-        fmin = fb;
-      }
-      int irand;
+      *x0 = *b0;
+      fmin = fb;
+    }
+    int irand;
 
-      int icount = 0;
-      for (irand = 0; irand < BRAKETMAX; irand++)
+    int icount = 0;
+    for (irand = 0; irand < BRAKETMAX; irand++)
+    {
+      xr = *a0 + irand * (*b0 - *a0) / BRAKETMAX;
+      for (i = 0; i < n; i++)
+        xrand.at(i) = xinit.at(i) + xr * xi.at(i);
+      frand = factor * (this->*func)(xrand, xtra, spect);
+      if (frand < fmin)
       {
-        xr = *a0 + irand * (*b0 - *a0) / BRAKETMAX;
-        for (i = 0; i < n; i++)
-          xrand[i] = xinit[i] + xr * xi[i];
-        frand = factor * (this->*func)(xrand, xtra, spect);
-        if (frand < fmin)
-        {
-          *x0 = xr;
-          fmin = frand;
-          icount++;
-        }
-        if (icount == 5)
-          break;
+        *x0 = xr;
+        fmin = frand;
+        icount++;
       }
+      if (icount == 5)
+        break;
     }
   }
 
@@ -2413,17 +2439,17 @@ namespace __SPEC_LIB_NAME__
     auto a2_size = a2.size();
     add.resize(a1_size);
 
-    if (a1[0].size() != a2[0].size() || a1_size != a2_size)
+    if (a1.at(0).size() != a2.at(0).size() || a1_size != a2_size)
       return 0;
     for (size_t i = 0; i < a1_size; i++)
     {
-      add[i].resize(2);
+      add.at(i).resize(2);
 
-      add[i][0] = a1[i][0];
-      add[i][1] = a1[i][1];
-      if (a1[i][0] >= a2[0][0] && a1[i][0] <= a2[a2_size - 1][0])
+      add.at(i).at(0) = a1.at(i).at(0);
+      add.at(i).at(1) = a1.at(i).at(1);
+      if (a1.at(i).at(0) >= a2.at(0).at(0) && a1.at(i).at(0) <= a2[a2_size - 1].at(0))
       {
-        add[i][1] += ind_param.logx_interpol(a2, a1[i][0]);
+        add.at(i).at(1) += ind_param.logx_interpol(a2, a1.at(i).at(0));
       }
     }
     return 1;
@@ -2435,8 +2461,8 @@ namespace __SPEC_LIB_NAME__
   /* AMS-02 chi^2 with background only */
   {
     std::vector<std::vector<real_t>> back, backS;
-    real_t A = param[0];
-    real_t phi_f = param[1];
+    real_t A = param.at(0);
+    real_t phi_f = param.at(1);
 
     if (!background_spectAMS(logE, A, back))
       return -1.e30;
@@ -2451,7 +2477,7 @@ namespace __SPEC_LIB_NAME__
     std::vector<real_t> logE;
     logE.resize(N_AMS02 + 1);
     for (int i = 0; i < N_AMS02; i++)
-      logE[i] = log10(AMS02[i][0]);
+      logE.at(i) = log10(AMS02.at(i).at(0));
     logE[N_AMS02] = 2.6;
 
     std::vector<real_t> xlimmin = {0, 0.1};
@@ -2476,9 +2502,9 @@ namespace __SPEC_LIB_NAME__
     real_t e, o, sigma;
     for (int i = 0; i < N_AMS02; i++)
     {
-      e = spectrum[i][1];
-      o = AMS02[i][1];
-      sigma = AMS02[i][2];
+      e = spectrum.at(i).at(1);
+      o = AMS02.at(i).at(1);
+      sigma = AMS02.at(i).at(2);
       chi += (e - o) * (e - o) / (sigma * sigma);
     }
 
@@ -2490,8 +2516,8 @@ namespace __SPEC_LIB_NAME__
   /* AMS-02 chi^2 for the total (primary+secondary) pbar spectrum */
   {
     std::vector<std::vector<real_t>> tot, back, totS;
-    real_t A = param[0];
-    real_t phi_f = param[1];
+    real_t A = param.at(0);
+    real_t phi_f = param.at(1);
     if (!background_spectAMS(logE, A, back))
       return -1.e30;
     if (!add_spectra(back, spec, tot))
@@ -2516,7 +2542,7 @@ namespace __SPEC_LIB_NAME__
     std::vector<real_t> logE;
     logE.resize(N_AMS02 + 1);
     for (int i = 0; i < N_AMS02; i++)
-      logE[i] = log10(AMS02[i][0]);
+      logE.at(i) = log10(AMS02.at(i).at(0));
     logE[N_AMS02] = 2.6;
 
     std::vector<real_t> xlimmin = {0, 0.1};
@@ -2540,7 +2566,7 @@ namespace __SPEC_LIB_NAME__
 
     int DM_candidate = input.getLightestBSMpart();
     real_t mass_chi = input.masses_vector.at(DM_candidate);
-    if (mass_chi < mass_list[0] || mass_chi > mass_list[N_MASS - 1])
+    if (mass_chi < mass_list.at(0) || mass_chi > mass_list[N_MASS - 1])
     {
       printf("Mass out of range, mDM must be between 5 and 1.0e+5 GeV\n");
       return -1;
@@ -2550,7 +2576,7 @@ namespace __SPEC_LIB_NAME__
     ind_param.compute_fluxes(production_spectrum);
 
     /*	FILE* ff=fopen("test.out", "w");*/
-    /*	for (i=0; i<fe->Nenergybins; i++) fprintf(ff, "%e\t %e\n", fe->Emin[i], fe->eflux[i]);*/
+    /*	for (i=0; i<fe->Nenergybins; i++) fprintf(ff, "%e\t %e\n", fe->Emin.at(i), fe->eflux.at(i));*/
     /*	fclose(ff);*/
 
     return 2 * likelihood_all_dwarfs();

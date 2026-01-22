@@ -813,6 +813,35 @@ public:
      */
     real_t deltalikelihood_fermi();
 
+    inline real_t test_func(const std::vector<real_t>& x, const std::vector<real_t>& xtra,
+                            const std::vector<std::vector<real_t>>& spec)
+    {
+      real_t a = xtra[0];
+      real_t b = xtra[1];
+      real_t c = xtra[2];
+      real_t d = xtra[3];
+      real_t e = xtra[4];
+
+      return a * pow(x[0], 2.) + c * pow(x[1], 2.) + b * x[0] * x[1] + d * x[0] + e * x[1];
+    };
+
+    inline real_t test_func_spec(const std::vector<real_t>& x, const std::vector<real_t>& xtra,
+                                 const std::vector<std::vector<real_t>>& spec)
+    {
+      real_t result = 0;
+      for (int i = 0; i < spec.size(); i++)
+      {
+        for (int j = 0; j < spec[i].size(); j++)
+        {
+          result += spec[i][j] * (pow(x[0], i + 2));
+        }
+      }
+
+      result /= xtra[0] * (x[0] - 1);
+
+      return result;
+    };
+
   }; // class Propagation_param_t
 } // namespace __SPEC_LIB_NAME__
 

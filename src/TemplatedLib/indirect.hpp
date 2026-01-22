@@ -44,9 +44,9 @@ private:
                 //!< cross section)
     std::array<std::vector<std::vector<real_t>>, 62> PPPC4DMID;  //!< Data from the PPPC4DMID
     std::vector<real_t> DM_masses;                               //!< List of DM masses in PPPC4DMID
-    std::array<std::vector<std::vector<real_t>>, 47> fermi_data; //!< Fermi-LAT binned data
+    std::array<std::vector<std::vector<real_t>>, 45> fermi_data; //!< Fermi-LAT binned data
     std::array<real_t, 24> fermi_eflux;            //!< Integrated energy fluxes of gamma rays for each energy bin
-    std::vector<std::vector<real_t>> logJ_factors; //!< Log J-factors for the 47 dSphs
+    std::vector<std::vector<real_t>> logJ_factors; //!< Log J-factors for the 45 dSphs
 
 public:
     /**
@@ -204,7 +204,7 @@ public:
 
     inline std::vector<real_t> get_DM_masses() { return DM_masses; };
 
-    inline std::array<std::vector<std::vector<real_t>>, 47> get_fermi_data() { return fermi_data; };
+    inline std::array<std::vector<std::vector<real_t>>, 45> get_fermi_data() { return fermi_data; };
 
     inline std::vector<std::vector<real_t>> get_logJ() { return logJ_factors; };
 

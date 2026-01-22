@@ -1,5 +1,5 @@
 #include "indirect.hpp"
-
+// #define DEBUG
 
 template <typename T> static inline T SQUARE(const T x) { return x * x; }
 
@@ -544,16 +544,33 @@ namespace __SPEC_LIB_NAME__
   {
     std::string path = "/workspaces/darkpack-cmake/src/fermi_data/";
     int i = 0;
+
+    // Organizing files in alphabetical order
+    std::vector<std::string> file_list;
     for (const auto& file : std::filesystem::directory_iterator(path))
     {
       std::string filepath = file.path().string();
+      file_list.push_back(filepath);
+    }
+    std::sort(file_list.begin(), file_list.end());
+
+    for (const auto& filepath : file_list)
+    {
       if (filepath == "/workspaces/darkpack-cmake/src/fermi_data/dSphs_list.dat")
       {
         logJ_factors.clear();
         read_file(filepath, 5, logJ_factors);
       }
+      else if (filepath == "/workspaces/darkpack-cmake/src/fermi_data/limits_bb.txt" ||
+               filepath == "/workspaces/darkpack-cmake/src/fermi_data/limits_tautau.txt")
+      {
+        continue; // Skip limits files
+      }
       else
       {
+#ifdef DEBUG
+        // std::cout << "Reading Fermi data file: " << std::filesystem::absolute(filepath) << "\n";
+#endif
         fermi_data.at(i).clear();
         read_file(filepath, 4, fermi_data.at(i));
         i++;
@@ -566,12 +583,16 @@ namespace __SPEC_LIB_NAME__
     const auto data = fermi_data.at(dsph);
     auto total_size = static_cast<int>(data.size());
     int ind_flux = bin * 25; // Each energy bin has 25 flux values
-    while (ind_flux < (bin + 1) * 25 - 1 && data.at(ind_flux).at(3) < flux && ind_flux < total_size)
+    while (ind_flux < (bin + 1) * 25 - 1 && data.at(ind_flux).at(2) < flux && ind_flux < total_size)
       ind_flux++;
-
-    real_t res = data.at(ind_flux - 1).at(3) + (data.at(ind_flux).at(3) - data.at(ind_flux - 1).at(2)) /
-                                                   (data.at(ind_flux).at(1) - data.at(ind_flux).at(1)) *
-                                                   (flux - data.at(ind_flux - 1).at(1));
+#ifdef DEBUG
+    std::cout << ind_flux << " " << flux << "\n";
+    std::cout << data.at(ind_flux).at(0) << " " << data.at(ind_flux).at(1) << " " << data.at(ind_flux).at(2) << " "
+              << data.at(ind_flux).at(3) << "\n";
+#endif
+    real_t res = data.at(ind_flux - 1).at(3) + (data.at(ind_flux).at(3) - data.at(ind_flux - 1).at(3)) /
+                                                   (data.at(ind_flux).at(2) - data.at(ind_flux - 1).at(2)) *
+                                                   (flux - data.at(ind_flux - 1).at(2));
 
     return res;
   }

@@ -30,8 +30,12 @@ RUN dnf update -y && \
                 pipx \
                 texlive-type1cm.noarch \
                 bc \
-                -y && \ 
-    dnf clean all  
+                valgrind \
+                perf \
+                root \
+                pdftk \
+                -y && \
+    dnf clean all
 
 RUN useradd ${username}
 
@@ -62,15 +66,9 @@ USER ${username}
 RUN pipx ensurepath && \
     pipx install poetry
 
-USER root
-RUN dnf install valgrind \
-                perf \
-                root \
-                pdftk \
-                -y && \
-    dnf clean all
 
 
+# USER root
 # Installs maquao (for profiling/development)
 # RUN cd /usr/bin && wget https://maqao.org/maqao_archive/maqao.intel64.2.17.0.tar.xz &&	\
 #     tar -xvf maqao.intel64.2.17.0.tar.xz && cp maqao.intel64.2.17.0/maqao.intel64 maqao && \

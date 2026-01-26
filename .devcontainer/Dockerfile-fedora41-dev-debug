@@ -1,0 +1,87 @@
+FROM registry.fedoraproject.org/fedora:41
+
+ARG username=vscode
+
+RUN dnf update -y && \
+    dnf upgrade -y && \
+    dnf install \
+                gcc \
+                gfortran \
+                g++ \
+                gsl \
+                gsl-devel \
+                texlive \
+                ImageMagick \
+                dvipng \
+                coreutils \
+                qtchooser \
+                cmake \
+                git \
+                ninja-build \
+                gdb \
+                eigen3-devel \
+                tbb \
+                tbb-devel \
+                wget \
+                python3 \
+                jupyter-notebook \
+                doxygen \
+                git-clang-format \
+                pipx \
+                texlive-type1cm.noarch \
+                bc \
+                -y && \ 
+    dnf clean all  
+
+RUN useradd ${username}
+
+# Installing MARTY
+USER ${username}
+
+WORKDIR /home/${username}
+
+RUN git clone https://github.com/docbrown1955/marty-public.git && \
+    cd marty-public && \
+    git checkout master && \
+    mkdir bin include lib build 
+
+RUN cd /home/${username}/marty-public/build && \
+  cmake .. -DCMAKE_INSTALL_PREFIX=.install -G Ninja -DCMAKE_BUILD_TYPE=Debug && \
+  cmake --build . && \
+  cmake --install .
+
+ENV INSTALLMARTYPATH="/home/${username}/marty-public/build/.install"
+ENV PATH=$INSTALLMARTYPATH/bin:$PATH
+ENV LD_LIBRARY_PATH=$INSTALLMARTYPATH/lib
+ENV LIBRARY_PATH=$INSTALLMARTYPATH/lib
+ENV C_INCLUDE_PATH=$INSTALLMARTYPATH/include
+ENV CPATH=$INSTALLMARTYPATH/include
+
+# Setting up pipx and poetry
+USER ${username}
+RUN pipx ensurepath && \
+    pipx install poetry
+
+USER root
+RUN dnf install valgrind \
+                perf \
+                root \
+                pdftk \
+                -y && \
+    dnf clean all
+
+
+# Installs maquao (for profiling/development)
+# RUN cd /usr/bin && wget https://maqao.org/maqao_archive/maqao.intel64.2.17.0.tar.xz &&	\
+#     tar -xvf maqao.intel64.2.17.0.tar.xz && cp maqao.intel64.2.17.0/maqao.intel64 maqao && \
+#     rm -rf maqao.intel64.2.17.0.tar.xz maqao.intel64.2.17.0/
+
+# # Installs microbenchmark (for profiling/development)
+# RUN git clone https://gitlab.in2p3.fr/CTA-LAPP/PHOENIX_LIBS/MicroBenchmark.git && \
+#     cd MicroBenchmark && \
+#     ./install.sh /usr/ && \
+#     cd .. && \
+#     rm -fr MicroBenchmark
+USER ${username}
+
+CMD ["sleep", "infinity"]

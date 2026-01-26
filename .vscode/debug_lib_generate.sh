@@ -84,6 +84,8 @@ compile_MARTY_source()
 rm "$source_mty.x" "$source_mty.o"
 compile_MARTY_source $source_mty
 
+[ -f "$source_mty.x" ] && exit 0 || exit 1
+
 ./$source_mty.x || exit 3
 
 

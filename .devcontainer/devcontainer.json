@@ -11,7 +11,7 @@
 	// The following uses the designed Dockerfile in the current folder to build the image.
 	 //"build": {
 	 	//"dockerfile": "Dockerfile-fedora41-dev"
-	 //},
+	  //},
 
 	// Custom arguments to pass to the container manager when creating the container from the image
 	//"runArgs": [

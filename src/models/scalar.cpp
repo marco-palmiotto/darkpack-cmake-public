@@ -338,6 +338,7 @@ int main()
   computeAndAddToLibFromList(scalar, lib, list_of_processes, list_of_processes_1to2, "smBsm.hpp");
 
   // Computation of the widths at the three TreeLevel
+
   Expr width_h = scalar.computeWidth(Order::TreeLevel, "h");
   Expr width_W = scalar.computeWidth(Order::TreeLevel, "W");
   Expr width_Z = scalar.computeWidth(Order::TreeLevel, "Z");
@@ -345,13 +346,14 @@ int main()
   Expr width_phi = scalar.computeWidth(Order::TreeLevel, "phi");
 
 
-  std::cout << "\n\n" << Evaluated(width_phi, eval::abbreviation) << std::endl << std::endl;
+  //std::cout << "\n\n" << Evaluated(width_phi, eval::abbreviation) << std::endl << std::endl;
 
   /*
   We construct a vector of expressions to expand
   NOTE: this prevents hardcoding some quantities in the library
   */
   std::vector<Expr> expr_to_expand = {width_h, width_W, width_Z, width_t, width_phi};
+
 
   for (Expr expression : expr_to_expand)
   {
@@ -371,6 +373,7 @@ int main()
   lib.addFunction("width_Z", width_Z);
   lib.addFunction("width_t", width_t);
   lib.addFunction("width_phi", width_phi);
+
 
   lib.addDefaultParameter("g_s", false);
 

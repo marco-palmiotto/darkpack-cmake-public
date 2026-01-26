@@ -1,37 +1,37 @@
+/* This file is empty on purpose
+ * Please, fill it if you want the constructor with a filename
+ *
+ *
 #pragma once
 
 #ifndef LESHOUCESFROMMARTY_INCLUDED
-  #define LESHOUCESFROMMARTY_INCLUDED
+#define LESHOUCESFROMMARTY_INCLUDED
+// NOTE: DO NOT replace the include guard with pragma once!
+//       The constructor Param_t(std::string) needs the macro to be defined
+
+#ifndef __cplusplus
+#define __cplusplus
+#endif
+
+#include "RunningSM.hpp"
+#include "config.hpp"
+#include "correspondance.hpp"
+#include "marty/lha/lha.h"
+#include "params_new.hpp"
 
 
-  #ifndef __cplusplus
-    #define __cplusplus
-  #endif
-
-  #include "RunningSM.hpp"
-  #include "correspondance.hpp"
-  #include "marty/lha/lha.h"
-  #include "params_new.hpp"
-  #include "scalar2to2.h"
-
-
-namespace scalar2to2::readmodule
+namespace __SPEC_LIB_NAME__::readmodule
 {
 
-  inline void computeThetaWandMw(const double alpha_em, const double Gf, const double Mz, double& thetaW, double& Mw)
+  Param_t ReadLHA(const std::string name)
   {
-    thetaW = 0.5 * std::asin(std::sqrt(4 * M_PI * alpha_em / (std::sqrt(2) * Gf * Mz * Mz)));
-    Mw = Mz * std::cos(thetaW);
-    return;
+    std::cerr << "Please, write the code for Param_t __SPEC_LIB_NAME__::readmoduleReadLHA(const std::string
+name)!\n"
+              << "Because such a function now just prints this message and returns nothing\n";
+
+    Param_t empty;
+    return empty;
   }
 
-
-  //   void ReadSMparams( darkpackparam_t &param, const std::string namefile);
-  void AssignSMparams(Param_t& param, const std::string namefile);
-  void ReadBSMparams(Param_t& param, const std::string filename);
-  void AssignBSMparams(Param_t& param);
-
-  Param_t ReadLHA(const std::string name);
-
-} // namespace scalar2to2::readmodule
-#endif
+}
+*/

@@ -334,8 +334,10 @@ int computeAndAddToLibFromList(mty::Model& model, // model
     }
     auto process_graphs = ampl.obtainGraphs();
     graphs.insert(graphs.end(), process_graphs.begin(), process_graphs.end());
+
   #ifdef SQUAREDAMP
     s1 = model.computeSquaredAmplitude(ampl, false);
+    
     if (s1 == CSL_0)
     {
       std::cout << "The squared amplitude is null\n";
@@ -360,7 +362,7 @@ int computeAndAddToLibFromList(mty::Model& model, // model
       std::cerr << "Found conjugation matrix dependence for " << nameSumSq << std::endl;
       exit(2);
     }
-    lib.addFunction(nameSumSq, s1);
+    //lib.addFunction(nameSumSq, s1);
     #ifdef DISPLAYSQUAREDAMPLITUDESEXPRESSIONS
     std::cout << "|M|^2 = " << DeepRefreshed(temp) << std::endl;
     #endif
@@ -500,6 +502,7 @@ int computeAndAddToLibFromList(mty::Model& model, // model
     graphs.insert(graphs.end(), process_graphs.begin(), process_graphs.end());
   #ifdef SQUAREDAMP
     s1 = model.computeSquaredAmplitude(ampl, false);
+    
     if (s1 == CSL_0)
     {
       std::cout << "The squared amplitude is null\n";
@@ -524,7 +527,7 @@ int computeAndAddToLibFromList(mty::Model& model, // model
       std::cerr << "Found conjugation matrix dependence for " << nameSumSq << std::endl;
       exit(2);
     }
-    lib.addFunction(nameSumSq, s1);
+    //lib.addFunction(nameSumSq, s1);
     #ifdef DISPLAYSQUAREDAMPLITUDESEXPRESSIONS
     std::cout << "|M|^2 = " << DeepRefreshed(temp) << std::endl;
     #endif

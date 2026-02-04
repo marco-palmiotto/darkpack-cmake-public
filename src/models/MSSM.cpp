@@ -364,7 +364,9 @@ int main()
     list_of_processes[i].printname();
   }
 
-  computeAndAddToLibFromList(mssm, lib, list_of_processes, "smBsm.hpp");
+  std::vector<Process2to2ToCompute> list_of_processes_1to2;
+
+  computeAndAddToLibFromList(mssm, lib, list_of_processes, list_of_processes_1to2, "smBsm.hpp");
 #ifndef DISABLE_LIB_CREATION
 
   // Computation of the widths at the three TreeLevel

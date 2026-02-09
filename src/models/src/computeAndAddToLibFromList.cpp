@@ -128,7 +128,7 @@ int computeAndAddToLibFromList(mty::Model& model, // model
   correspondancefileh << "#define EMPTYCHAR 32\n";
   correspondancefileh << "#define ANTICHAR 126\n";
   correspondancefileh << "using Cfptr_t = ccomplex_return_t (*) (cparam_t const *);\n";
-  correspondancefileh << "using CXXfptr_t = complex_t (*) (param_t const *);\n";
+  correspondancefileh << "using CXXfptr_t = complex_t (*) (const param_t&);\n";
   correspondancefileh << "namespace corr{\n";
   correspondancefileh << "  using Entry_t = std::tuple<Cfptr_t, short int, short int>;\n";
   correspondancefileh << "  using Entry_t_1to2 = std::tuple<CXXfptr_t, short int, short int>;\n";

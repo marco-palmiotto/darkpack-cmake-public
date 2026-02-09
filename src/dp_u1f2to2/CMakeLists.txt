@@ -25,7 +25,15 @@ set(INVARIANT_LIB_HEADER_PATH ${PROJECT_SOURCE_DIR}/../${INVARIANT_LIB_NAME})
 set(INVARIANT_LIB_PATH ${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_PREFIX}/lib) 
 
 if(CMAKE_SOURCE_DIR STREQUAL PROJECT_SOURCE_DIR)
-    # Compilazione indipendente: usa i flag specifici del sottoprogetto
+    # Independent compilation: use the flags and settings defined here
+
+    # Set C++ standard globally
+    set(CMAKE_CXX_STANDARD 23)
+    set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+    # Set C standard globally
+    set(CMAKE_C_STANDARD 23)
+    set(CMAKE_C_STANDARD_REQUIRED ON)
 
     # Set global compilation flags (applied to all targets)
     set(GENERIC_FLAGS "-Wall -Wextra -Wpedantic -Wno-deprecated-declarations -fPIC -fdiagnostics-color=always")

@@ -346,7 +346,7 @@ int main()
   Expr width_phi = scalar.computeWidth(Order::TreeLevel, "phi");
 
 
-  //std::cout << "\n\n" << Evaluated(width_phi, eval::abbreviation) << std::endl << std::endl;
+  std::cout << "\n\n" << Evaluated(width_phi, eval::abbreviation) << std::endl << std::endl;
 
   /*
   We construct a vector of expressions to expand

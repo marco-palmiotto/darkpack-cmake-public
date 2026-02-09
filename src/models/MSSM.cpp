@@ -8,7 +8,9 @@
 
 #define LIBNAME "mssm2to2" // Name of the output library
 #define FULL_PARAM
-
+#define INDIRECT_DETECTION_ONLY                                                                                        \
+  "data/processes_idetection.psiso" // If defined, only processes relevant for indirect detection are computed
+#define DECAYS "data/decays.psiso"  // File that contains the 1to2 decay processes to be computed
 
 // Output files and paths
 #define DIMCHEPSTRING 30 // String dimension for calcHep names' output
@@ -85,7 +87,6 @@ std::vector<Process2to2ToCompute> convertToVecofP(Process2to2ToComputeVec input)
     temp.process = input.process[i];
     temp.order = input.order[i];
     temp.leading_order = input.leading_order[i];
-    temp.Wgauge = input.Wgauge[i];
 
     output.push_back(temp);
   }
@@ -281,7 +282,7 @@ int main()
     std::cout << particle->getName() << " has dof: " << dofs.back() << std::endl;
   }
 
-
+#ifndef INDIRECT_DETECTION_ONLY
   std::cout << "Reading the processes from file (MSSM)\n";
 
   // To this purpose, we use the type
@@ -320,9 +321,9 @@ int main()
 
   // For the sake of clarity we save the total number of processes in a new variable
   const size_t n_siso = vec1.process.size();
-#ifdef DEBUG
+  #ifdef DEBUG
   std::cout << "  n_siso - (temp + n_nosiso) = " << n_siso - (temp + n_nosiso) << std::endl;
-#endif
+  #endif
 
   // Setting Feynman gauge to each process as default
 
@@ -363,8 +364,77 @@ int main()
     std::cout << i << " ";
     list_of_processes[i].printname();
   }
+#endif
+#ifdef INDIRECT_DETECTION_ONLY
+  std::cout << "Generating processes relevant for indirect detection\n";
 
-  std::vector<Process2to2ToCompute> list_of_processes_1to2;
+  std::system("[ -f data/processes_chep.txt ] && rm -f data/processes_chep.txt");
+
+  Process2to2ToComputeVec vec1;
+
+  std::string listprocess = INDIRECT_DETECTION_ONLY;
+
+  int temp = addFromFile(mssm, vec1.process, vec1.namemarty, vec1.namesiso, listprocess);
+  if (temp <= 0)
+  {
+    std::cout << "  Something went wrong\n";
+    exit(1);
+  }
+
+  // For the sake of clarity we save the total number of processes in a new variable
+  const size_t n_idetection = vec1.process.size();
+
+
+  // Setting Feynman gauge to each process as default
+
+  for (size_t i = 0; i < n_idetection; i++)
+  {
+    vec1.order.push_back(mty::Order::TreeLevel);
+    vec1.Wgauge.push_back(mty::gauge::Type::Feynman);
+    vec1.leading_order.push_back(false);
+  }
+
+  std::vector<Process2to2ToCompute> list_of_processes = convertToVecofP(vec1);
+
+  std::cout << "We just read\n";
+
+  for (size_t i = 0; i < list_of_processes.size(); i++)
+  {
+    std::cout << i << " ";
+    list_of_processes[i].printname();
+  }
+
+#endif
+  Process2to2ToComputeVec vec2;
+  std::string listdecays = DECAYS;
+  int temp2 = addFromFile(mssm, vec2.process, vec2.namemarty, vec2.namesiso, listdecays, true);
+  if (temp2 <= 0)
+  {
+    std::cout << "  Something went wrong\n";
+    exit(1);
+  }
+
+  // For the sake of clarity we save the total number of processes in a new variable
+  const size_t n_decays = vec2.process.size();
+
+  // Setting Feynman gauge to each process as default
+
+  for (size_t i = 0; i < n_decays; i++)
+  {
+    vec2.order.push_back(mty::Order::TreeLevel);
+    vec2.Wgauge.push_back(mty::gauge::Type::Feynman);
+    vec2.leading_order.push_back(false);
+  }
+
+  std::vector<Process2to2ToCompute> list_of_processes_1to2 = convertToVecofP(vec2);
+
+  std::cout << "We just read\n";
+
+  for (size_t i = 0; i < list_of_processes_1to2.size(); i++)
+  {
+    std::cout << i << " ";
+    list_of_processes_1to2[i].printname();
+  }
 
   computeAndAddToLibFromList(mssm, lib, list_of_processes, list_of_processes_1to2, "smBsm.hpp");
 #ifndef DISABLE_LIB_CREATION

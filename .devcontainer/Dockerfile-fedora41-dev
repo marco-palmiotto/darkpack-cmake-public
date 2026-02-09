@@ -30,6 +30,10 @@ RUN dnf update -y && \
                 pipx \
                 texlive-type1cm.noarch \
                 bc \
+                valgrind \
+                perf \
+                root \
+                pdftk \
                 -y && \ 
     dnf clean all  
 
@@ -62,13 +66,7 @@ USER ${username}
 RUN pipx ensurepath && \
     pipx install poetry
 
-USER root
-RUN dnf install valgrind \
-                perf \
-                root \
-                pdftk \
-                -y && \
-    dnf clean all
+
 
 
 # Installs maquao (for profiling/development)

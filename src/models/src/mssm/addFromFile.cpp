@@ -2,7 +2,8 @@ int addFromFile(mty::Model& model,                       // Model
                 Processes& processes,                    // Vector where I add the processes
                 std::vector<std::string>& names,         // Name of the function in MARTY
                 std::vector<std::string>& namesSuperiso, // Name of the process in SuperIso
-                const std::string filename               // Input file
+                const std::string filename,              // Input file
+                bool one_to_two = false                  // Flag for 1to2 processes (default false)
 )
 {
 
@@ -15,6 +16,7 @@ int addFromFile(mty::Model& model,                       // Model
     std::cout << "Impossible to open " << NAMECHEPFILE << "\n";
     exit(1);
   }
+
   std::ofstream savenamesclean;
   savenamesclean.open(NAMES_CLEAN, std::ios::out);
   if (!savenamesclean)
@@ -69,181 +71,409 @@ int addFromFile(mty::Model& model,                       // Model
   std::string line, buffer, prevline = "";
   char tempstring[20];
 
-  while (!feof(source))
+  if (!one_to_two)
   {
-    fscanf(source, "%s", tempstring);
-    line = tempstring;
-    if (line.size() < 4 || line.size() > 20)
+    while (!feof(source))
     {
-      std::cout << "Line has invalid length" << std::endl;
-      savechepnames.close();
-      savenamesclean.close();
-      fclose(source);
-      return 0;
-    }
-    if (line == prevline)
-      continue;
-    prevline = line;
-#ifdef DEBUG
-    std::cout << "Reading line " << line << std::endl;
-#endif
-    particle = 0;
-    size_t position = 0;
-    int indexes[4];
-    bool antiPart[4];
-    size_t count = 0;
-    bool perfectmatch = false;
-    Process tempProcess;
-    Particle tempParticle;
-
-    buffer.clear();
-    tempProcess.clear();
-    // Reading the incoming state (SUSY)
-    do
-    {
-      if (line.at(position) != '\0')
-        buffer.push_back(line.at(position));
-      else
-        break;
-      for (int i = 0; i < SIZEPYSICALSUSY; i++)
+      fscanf(source, "%s", tempstring);
+      line = tempstring;
+      if (line.size() < 4 || line.size() > 20)
       {
-        if (buffer == listSisoSusy[i])
-        {
-          indexes[particle] = i;
-          if (line.size() >= position + 3 && line[position + 1] == 'b' && line[position + 2] == 'a' &&
-              line[position + 3] == 'r')
-          {
-            antiPart[particle] = true;
-            position += 3;
-          }
-          else
-          {
-            antiPart[particle] = false;
-          }
-          particle++;
-          buffer.clear();
-          i = SIZEPYSICALSUSY;
-        }
+        std::cout << "Line has invalid length" << std::endl;
+        savechepnames.close();
+        savenamesclean.close();
+        fclose(source);
+        return 0;
       }
-      position++;
-    } while (particle < 2);
+      if (line == prevline)
+        continue;
+      prevline = line;
+#ifdef DEBUG
+      std::cout << "Reading line " << line << std::endl;
+#endif
+      particle = 0;
+      size_t position = 0;
+      int indexes[4];
+      bool antiPart[4];
+      size_t count = 0;
+      bool perfectmatch = false;
+      Process tempProcess;
+      Particle tempParticle;
 
-    // Reading the outgoing state (SM)
-    do
-    {
-      if (line.at(position) != '\0')
-        buffer.push_back(line.at(position));
-      else
-        break;
-      for (int i = 0; i < SIZEPYSICALSM; i++)
+      buffer.clear();
+      tempProcess.clear();
+      // Reading the incoming state (SUSY)
+      do
       {
-        if (buffer == listSisoSM[i])
+        if (line.at(position) != '\0')
+          buffer.push_back(line.at(position));
+        else
+          break;
+        for (int i = 0; i < SIZEPYSICALSUSY; i++)
         {
-          // If particle is h*, checking a second character
-          bool cond1 = (buffer.size() == 1 && buffer.at(0) == 'h' && line.size() > position + 1);
-          if (cond1 && !(particle == 2 && line.size() == position + 1))
+          if (buffer == listSisoSusy[i])
           {
-            perfectmatch = false;
-            if (particle == 2)
+            indexes[particle] = i;
+            if (line.size() >= position + 3 && line[position + 1] == 'b' && line[position + 2] == 'a' &&
+                line[position + 3] == 'r')
             {
-              // Check if the rest of the string matches exactly with a particle
-              std::string termination_buf;
-              for (size_t newpos = position + 1; newpos < line.size(); newpos++)
-                termination_buf.push_back(line.at(newpos));
-              for (int j = 0; j < SIZEPYSICALSM; j++)
+              antiPart[particle] = true;
+              position += 3;
+            }
+            else
+            {
+              antiPart[particle] = false;
+            }
+            particle++;
+            buffer.clear();
+            i = SIZEPYSICALSUSY;
+          }
+        }
+        position++;
+      } while (particle < 2);
+
+      // Reading the outgoing state (SM)
+      do
+      {
+        if (line.at(position) != '\0')
+          buffer.push_back(line.at(position));
+        else
+          break;
+        for (int i = 0; i < SIZEPYSICALSM; i++)
+        {
+          if (buffer == listSisoSM[i])
+          {
+            // If particle is h*, checking a second character
+            bool cond1 = (buffer.size() == 1 && buffer.at(0) == 'h' && line.size() > position + 1);
+            if (cond1 && !(particle == 2 && line.size() == position + 1))
+            {
+              perfectmatch = false;
+              if (particle == 2)
               {
-                if (termination_buf == listSisoSM[j] || termination_buf == listSisoSM[j] + "bar")
+                // Check if the rest of the string matches exactly with a particle
+                std::string termination_buf;
+                for (size_t newpos = position + 1; newpos < line.size(); newpos++)
+                  termination_buf.push_back(line.at(newpos));
+                for (int j = 0; j < SIZEPYSICALSM; j++)
                 {
-                  // If there's a match
-                  perfectmatch = true;
-                  i = 0;
-                  j = SIZEPYSICALSM;
+                  if (termination_buf == listSisoSM[j] || termination_buf == listSisoSM[j] + "bar")
+                  {
+                    // If there's a match
+                    perfectmatch = true;
+                    i = 0;
+                    j = SIZEPYSICALSM;
+                  }
                 }
               }
+              if (!perfectmatch)
+                switch (line.at(position + 1))
+                {
+                case 'h':
+                  i = 1;
+                  position++;
+                  break;
+                case 'c':
+                  i = 2;
+                  position++;
+                  break;
+                case '3':
+                  i = 3;
+                  position++;
+                  break;
+                default:
+                  break;
+                }
             }
-            if (!perfectmatch)
-              switch (line.at(position + 1))
-              {
-              case 'h':
-                i = 1;
-                position++;
-                break;
-              case 'c':
-                i = 2;
-                position++;
-                break;
-              case '3':
-                i = 3;
-                position++;
-                break;
-              default:
-                break;
-              }
+            indexes[particle] = i;
+            if (line.size() >= position + 3 && line.at(position + 1) == 'b' && line.at(position + 2) == 'a' &&
+                line.at(position + 3) == 'r')
+            {
+              antiPart[particle] = true;
+              position += 3;
+            }
+            else
+            {
+              antiPart[particle] = false;
+            }
+            particle++;
+            buffer.clear();
+            i = SIZEPYSICALSM;
           }
-          indexes[particle] = i;
-          if (line.size() >= position + 3 && line.at(position + 1) == 'b' && line.at(position + 2) == 'a' &&
-              line.at(position + 3) == 'r')
-          {
-            antiPart[particle] = true;
-            position += 3;
-          }
-          else
-          {
-            antiPart[particle] = false;
-          }
-          particle++;
-          buffer.clear();
-          i = SIZEPYSICALSM;
         }
-      }
-      position++;
-    } while (particle < 4);
+        position++;
+      } while (particle < 4);
 
-    count = 0;
+      count = 0;
 
-    do
+      do
+      {
+        tempParticle = model.getParticle(listMartySusy[indexes[count]]);
+        if (antiPart[count])
+        {
+          tempProcess.push_back(AntiPart(Incoming(tempParticle)));
+        }
+        else
+        {
+          tempProcess.push_back(Incoming(tempParticle));
+        }
+        count++;
+      } while (count < 2);
+
+      do
+      {
+        tempParticle = model.getParticle(listMartySM[indexes[count]]);
+        if (antiPart[count])
+        {
+          tempProcess.push_back(AntiPart(Outgoing(tempParticle)));
+        }
+        else
+        {
+          tempProcess.push_back(Outgoing(tempParticle));
+        }
+        count++;
+      } while (count < 4);
+      sprintf(outstrings[nproc], "%s,%s->%s,%s",
+              antiPart[0] ? listChepSusyAnti[indexes[0]].c_str() : listChepSusy[indexes[0]].c_str(),
+              antiPart[1] ? listChepSusyAnti[indexes[1]].c_str() : listChepSusy[indexes[1]].c_str(),
+              antiPart[2] ? listChepSMAnti[indexes[2]].c_str() : listChepSM[indexes[2]].c_str(),
+              antiPart[3] ? listChepSMAnti[indexes[3]].c_str() : listChepSM[indexes[3]].c_str());
+
+      namesChep.push_back(outstrings[nproc]);
+      names.push_back(processName(tempProcess));
+      processes.push_back(tempProcess);
+      namesSuperiso.push_back(line);
+      savechepnames << outstrings[nproc] << "\t" << line << std::endl;
+      savenamesclean << processName(tempProcess) << " " << line << std::endl;
+      nproc++;
+    } // Ending cycle
+    savechepnames.close();
+    fclose(source);
+  }
+  else
+  {
+    while (!feof(source))
     {
-      tempParticle = model.getParticle(listMartySusy[indexes[count]]);
-      if (antiPart[count])
+      fscanf(source, "%s", tempstring);
+      line = tempstring;
+      if (line.size() < 3 || line.size() > 20)
       {
-        tempProcess.push_back(AntiPart(Incoming(tempParticle)));
+        std::cout << "Line has invalid length" << std::endl;
+        savechepnames.close();
+        savenamesclean.close();
+        fclose(source);
+        return 0;
       }
-      else
-      {
-        tempProcess.push_back(Incoming(tempParticle));
-      }
-      count++;
-    } while (count < 2);
+      if (line == prevline)
+        continue;
+      prevline = line;
+#ifdef DEBUG
+      std::cout << "Reading line " << line << std::endl;
+#endif
+      particle = 0;
+      size_t position = 0;
+      int indexes[3];
+      bool antiPart[3];
+      size_t count = 0;
+      bool perfectmatch = false;
+      Process tempProcess;
+      Particle tempParticle;
 
-    do
-    {
-      tempParticle = model.getParticle(listMartySM[indexes[count]]);
-      if (antiPart[count])
+      buffer.clear();
+      tempProcess.clear();
+      // Reading the incoming state (SM)
+      do
       {
-        tempProcess.push_back(AntiPart(Outgoing(tempParticle)));
-      }
-      else
-      {
-        tempProcess.push_back(Outgoing(tempParticle));
-      }
-      count++;
-    } while (count < 4);
-    sprintf(outstrings[nproc], "%s,%s->%s,%s",
-            antiPart[0] ? listChepSusyAnti[indexes[0]].c_str() : listChepSusy[indexes[0]].c_str(),
-            antiPart[1] ? listChepSusyAnti[indexes[1]].c_str() : listChepSusy[indexes[1]].c_str(),
-            antiPart[2] ? listChepSMAnti[indexes[2]].c_str() : listChepSM[indexes[2]].c_str(),
-            antiPart[3] ? listChepSMAnti[indexes[3]].c_str() : listChepSM[indexes[3]].c_str());
+        if (line.at(position) != '\0')
+          buffer.push_back(line.at(position));
+        else
+          break;
+        for (int i = 0; i < SIZEPYSICALSM; i++)
+        {
+          if (buffer == listSisoSM[i])
+          {
+            // If particle is h*, checking a second character
+            bool cond1 = (buffer.size() == 1 && buffer.at(0) == 'h' && line.size() > position + 1);
+            if (cond1 && !(particle == 1 && line.size() == position + 1))
+            {
+              perfectmatch = false;
+              if (particle == 1)
+              {
+                // Check if the rest of the string matches exactly with a particle
+                std::string termination_buf;
+                for (size_t newpos = position + 1; newpos < line.size(); newpos++)
+                  termination_buf.push_back(line.at(newpos));
+                for (int j = 0; j < SIZEPYSICALSM; j++)
+                {
+                  if (termination_buf == listSisoSM[j] || termination_buf == listSisoSM[j] + "bar")
+                  {
+                    // If there's a match
+                    perfectmatch = true;
+                    i = 0;
+                    j = SIZEPYSICALSM;
+                  }
+                }
+              }
+              if (!perfectmatch)
+                switch (line.at(position + 1))
+                {
+                case 'h':
+                  i = 1;
+                  position++;
+                  break;
+                case 'c':
+                  if (line.at(position + 2) == 'b')
+                    i = 0; // To distinguinsh between hc and h + cbar
+                  else
+                  {
+                    i = 2;
+                    position++;
+                  }
+                  break;
+                case '3':
+                  i = 3;
+                  position++;
+                  break;
+                default:
+                  break;
+                }
+            }
+            indexes[particle] = i;
+            if (line.size() >= position + 3 && line.at(position + 1) == 'b' && line.at(position + 2) == 'a' &&
+                line.at(position + 3) == 'r')
+            {
+              antiPart[particle] = true;
+              position += 3;
+            }
+            else
+            {
+              antiPart[particle] = false;
+            }
+            particle++;
+            buffer.clear();
+            i = SIZEPYSICALSM;
+          }
+        }
+        position++;
+      } while (particle < 1);
 
-    namesChep.push_back(outstrings[nproc]);
-    names.push_back(processName(tempProcess));
-    processes.push_back(tempProcess);
-    namesSuperiso.push_back(line);
-    savechepnames << outstrings[nproc] << "\t" << line << std::endl;
-    savenamesclean << processName(tempProcess) << " " << line << std::endl;
-    nproc++;
-  } // Ending cycle
-  savechepnames.close();
-  fclose(source);
+      // Reading the outgoing state (SM)
+      do
+      {
+        if (line.at(position) != '\0')
+          buffer.push_back(line.at(position));
+        else
+          break;
+        for (int i = 0; i < SIZEPYSICALSM; i++)
+        {
+          if (buffer == listSisoSM[i])
+          {
+            // If particle is h*, checking a second character
+            bool cond1 = (buffer.size() == 1 && buffer.at(0) == 'h' && line.size() > position + 1);
+            if (cond1 && !(particle == 1 && line.size() == position + 1))
+            {
+              perfectmatch = false;
+              if (particle == 1)
+              {
+                // Check if the rest of the string matches exactly with a particle
+                std::string termination_buf;
+                for (size_t newpos = position + 1; newpos < line.size(); newpos++)
+                  termination_buf.push_back(line.at(newpos));
+                for (int j = 0; j < SIZEPYSICALSM; j++)
+                {
+                  if (termination_buf == listSisoSM[j] || termination_buf == listSisoSM[j] + "bar")
+                  {
+                    // If there's a match
+                    perfectmatch = true;
+                    i = 0;
+                    j = SIZEPYSICALSM;
+                  }
+                }
+              }
+              if (!perfectmatch)
+                switch (line.at(position + 1))
+                {
+                case 'h':
+                  i = 1;
+                  position++;
+                  break;
+                case 'c':
+                  i = 2;
+                  position++;
+                  break;
+                case '3':
+                  i = 3;
+                  position++;
+                  break;
+                default:
+                  break;
+                }
+            }
+            indexes[particle] = i;
+            if (line.size() >= position + 3 && line.at(position + 1) == 'b' && line.at(position + 2) == 'a' &&
+                line.at(position + 3) == 'r')
+            {
+              antiPart[particle] = true;
+              position += 3;
+            }
+            else
+            {
+              antiPart[particle] = false;
+            }
+            particle++;
+            buffer.clear();
+            i = SIZEPYSICALSM;
+          }
+        }
+        position++;
+      } while (particle < 3);
+
+
+      count = 0;
+
+      do
+      {
+        tempParticle = model.getParticle(listMartySM[indexes[count]]);
+        if (antiPart[count])
+        {
+          tempProcess.push_back(AntiPart(Incoming(tempParticle)));
+        }
+        else
+        {
+          tempProcess.push_back(Incoming(tempParticle));
+        }
+        count++;
+      } while (count < 1);
+
+      do
+      {
+        tempParticle = model.getParticle(listMartySM[indexes[count]]);
+        if (antiPart[count])
+        {
+          tempProcess.push_back(AntiPart(Outgoing(tempParticle)));
+        }
+        else
+        {
+          tempProcess.push_back(Outgoing(tempParticle));
+        }
+        count++;
+      } while (count < 3);
+
+      sprintf(outstrings[nproc], "%s->%s,%s",
+              antiPart[0] ? listChepSusyAnti[indexes[0]].c_str() : listChepSusy[indexes[0]].c_str(),
+              antiPart[1] ? listChepSusyAnti[indexes[1]].c_str() : listChepSusy[indexes[1]].c_str(),
+              antiPart[2] ? listChepSMAnti[indexes[2]].c_str() : listChepSM[indexes[2]].c_str());
+
+      namesChep.push_back(outstrings[nproc]);
+      names.push_back(processName(tempProcess));
+      processes.push_back(tempProcess);
+      namesSuperiso.push_back(line);
+      savechepnames << outstrings[nproc] << "\t" << line << std::endl;
+      savenamesclean << processName(tempProcess) << " " << line << std::endl;
+      nproc++;
+    } // Ending cycle
+    savechepnames.close();
+    fclose(source);
+  }
 #ifdef DEBUG
   std::cout << "Read " << nproc << " processes\n";
 #endif

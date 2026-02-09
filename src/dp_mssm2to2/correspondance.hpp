@@ -13,9 +13,11 @@ namespace mssm2to2
 #define EMPTYCHAR 32
 #define ANTICHAR  126
   using Cfptr_t = ccomplex_return_t (*)(cparam_t const*);
+  using CXXfptr_t = complex_t (*)(param_t const*);
   namespace corr
   {
     using Entry_t = std::tuple<Cfptr_t, short int, short int>;
+    using Entry_t_1to2 = std::tuple<CXXfptr_t, short int, short int>;
     enum Part_t
     {
       G = 1,
@@ -116,6 +118,8 @@ namespace mssm2to2
 
 
     extern const std::unordered_map<std::string, Entry_t> squaredampl;
+
+    extern const std::unordered_map<std::string, Entry_t_1to2> squaredampl_1to2;
 
     inline double getMassFirst(const int p, const param_t& input)
     {

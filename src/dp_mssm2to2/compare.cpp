@@ -59,8 +59,6 @@ namespace __SPEC_LIB_NAME__
       return false;
     if (!(p1.M_tauL == p2.M_tauL))
       return false;
-    if (!(p1.Gamma_W == p2.Gamma_W))
-      return false;
     if (!(p1.Gamma_Z == p2.Gamma_Z))
       return false;
     if (!(p1.Gamma_h == p2.Gamma_h))
@@ -70,8 +68,6 @@ namespace __SPEC_LIB_NAME__
     if (!(p1.Gamma_A0 == p2.Gamma_A0))
       return false;
     if (!(p1.Gamma_H0 == p2.Gamma_H0))
-      return false;
-    if (!(p1.Gamma_Hp == p2.Gamma_Hp))
       return false;
     if (!(p1.Gamma_b1 == p2.Gamma_b1))
       return false;
@@ -120,8 +116,6 @@ namespace __SPEC_LIB_NAME__
     if (!(p1.V_ub_mod == p2.V_ub_mod))
       return false;
     if (!(p1.reg_prop == p2.reg_prop))
-      return false;
-    if (!(p1.Gamma_top == p2.Gamma_top))
       return false;
     if (!(p1.Gamma_nuel == p2.Gamma_nuel))
       return false;

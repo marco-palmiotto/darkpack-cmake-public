@@ -17,6 +17,7 @@ echo You have installed $gcc_version
 
 # Define the minimum required GCC version
 required_version="14"
+cpp_standard="-std=c++20"
 
 echo The required version is $required_version
 
@@ -56,11 +57,11 @@ compile_MARTY_source()
 {
   [ $# -ne 1 ] && echo "This function requires 1 argument : the name of the target file" && exit 1
   echo 'Generating C++ library via g++...'
-  echo "$CXX -std=c++17 -c $1.cpp -o $1.o -I$INSTALLMARTYPATH/include"
-  $CXX -std=c++17 -c $1.cpp -o $1.o -I$INSTALLMARTYPATH/include || exit 2
+  echo "$CXX $cpp_standard -c $1.cpp -o $1.o -I$INSTALLMARTYPATH/include"
+  $CXX $cpp_standard -c $1.cpp -o $1.o -I$INSTALLMARTYPATH/include || exit 2
   [[ ! -f "$1.o" ]] && echo 'The file .o has not been generated. Compilation will stop now.' && exit 1
   echo 'Generating executable file linking with the libraries of MARTY...'
-  $CXX -std=c++17 -o $1.x $1.o -L$INSTALLMARTYPATH/lib -lmarty || exit 2
+  $CXX $cpp_standard -o $1.x $1.o -L$INSTALLMARTYPATH/lib -lmarty || exit 2
   [[ ! -f "$1.x" ]] && echo 'The file .x has not been generated. Compilation will stop now.' && exit 1
 }
 
@@ -218,3 +219,4 @@ generate_copy_to_c_struct
 cd $curdir
 
 exit $exit_code
+

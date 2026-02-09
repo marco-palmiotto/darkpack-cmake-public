@@ -27,6 +27,8 @@ namespace __SPEC_LIB_NAME__
       return false;
     if (!(p1.s_12 == p2.s_12))
       return false;
+    if (!(p1.s_23 == p2.s_23))
+      return false;
     if (!(p1.s_34 == p2.s_34))
       return false;
     if (!(p1.g_chi == p2.g_chi))

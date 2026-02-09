@@ -40,13 +40,11 @@ namespace mssm2to2
     output.M_quR = input.M_quR;
     output.alpha = input.alpha;
     output.M_tauL = input.M_tauL;
-    output.Gamma_W = input.Gamma_W;
     output.Gamma_Z = input.Gamma_Z;
     output.Gamma_h = input.Gamma_h;
     output.theta_W = input.theta_W;
     output.Gamma_A0 = input.Gamma_A0;
     output.Gamma_H0 = input.Gamma_H0;
-    output.Gamma_Hp = input.Gamma_Hp;
     output.Gamma_b1 = input.Gamma_b1;
     output.Gamma_b2 = input.Gamma_b2;
     output.Gamma_c1 = input.Gamma_c1;
@@ -71,7 +69,6 @@ namespace mssm2to2
     output.Gamma_ur = input.Gamma_ur;
     output.V_ub_mod = input.V_ub_mod;
     output.reg_prop = input.reg_prop;
-    output.Gamma_top = input.Gamma_top;
     output.Gamma_nuel = input.Gamma_nuel;
     output.Gamma_numl = input.Gamma_numl;
     output.Gamma_tau1 = input.Gamma_tau1;

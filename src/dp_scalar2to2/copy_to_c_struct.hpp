@@ -3,6 +3,7 @@ namespace scalar2to2
   inline void update_kinematics(Param_t& input, const double sij[5][5])
   {
     input.s_12 = sij[1][2];
+    input.s_23 = sij[2][3];
     input.s_34 = sij[3][4];
   }
   inline cparam_s copy_to_c_struct(Param_t& input)
@@ -20,6 +21,7 @@ namespace scalar2to2
     output.V_us = input.V_us;
     output.e_em = input.e_em;
     output.s_12 = input.s_12;
+    output.s_23 = input.s_23;
     output.s_34 = input.s_34;
     output.g_chi = input.g_chi;
     output.theta_W = input.theta_W;
@@ -51,6 +53,7 @@ namespace scalar2to2
   inline cparam_s update_c_kinematics(const Param_t& input, cparam_s output)
   {
     output.s_12 = input.s_12;
+    output.s_23 = input.s_23;
     output.s_34 = input.s_34;
     return output;
   }

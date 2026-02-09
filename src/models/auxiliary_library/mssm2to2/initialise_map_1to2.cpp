@@ -1,0 +1,30 @@
+#include "correspondance.hpp"
+namespace mssm2to2::corr{
+const std::unordered_map<std::string, Entry_t_1to2> squaredampl_1to2{ 
+{ {EMPTYCHAR+corr::h,ANTICHAR,EMPTYCHAR+corr::mu,EMPTYCHAR+corr::mu},{  &sumSqAmpl_h_to_anti_mu_mu, 1,1} },
+{ {EMPTYCHAR+corr::h,ANTICHAR,EMPTYCHAR+corr::tau,EMPTYCHAR+corr::tau},{  &sumSqAmpl_h_to_anti_tau_tau, 1,1} },
+{ {EMPTYCHAR+corr::h,ANTICHAR,EMPTYCHAR+corr::s,EMPTYCHAR+corr::s},{  &sumSqAmpl_h_to_anti_s_s, 1,1} },
+{ {EMPTYCHAR+corr::h,ANTICHAR,EMPTYCHAR+corr::c,EMPTYCHAR+corr::c},{  &sumSqAmpl_h_to_anti_c_c, 1,1} },
+{ {EMPTYCHAR+corr::h,ANTICHAR,EMPTYCHAR+corr::b,EMPTYCHAR+corr::b},{  &sumSqAmpl_h_to_anti_b_b, 1,1} },
+{ {EMPTYCHAR+corr::h,ANTICHAR,EMPTYCHAR+corr::t,EMPTYCHAR+corr::t},{  &sumSqAmpl_h_to_anti_t_t, 1,1} },
+{ {EMPTYCHAR+corr::h,ANTICHAR,EMPTYCHAR+corr::W,EMPTYCHAR+corr::W},{  &sumSqAmpl_h_to_anti_W_W, 1,1} },
+{ {EMPTYCHAR+corr::h,EMPTYCHAR+corr::Z,EMPTYCHAR+corr::Z},{  &sumSqAmpl_h_to_Z_Z, 2,1} },
+{ {EMPTYCHAR+corr::H0,ANTICHAR,EMPTYCHAR+corr::mu,EMPTYCHAR+corr::mu},{  &sumSqAmpl_H0_to_anti_mu_mu, 1,1} },
+{ {EMPTYCHAR+corr::H0,ANTICHAR,EMPTYCHAR+corr::tau,EMPTYCHAR+corr::tau},{  &sumSqAmpl_H0_to_anti_tau_tau, 1,1} },
+{ {EMPTYCHAR+corr::H0,ANTICHAR,EMPTYCHAR+corr::s,EMPTYCHAR+corr::s},{  &sumSqAmpl_H0_to_anti_s_s, 1,1} },
+{ {EMPTYCHAR+corr::H0,ANTICHAR,EMPTYCHAR+corr::c,EMPTYCHAR+corr::c},{  &sumSqAmpl_H0_to_anti_c_c, 1,1} },
+{ {EMPTYCHAR+corr::H0,ANTICHAR,EMPTYCHAR+corr::b,EMPTYCHAR+corr::b},{  &sumSqAmpl_H0_to_anti_b_b, 1,1} },
+{ {EMPTYCHAR+corr::H0,ANTICHAR,EMPTYCHAR+corr::t,EMPTYCHAR+corr::t},{  &sumSqAmpl_H0_to_anti_t_t, 1,1} },
+{ {EMPTYCHAR+corr::H0,ANTICHAR,EMPTYCHAR+corr::W,EMPTYCHAR+corr::W},{  &sumSqAmpl_H0_to_anti_W_W, 1,1} },
+{ {EMPTYCHAR+corr::H0,EMPTYCHAR+corr::Z,EMPTYCHAR+corr::Z},{  &sumSqAmpl_H0_to_Z_Z, 2,1} },
+{ {EMPTYCHAR+corr::H0,EMPTYCHAR+corr::h,EMPTYCHAR+corr::h},{  &sumSqAmpl_H0_to_h_h, 2,1} },
+{ {EMPTYCHAR+corr::A0,ANTICHAR,EMPTYCHAR+corr::mu,EMPTYCHAR+corr::mu},{  &sumSqAmpl_A0_to_anti_mu_mu, 1,1} },
+{ {EMPTYCHAR+corr::A0,ANTICHAR,EMPTYCHAR+corr::tau,EMPTYCHAR+corr::tau},{  &sumSqAmpl_A0_to_anti_tau_tau, 1,1} },
+{ {EMPTYCHAR+corr::A0,ANTICHAR,EMPTYCHAR+corr::s,EMPTYCHAR+corr::s},{  &sumSqAmpl_A0_to_anti_s_s, 1,1} },
+{ {EMPTYCHAR+corr::A0,ANTICHAR,EMPTYCHAR+corr::c,EMPTYCHAR+corr::c},{  &sumSqAmpl_A0_to_anti_c_c, 1,1} },
+{ {EMPTYCHAR+corr::A0,ANTICHAR,EMPTYCHAR+corr::b,EMPTYCHAR+corr::b},{  &sumSqAmpl_A0_to_anti_b_b, 1,1} },
+{ {EMPTYCHAR+corr::A0,ANTICHAR,EMPTYCHAR+corr::t,EMPTYCHAR+corr::t},{  &sumSqAmpl_A0_to_anti_t_t, 1,1} },
+{ {EMPTYCHAR+corr::A0,EMPTYCHAR+corr::h,EMPTYCHAR+corr::Z},{  &sumSqAmpl_A0_to_h_Z, 1,1} },
+{ {EMPTYCHAR+corr::Hp,EMPTYCHAR+corr::W,EMPTYCHAR+corr::h},{  &sumSqAmpl_Hp_to_W_h, 1,1} },
+{ {EMPTYCHAR+corr::Hp,EMPTYCHAR+corr::W,EMPTYCHAR+corr::A0},{  &sumSqAmpl_Hp_to_W_A0, 1,1} }};
+}

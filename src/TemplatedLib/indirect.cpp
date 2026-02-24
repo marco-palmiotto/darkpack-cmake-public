@@ -1,5 +1,6 @@
 #include "indirect.hpp"
 // #define DEBUG
+#define AVG_SV_CALCULATOR
 
 template <typename T> static inline T SQUARE(const T x) { return x * x; }
 
@@ -86,7 +87,7 @@ namespace __SPEC_LIB_NAME__
     // using a low velocity approximation (assuming processes with two identical particles in the initial state)
     for (size_t i = 0; i < Processes.size(); i++)
     {
-
+#ifndef AVG_SV_CALCULATOR
       Process2to2 p = Processes[i];
       const real_t m1 = p.getMass(1, input);
       const real_t m3 = p.getMass(3, input);
@@ -94,11 +95,32 @@ namespace __SPEC_LIB_NAME__
 
       const real_t sqrt_s = 2 * m1; // s at threshold
 
+  #ifdef INTEGRATION_SQAMP
+      real_t temp_squared_amp = p.integrate_sum_squared_ampl(input, sqrt_s, nullptr);
+  #endif
+  #ifndef INTEGRATION_SQAMP
+      real_t temp_squared_amp = p.getSumSquaredAmpl(input, sqrt_s, 0.);
+  #endif
+      std::cout << "Process: " << p.getName() << " at energy " << sqrt_s << " with squared amplitude "
+                << temp_squared_amp << "\n";
 
+
+
+      real_t s_v = (temp_squared_amp != 0.) ? temp_squared_amp / (128. * M_PI * SQUARE(m1)) *
+                                                  SQRT(1. - (m3 * m3 + m4 * m4) / (2. * m1 * m1) +
+                                                       (pow(m3 * m3 - m4 * m4, 2.)) / (16. * pow(m1, 4.))) *
+                                                  3.8937966e+8 * 2.997900e-26 / (p.getSf34())
+                                            : 0.;
+#else
+      std::shared_ptr<std::vector<Process2to2>> p_ptr = std::make_shared<std::vector<Process2to2>>(1, Processes[i]);
+      const real_t m1 = (*p_ptr)[0].getMass(1, input);
+      AvgSvCalculator avg_sv_calculator(input, p_ptr);
+      avg_sv_calculator.setTaylorCoeffSVx_nosplitting();
+      real_t taylor_0 = avg_sv_calculator.get_TaylorCoeffSVT(0);
       real_t s_v =
-          (p.getSumSquaredAmpl(input, sqrt_s, 0.)) / (128. * M_PI * SQUARE(m1)) *
-          SQRT(1. - (m3 * m3 + m4 * m4) / (2. * m1 * m1) + (pow(m3 * m3 - m4 * m4, 2.)) / (16. * pow(m1, 4.))) /
-          (p.getSf34());
+          (taylor_0 != 0.) ? taylor_0 * 3.8937966e+8 * 2.997900e-26 / ((*p_ptr)[0].getSf34()) / (4 * SQUARE(m1)) : 0.;
+      std::cout << "Process: " << (*p_ptr)[0].getName() << " with thermally averaged cross section " << s_v << "\n";
+#endif
       sigma_v_process.push_back(s_v);
       total_sigma_v += s_v;
     }

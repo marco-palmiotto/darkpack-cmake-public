@@ -35,13 +35,11 @@ typedef struct cparam_s {
     creal_t M_quR;
     creal_t alpha;
     creal_t M_tauL;
-    creal_t Gamma_W;
     creal_t Gamma_Z;
     creal_t Gamma_h;
     creal_t theta_W;
     creal_t Gamma_A0;
     creal_t Gamma_H0;
-    creal_t Gamma_Hp;
     creal_t Gamma_b1;
     creal_t Gamma_b2;
     creal_t Gamma_c1;
@@ -66,7 +64,6 @@ typedef struct cparam_s {
     creal_t Gamma_ur;
     creal_t V_ub_mod;
     creal_t reg_prop;
-    creal_t Gamma_top;
     creal_t Gamma_nuel;
     creal_t Gamma_numl;
     creal_t Gamma_tau1;

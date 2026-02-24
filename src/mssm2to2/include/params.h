@@ -1,3 +1,34 @@
+#define WIDTH_nutaul
+#define WIDTH_tau2
+#define WIDTH_tau1
+#define WIDTH_numl
+#define WIDTH_nuel
+#define WIDTH_ur
+#define WIDTH_ul
+#define WIDTH_t2
+#define WIDTH_t1
+#define WIDTH_sr
+#define WIDTH_sl
+#define WIDTH_o4
+#define WIDTH_o3
+#define WIDTH_o2
+#define WIDTH_o1
+#define WIDTH_mr
+#define WIDTH_ml
+#define WIDTH_er
+#define WIDTH_el
+#define WIDTH_dr
+#define WIDTH_dl
+#define WIDTH_cr
+#define WIDTH_cl
+#define WIDTH_c2
+#define WIDTH_c1
+#define WIDTH_b2
+#define WIDTH_b1
+#define WIDTH_H0
+#define WIDTH_A0
+#define WIDTH_h
+#define WIDTH_Z
 #ifndef CSL_LIB_PARAM_H_INCLUDED
 #define CSL_LIB_PARAM_H_INCLUDED
 
@@ -41,13 +72,11 @@ struct param_t {
     csl::InitSanitizer<real_t> M_quR { "M_quR" };
     csl::InitSanitizer<real_t> alpha { "alpha" };
     csl::InitSanitizer<real_t> M_tauL { "M_tauL" };
-    csl::InitSanitizer<real_t> Gamma_W { "Gamma_W" };
     csl::InitSanitizer<real_t> Gamma_Z { "Gamma_Z" };
     csl::InitSanitizer<real_t> Gamma_h { "Gamma_h" };
     csl::InitSanitizer<real_t> theta_W { "theta_W" };
     csl::InitSanitizer<real_t> Gamma_A0 { "Gamma_A0" };
     csl::InitSanitizer<real_t> Gamma_H0 { "Gamma_H0" };
-    csl::InitSanitizer<real_t> Gamma_Hp { "Gamma_Hp" };
     csl::InitSanitizer<real_t> Gamma_b1 { "Gamma_b1" };
     csl::InitSanitizer<real_t> Gamma_b2 { "Gamma_b2" };
     csl::InitSanitizer<real_t> Gamma_c1 { "Gamma_c1" };
@@ -72,7 +101,6 @@ struct param_t {
     csl::InitSanitizer<real_t> Gamma_ur { "Gamma_ur" };
     csl::InitSanitizer<real_t> V_ub_mod { "V_ub_mod" };
     csl::InitSanitizer<real_t> reg_prop { "reg_prop" };
-    csl::InitSanitizer<real_t> Gamma_top { "Gamma_top" };
     csl::InitSanitizer<real_t> Gamma_nuel { "Gamma_nuel" };
     csl::InitSanitizer<real_t> Gamma_numl { "Gamma_numl" };
     csl::InitSanitizer<real_t> Gamma_tau1 { "Gamma_tau1" };
@@ -181,7 +209,7 @@ struct param_t {
 
     void reset()
     {
-        using real_params = std::array<csl::InitSanitizer<real_t>*, 107>;
+        using real_params = std::array<csl::InitSanitizer<real_t>*, 104>;
         using complex_params = std::array<csl::InitSanitizer<complex_t>*, 45>;
 
         for (auto &par : real_params{
@@ -189,20 +217,20 @@ struct param_t {
                 &M_eR, &V_cb, &V_ud, &V_us, &beta, &e_em, 
                 &mu_h, &s_12, &s_13, &s_14, &s_23, &s_24, 
                 &s_34, &A_tau, &M_q1L, &M_q3L, &M_qbR, &M_qdR, 
-                &M_quR, &alpha, &M_tauL, &Gamma_W, &Gamma_Z, &Gamma_h, 
-                &theta_W, &Gamma_A0, &Gamma_H0, &Gamma_Hp, &Gamma_b1, &Gamma_b2, 
-                &Gamma_c1, &Gamma_c2, &Gamma_cl, &Gamma_cr, &Gamma_dl, &Gamma_dr, 
-                &Gamma_el, &Gamma_er, &Gamma_ml, &Gamma_mr, &Gamma_o1, &Gamma_o2, 
-                &Gamma_o3, &Gamma_o4, &Gamma_sl, &Gamma_sr, &Gamma_t1, &Gamma_t2, 
-                &Gamma_ul, &Gamma_ur, &V_ub_mod, &reg_prop, &Gamma_top, &Gamma_nuel, 
-                &Gamma_numl, &Gamma_tau1, &Gamma_tau2, &delta_wolf, &Gamma_nutaul, &m_W, 
-                &m_Z, &m_b, &m_c, &m_d, &m_e, &m_h, 
-                &m_s, &m_t, &m_u, &m_A0, &m_H0, &m_Hp, 
-                &m_mu, &m_sG, &m_C_1, &m_C_2, &m_N_1, &m_N_2, 
-                &m_N_3, &m_N_4, &m_tau, &m_sb_1, &m_sb_2, &m_sc_L, 
-                &m_sc_R, &m_sd_L, &m_sd_R, &m_se_L, &m_se_R, &m_ss_L, 
-                &m_ss_R, &m_st_1, &m_st_2, &m_su_L, &m_su_R, &m_smu_L, 
-                &m_smu_R, &m_snu_e, &m_snu_mu, &m_stau_1, &m_stau_2, &m_snu_tau, })
+                &M_quR, &alpha, &M_tauL, &Gamma_Z, &Gamma_h, &theta_W, 
+                &Gamma_A0, &Gamma_H0, &Gamma_b1, &Gamma_b2, &Gamma_c1, &Gamma_c2, 
+                &Gamma_cl, &Gamma_cr, &Gamma_dl, &Gamma_dr, &Gamma_el, &Gamma_er, 
+                &Gamma_ml, &Gamma_mr, &Gamma_o1, &Gamma_o2, &Gamma_o3, &Gamma_o4, 
+                &Gamma_sl, &Gamma_sr, &Gamma_t1, &Gamma_t2, &Gamma_ul, &Gamma_ur, 
+                &V_ub_mod, &reg_prop, &Gamma_nuel, &Gamma_numl, &Gamma_tau1, &Gamma_tau2, 
+                &delta_wolf, &Gamma_nutaul, &m_W, &m_Z, &m_b, &m_c, 
+                &m_d, &m_e, &m_h, &m_s, &m_t, &m_u, 
+                &m_A0, &m_H0, &m_Hp, &m_mu, &m_sG, &m_C_1, 
+                &m_C_2, &m_N_1, &m_N_2, &m_N_3, &m_N_4, &m_tau, 
+                &m_sb_1, &m_sb_2, &m_sc_L, &m_sc_R, &m_sd_L, &m_sd_R, 
+                &m_se_L, &m_se_R, &m_ss_L, &m_ss_R, &m_st_1, &m_st_2, 
+                &m_su_L, &m_su_R, &m_smu_L, &m_smu_R, &m_snu_e, &m_snu_mu, 
+                &m_stau_1, &m_stau_2, &m_snu_tau, })
         {
             par->reset();
         }
@@ -223,7 +251,7 @@ struct param_t {
 
     void print(std::ostream &out = std::cout) const
     {
-        using real_params = std::array<csl::InitSanitizer<real_t> const*, 107>;
+        using real_params = std::array<csl::InitSanitizer<real_t> const*, 104>;
         using complex_params = std::array<csl::InitSanitizer<complex_t> const*, 45>;
 
         out << "param_t struct:\n";
@@ -233,20 +261,20 @@ struct param_t {
                 &M_eR, &V_cb, &V_ud, &V_us, &beta, &e_em, 
                 &mu_h, &s_12, &s_13, &s_14, &s_23, &s_24, 
                 &s_34, &A_tau, &M_q1L, &M_q3L, &M_qbR, &M_qdR, 
-                &M_quR, &alpha, &M_tauL, &Gamma_W, &Gamma_Z, &Gamma_h, 
-                &theta_W, &Gamma_A0, &Gamma_H0, &Gamma_Hp, &Gamma_b1, &Gamma_b2, 
-                &Gamma_c1, &Gamma_c2, &Gamma_cl, &Gamma_cr, &Gamma_dl, &Gamma_dr, 
-                &Gamma_el, &Gamma_er, &Gamma_ml, &Gamma_mr, &Gamma_o1, &Gamma_o2, 
-                &Gamma_o3, &Gamma_o4, &Gamma_sl, &Gamma_sr, &Gamma_t1, &Gamma_t2, 
-                &Gamma_ul, &Gamma_ur, &V_ub_mod, &reg_prop, &Gamma_top, &Gamma_nuel, 
-                &Gamma_numl, &Gamma_tau1, &Gamma_tau2, &delta_wolf, &Gamma_nutaul, &m_W, 
-                &m_Z, &m_b, &m_c, &m_d, &m_e, &m_h, 
-                &m_s, &m_t, &m_u, &m_A0, &m_H0, &m_Hp, 
-                &m_mu, &m_sG, &m_C_1, &m_C_2, &m_N_1, &m_N_2, 
-                &m_N_3, &m_N_4, &m_tau, &m_sb_1, &m_sb_2, &m_sc_L, 
-                &m_sc_R, &m_sd_L, &m_sd_R, &m_se_L, &m_se_R, &m_ss_L, 
-                &m_ss_R, &m_st_1, &m_st_2, &m_su_L, &m_su_R, &m_smu_L, 
-                &m_smu_R, &m_snu_e, &m_snu_mu, &m_stau_1, &m_stau_2, &m_snu_tau, })
+                &M_quR, &alpha, &M_tauL, &Gamma_Z, &Gamma_h, &theta_W, 
+                &Gamma_A0, &Gamma_H0, &Gamma_b1, &Gamma_b2, &Gamma_c1, &Gamma_c2, 
+                &Gamma_cl, &Gamma_cr, &Gamma_dl, &Gamma_dr, &Gamma_el, &Gamma_er, 
+                &Gamma_ml, &Gamma_mr, &Gamma_o1, &Gamma_o2, &Gamma_o3, &Gamma_o4, 
+                &Gamma_sl, &Gamma_sr, &Gamma_t1, &Gamma_t2, &Gamma_ul, &Gamma_ur, 
+                &V_ub_mod, &reg_prop, &Gamma_nuel, &Gamma_numl, &Gamma_tau1, &Gamma_tau2, 
+                &delta_wolf, &Gamma_nutaul, &m_W, &m_Z, &m_b, &m_c, 
+                &m_d, &m_e, &m_h, &m_s, &m_t, &m_u, 
+                &m_A0, &m_H0, &m_Hp, &m_mu, &m_sG, &m_C_1, 
+                &m_C_2, &m_N_1, &m_N_2, &m_N_3, &m_N_4, &m_tau, 
+                &m_sb_1, &m_sb_2, &m_sc_L, &m_sc_R, &m_sd_L, &m_sd_R, 
+                &m_se_L, &m_se_R, &m_ss_L, &m_ss_R, &m_st_1, &m_st_2, 
+                &m_su_L, &m_su_R, &m_smu_L, &m_smu_R, &m_snu_e, &m_snu_mu, 
+                &m_stau_1, &m_stau_2, &m_snu_tau, })
         {
             out << "  -> " << par->getName() << ": ";
             if (par->hasValue()) {
@@ -307,13 +335,11 @@ struct param_t {
         {"M_quR", &M_quR},
         {"alpha", &alpha},
         {"M_tauL", &M_tauL},
-        {"Gamma_W", &Gamma_W},
         {"Gamma_Z", &Gamma_Z},
         {"Gamma_h", &Gamma_h},
         {"theta_W", &theta_W},
         {"Gamma_A0", &Gamma_A0},
         {"Gamma_H0", &Gamma_H0},
-        {"Gamma_Hp", &Gamma_Hp},
         {"Gamma_b1", &Gamma_b1},
         {"Gamma_b2", &Gamma_b2},
         {"Gamma_c1", &Gamma_c1},
@@ -338,7 +364,6 @@ struct param_t {
         {"Gamma_ur", &Gamma_ur},
         {"V_ub_mod", &V_ub_mod},
         {"reg_prop", &reg_prop},
-        {"Gamma_top", &Gamma_top},
         {"Gamma_nuel", &Gamma_nuel},
         {"Gamma_numl", &Gamma_numl},
         {"Gamma_tau1", &Gamma_tau1},

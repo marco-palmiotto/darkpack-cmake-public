@@ -168,9 +168,12 @@ namespace mssm2to2::input_manip
     input.V_ts = pdg2016Value::V_ts;
     input.V_tb = pdg2016Value::V_tb;
 
+#ifdef WIDTH_Z
     input.Gamma_Z = pdg2016Value::Gamma_Z;
-
+#endif
+#ifdef WIDTH_W
     input.Gamma_W = pdg2016Value::Gamma_W;
+#endif
   }
 
 } // namespace mssm2to2::input_manip

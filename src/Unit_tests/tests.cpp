@@ -5,25 +5,25 @@
 
 #include <gtest/gtest.h>
 
-#include "dp_scalar2to2/RunningSM.hpp"
-#include "dp_scalar2to2/indirect.hpp"
-#include "dp_scalar2to2/process.hpp"
-#include "dp_scalar2to2/process_1to2.hpp"
-#include "dp_scalar2to2/propagation.hpp"
-#include "dp_scalar2to2/relicparam.hpp"
+#include "dp_mssm2to2/RunningSM.hpp"
+#include "dp_mssm2to2/indirect.hpp"
+#include "dp_mssm2to2/process.hpp"
+#include "dp_mssm2to2/process_1to2.hpp"
+#include "dp_mssm2to2/propagation.hpp"
+#include "dp_mssm2to2/relicparam.hpp"
 
-using namespace scalar2to2;
+using namespace mssm2to2;
 using namespace advmath;
 
 TEST(IndirectParamTest, Initialization)
 {
-  struct Param_t input("/workspaces/darkpack-cmake/src/models/scalar.lha");
+  struct Param_t input("/workspaces/darkpack-cmake/src/models/mssm.lha");
   EXPECT_NO_THROW({ Indirectparam_t ind_param(input); });
 }
 
 TEST(IndirectParamTest, ReadingFile)
 {
-  struct Param_t input("/workspaces/darkpack-cmake/src/models/scalar.lha");
+  struct Param_t input("/workspaces/darkpack-cmake/src/models/mssm.lha");
   Indirectparam_t ind_param(input);
 
   std::vector<std::vector<real_t>> dummy_data;
@@ -43,7 +43,7 @@ TEST(IndirectParamTest, ReadingFile)
 
 TEST(IndirectParamTest, SpectrumIntegration)
 {
-  struct Param_t input("/workspaces/darkpack-cmake/src/models/scalar.lha");
+  struct Param_t input("/workspaces/darkpack-cmake/src/models/mssm.lha");
   Indirectparam_t ind_param(input);
 
   std::vector<std::vector<real_t>> spectrum = {{0.1, 10.0}, {1.0, 5.0}, {10.0, 1.0}};
@@ -57,7 +57,7 @@ TEST(IndirectParamTest, SpectrumIntegration)
 
 TEST(IndirectParamTest, LikelihoodInterpolation)
 {
-  struct Param_t input("/workspaces/darkpack-cmake/src/models/scalar.lha");
+  struct Param_t input("/workspaces/darkpack-cmake/src/models/mssm.lha");
   Indirectparam_t ind_param(input);
 
   ind_param.read_fermi_data();
@@ -76,7 +76,7 @@ TEST(IndirectParamTest, LikelihoodInterpolation)
 
 TEST(IndirectParamTest, FermiReading)
 {
-  struct Param_t input("/workspaces/darkpack-cmake/src/models/scalar.lha");
+  struct Param_t input("/workspaces/darkpack-cmake/src/models/mssm.lha");
   Indirectparam_t ind_param(input);
 
   EXPECT_NO_THROW({ ind_param.read_fermi_data(); });
@@ -90,7 +90,7 @@ TEST(IndirectParamTest, FermiReading)
 
 TEST(IndirectParamTest, LogxInterpolation)
 {
-  struct Param_t input("/workspaces/darkpack-cmake/src/models/scalar.lha");
+  struct Param_t input("/workspaces/darkpack-cmake/src/models/mssm.lha");
   Indirectparam_t ind_param(input);
 
   std::vector<std::vector<real_t>> x_data = {{1.0, 100.0}, {10.0, 10.0}, {100.0, 1.0}};
@@ -104,9 +104,38 @@ TEST(IndirectParamTest, LogxInterpolation)
   EXPECT_NEAR(y_interp, expected_y, 1e-6);
 }
 
+TEST(IndirectParamTest, sigma_v)
+{
+  struct Param_t input("/workspaces/darkpack-cmake/src/models/mssm.lha");
+  std::cout << input.getLightestBSMpart() << "\n";
+  Indirectparam_t ind_param(input);
+  auto sigma_v_process = ind_param.get_sigma_v_process();
+  auto total_sigma_v = ind_param.get_total_sigma_v();
+
+  EXPECT_EQ(sigma_v_process.size(), 25);
+  EXPECT_NEAR(total_sigma_v, 4.082059e-30, 1e-32);
+}
+
+TEST(IndirectParamTest, FillSpectrum)
+{
+  struct Param_t input("/workspaces/darkpack-cmake/src/models/mssm.lha");
+  Indirectparam_t ind_param(input);
+  int DM_candidate = input.getLightestBSMpart();
+  real_t mass_chi = input.masses_vector.at(DM_candidate);
+  std::cout << mass_chi << "\n";
+  auto sigma_v_process = ind_param.get_sigma_v_process();
+  auto processes = ind_param.get_processes();
+
+  ind_param.fill_spectrum(processes, sigma_v_process, 2. * mass_chi);
+
+  real_t dof = ind_param.get_dof();
+
+  EXPECT_EQ(dof, 6);
+}
+
 TEST(PropagationParamTest, Initialization)
 {
-  struct Param_t input("/workspaces/darkpack-cmake/src/models/scalar.lha");
+  struct Param_t input("/workspaces/darkpack-cmake/src/models/mssm.lha");
   EXPECT_NO_THROW({
     Propagation_param_t prop_param(input, Propagation_param_t::propagation_models::MED,
                                    Propagation_param_t::halo_profiles::NFW, 8.5, 0.3);
@@ -116,7 +145,7 @@ TEST(PropagationParamTest, Initialization)
 
 TEST(PropagationParamTest, FunctionOptimizationPolin)
 {
-  struct Param_t input("/workspaces/darkpack-cmake/src/models/scalar.lha");
+  struct Param_t input("/workspaces/darkpack-cmake/src/models/mssm.lha");
   Propagation_param_t prop_param(input, Propagation_param_t::propagation_models::MED,
                                  Propagation_param_t::halo_profiles::NFW, 8.5, 0.3);
   std::vector<std::vector<real_t>> dummy_spectrum;
@@ -138,7 +167,7 @@ TEST(PropagationParamTest, FunctionOptimizationPolin)
 
 TEST(PropagationParamTest, FunctionOptimizationNonLin)
 {
-  struct Param_t input("/workspaces/darkpack-cmake/src/models/scalar.lha");
+  struct Param_t input("/workspaces/darkpack-cmake/src/models/mssm.lha");
   Propagation_param_t prop_param(input, Propagation_param_t::propagation_models::MED,
                                  Propagation_param_t::halo_profiles::NFW, 8.5, 0.3);
   std::vector<std::vector<real_t>> spectrum = {{1.0}};
@@ -154,6 +183,21 @@ TEST(PropagationParamTest, FunctionOptimizationNonLin)
                       "min");
 
   EXPECT_NEAR(x_min[0], 2., 1e-6);
+}
+
+TEST(PropagationParamTest, BesselZeros)
+{
+  struct Param_t input("/workspaces/darkpack-cmake/src/models/mssm.lha");
+  Propagation_param_t prop_param(input, Propagation_param_t::propagation_models::MED,
+                                 Propagation_param_t::halo_profiles::NFW, 8.5, 0.3);
+
+  prop_param.search_zeros_J0(1e-8);
+
+  auto alpha_i = prop_param.get_alpha_i();
+
+  EXPECT_NEAR(alpha_i[0], 2.404826, 1e-6);
+  EXPECT_NEAR(alpha_i[9], 30.634606, 1e-6);
+  EXPECT_NEAR(alpha_i[99], 313.374266, 1e-6);
 }
 
 

@@ -20,7 +20,7 @@ namespace __SPEC_LIB_NAME__
     setSanitNames();
     int i;
     runlightquarks = false;
-    runcharm = false;
+    runcharm = true;
     higgsloops = true;
 
     // Initialising class fixed parametrs
@@ -95,7 +95,7 @@ namespace __SPEC_LIB_NAME__
   {
     setSanitNames();
     runlightquarks = false;
-    runcharm = false;
+    runcharm = true;
     higgsloops = true;
 
     // Initialising class fixed parametrs

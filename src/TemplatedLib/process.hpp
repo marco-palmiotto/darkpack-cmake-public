@@ -397,6 +397,8 @@ public:
      */
     real_t getSumSquaredAmpl(Param_t& input, const real_t& sqrts, const real_t& ctheta);
 
+    real_t integrate_sum_squared_ampl(Param_t& input, const real_t& sqrts, real_t* discr);
+
     /**
      * @brief Returns the sum of the sum of the squared amplitudes, avereaged with the combinatorial factor, for the
      * instance of the class.

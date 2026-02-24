@@ -813,6 +813,8 @@ public:
      */
     real_t deltalikelihood_fermi();
 
+    inline std::vector<real_t> get_alpha_i() const { return alpha_i; };
+
     inline real_t test_func(const std::vector<real_t>& x, const std::vector<real_t>& xtra,
                             const std::vector<std::vector<real_t>>& spec)
     {

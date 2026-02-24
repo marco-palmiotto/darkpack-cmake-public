@@ -214,11 +214,8 @@ int main(int argc, char** argv)
   // with the results of the formulas derived by hand, or present in literature.
   // In order to compute the latters, we initalise the instance of the global
   // RunningSM class.
-  // run = new RunningSM(input);
   run.init(input);
   run.RunCharmMass(false);
-
-  run.TestRunningMasses(input); //<- Testing the running of the masses
 
   std::cout << "The Higgs vev is:\n";
   std::cout << "v = " << 2 * (input.m_W * std::sin(input.theta_W) / input.e_em);
@@ -283,14 +280,6 @@ int main(int argc, char** argv)
   std::cout << "Weff (from formula with M2 from MARTY) = " << weff_with_kinematics_by_hand << std::endl;
 
   std::cout << "Ratio Weff/formula  = " << weff_from_darkpack / weff_formula_by_hand << std::endl;
-
-  // std::cout << "The input structure after running:\n";
-  // input.Print();
-  // run.print();
-
-  // std::cout << "The input structure inside the avcgsvcalc:\n";
-  // avgsvcalc.print();
-
 
   std::cout << "Defining a low temperature, to compare computed and predicted values of <σv>\n";
   double T = 0.001 * input.m_chi;

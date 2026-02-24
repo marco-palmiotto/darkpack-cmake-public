@@ -456,6 +456,51 @@ namespace __SPEC_LIB_NAME__
     return (std::isnormal(SumSquaredAmpl_temp.real) && SumSquaredAmpl_temp.real > 0.) ? SumSquaredAmpl_temp.real : 0.;
   }
 
+  real_t Process2to2::integrate_sum_squared_ampl(Param_t& input, const real_t& sqrts, real_t* discr)
+  {
+    // This method integrates the sum of the squared amplitude over the cosine of the angle, for the instance of the
+    // class. Therefore, it takes as input the numerical parameters and the centre-of-mass energy.
+
+    if (!isRunningExternal)
+    {
+      handleRunning(input, sqrts);
+    }
+
+    real_t p1, p3, sij[5][5];
+    if (!setKinematics(input, sqrts, 0., p1, p3, sij))
+      return 0.;
+
+    update_kinematics(input, sij);
+
+
+
+    // Defining a lambda function for the differential cross section
+    // Everything has to be passed by value because we use multithreading
+    auto lambda_opti = [=, this](real_t cosine) mutable
+    {
+      real_t p1_local, p3_local, sij_local[5][5];
+
+      if (!setKinematics(input, sqrts, cosine, p1_local, p3_local, sij_local))
+        return 0.;
+
+      update_kinematics(input, sij_local);
+      const real_t SumSquaredAmpl = getSumSquaredAmpl(input, sqrts, cosine);
+      return (std::isnormal(SumSquaredAmpl) && SumSquaredAmpl > 0.) ? SumSquaredAmpl : 0.0;
+    };
+
+    real_t integral, discrepancy;
+    const real_t maxdiscrepancy = 5.0e-3;
+
+    integral = advmath::integrate_gauss_comparative(-1., 1., lambda_opti, maxdiscrepancy, &discrepancy);
+
+    if (discrepancy > maxdiscrepancy)
+      integral = advmath::integrate_trap(-1., 1., lambda_opti, maxdiscrepancy, &discrepancy);
+    if (discr != nullptr)
+      *discr = discrepancy;
+
+    return integral * 2. * M_PI;
+  }
+
   real_t Process2to2::get_process_dependent_contrib_dweff_dcos(Param_t& input, const real_t& Ecm,
                                                                const real_t& ctheta) const
   {

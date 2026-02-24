@@ -110,7 +110,7 @@ namespace __SPEC_LIB_NAME__
     std::cout << "Assigning the first value\n";
 #endif
     size_t count = 0;
-    part_lbsm = count;
+    part_lbsm = corr::Part_t(bsm_particles[count]);
     m_lbsm = std::abs(masses_vector[bsm_particles[count]].get());
     em_charge_lbsm = corr::part_charge.at(bsm_particles[count]);
     g_lbsm = corr::part_hel_dof.at(bsm_particles[count]);
@@ -125,7 +125,7 @@ namespace __SPEC_LIB_NAME__
       bool isless = (std::abs(masses_vector[bsm_particles[count]].get()) < m_lbsm.get());
       if (isless)
       {
-        part_lbsm = count;
+        part_lbsm = corr::Part_t(bsm_particles[count]);
         m_lbsm = std::abs(masses_vector[bsm_particles[count]].get());
         em_charge_lbsm = corr::part_charge.at(bsm_particles[count]);
         g_lbsm = corr::part_hel_dof.at(bsm_particles[count]);
@@ -187,9 +187,8 @@ namespace __SPEC_LIB_NAME__
     else
       out << "The widths_vector is not initialised\n";
 
-    part_lbsm.hasValue()
-        ? (out << "The lightest BSM particle is " << corr::part_names[corr::bsm_particles[part_lbsm]] << '\n')
-        : (out << "The lightest BSM particle is not set" << '\n');
+    part_lbsm.hasValue() ? (out << "The lightest BSM particle is " << corr::part_names[part_lbsm] << '\n')
+                         : (out << "The lightest BSM particle is not set" << '\n');
 
     m_lbsm.print(out);
     g_lbsm.print(out);

@@ -11,6 +11,7 @@
 
   #include "RunningSM.hpp"
   #include "advmath.hpp"
+  #include "avgsvcalculator.hpp"
   #include "config.hpp"
   #include "correspondance.hpp"
   #include "process.hpp"

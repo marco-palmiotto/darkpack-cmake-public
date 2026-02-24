@@ -13,7 +13,7 @@ namespace mssm2to2
 #define EMPTYCHAR 32
 #define ANTICHAR  126
   using Cfptr_t = ccomplex_return_t (*)(cparam_t const*);
-  using CXXfptr_t = complex_t (*)(param_t const*);
+  using CXXfptr_t = complex_t (*)(const param_t&);
   namespace corr
   {
     using Entry_t = std::tuple<Cfptr_t, short int, short int>;

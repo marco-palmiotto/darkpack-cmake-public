@@ -47,9 +47,12 @@ namespace mssm2to2::readmodule
     param.m_W = get_value(data, "MASS", 24, pdg2016Value::m_W);
 
     param.m_h = get_value(data, "MASS", 25);
-
+#ifdef WIDTH_Z
     param.Gamma_Z = get_value(data, "ALLDECAYS", 23, pdg2016Value::Gamma_Z);
+#endif
+#ifdef WIDTH_W
     param.Gamma_W = get_value(data, "ALLDECAYS", 24, pdg2016Value::Gamma_W);
+#endif
 
     //     param.theta_W = thetaW;
     param.theta_W = std::acos(param.m_W / param.m_Z);
@@ -443,12 +446,21 @@ namespace mssm2to2::readmodule
 #ifdef DEBUG
     std::cout << "Entering reading widths function\n";
 #endif
-
+#ifdef WIDTH_h
     param.Gamma_h = get_value(data, "ALLDECAYS", 25, width_h(param).real());
+#endif
+#ifdef WIDTH_TOP
     param.Gamma_top = get_value(data, "ALLDECAYS", 6, width_t(param).real());
+#endif
+#ifdef WIDTH_H0
     param.Gamma_H0 = get_value(data, "ALLDECAYS", 35, width_H0(param).real());
+#endif
+#ifdef WIDTH_A0
     param.Gamma_A0 = get_value(data, "ALLDECAYS", 36, width_A0(param).real());
+#endif
+#ifdef WIDTH_Hp
     param.Gamma_Hp = get_value(data, "ALLDECAYS", 37, width_Hp(param).real());
+#endif
 
     param.Gamma_c1 = 0.;
     param.Gamma_c2 = 0.;
@@ -485,13 +497,27 @@ namespace mssm2to2::readmodule
       param.widths_vector[part] = 0.;
     }
 
+#ifdef WIDTH_Z
     param.widths_vector[corr::Z] = param.Gamma_Z;
+#endif
+#ifdef WIDTH_W
     param.widths_vector[corr::W] = param.Gamma_W;
-    param.widths_vector[corr::Hp] = param.Gamma_Hp;
-    param.widths_vector[corr::h] = param.Gamma_h;
-    param.widths_vector[corr::H0] = param.Gamma_H0;
+#endif
+#ifdef WIDTH_A0
     param.widths_vector[corr::A0] = param.Gamma_A0;
+#endif
+#ifdef WIDTH_h
+    param.widths_vector[corr::h] = param.Gamma_h;
+#endif
+#ifdef WIDTH_H0
+    param.widths_vector[corr::H0] = param.Gamma_H0;
+#endif
+#ifdef WIDTH_TOP
     param.widths_vector[corr::t] = param.Gamma_top;
+#endif
+#ifdef WIDTH_Hp
+    param.widths_vector[corr::Hp] = param.Gamma_Hp;
+#endif
 
     param.arewidthsassigned = true;
 
@@ -567,7 +593,6 @@ namespace mssm2to2::readmodule
 
 #ifdef DEBUG
     std::cout << "Printing widths in both formats\n";
-#endif
     fprintf(fptr, "\nDECAY    %d    %.6E    # %s decay\n", 23, param.widths_vector[corr::Z].get(), "Z");
     fprintf(fptr, "DECAY    %d    %.6E    # %s decay\n", 24, param.widths_vector[corr::W].get(), "W");
     fprintf(fptr, "DECAY    %d    %.6E    # %s decay\n", 37, param.widths_vector[corr::Hp].get(), "H+");
@@ -586,5 +611,6 @@ namespace mssm2to2::readmodule
     fprintf(fptr, "   %d    %.6E    # %s decay\n", 6, param.widths_vector[corr::t].get(), "top");
 
     fclose(fptr);
+#endif
   }
 } // namespace mssm2to2::readmodule

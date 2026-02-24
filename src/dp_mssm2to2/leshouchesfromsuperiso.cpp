@@ -138,6 +138,7 @@ namespace mssm2to2::superisosupport
 
     input.reg_prop = 0;
 
+    /*
     input.Gamma_Z = param->width_Z;
     input.Gamma_W = param->width_W;
 
@@ -146,6 +147,7 @@ namespace mssm2to2::superisosupport
     input.Gamma_H0 = param->width_H0;
     input.Gamma_A0 = param->width_A0;
     input.Gamma_top = param->width_top;
+    */
 
     input.Gamma_c1 = param->width_c1 * 0.;
     input.Gamma_c2 = param->width_c2 * 0.;
@@ -242,7 +244,7 @@ namespace mssm2to2::superisosupport
     {
       input.widths_vector[part] = 0.;
     }
-
+    /*
     input.widths_vector[corr::Z] = input.Gamma_Z;
     input.widths_vector[corr::W] = input.Gamma_W;
     input.widths_vector[corr::Hp] = input.Gamma_Hp;
@@ -250,6 +252,7 @@ namespace mssm2to2::superisosupport
     input.widths_vector[corr::H0] = input.Gamma_H0;
     input.widths_vector[corr::A0] = input.Gamma_A0;
     input.widths_vector[corr::t] = input.Gamma_top;
+    */
 
     input.arewidthsassigned = true;
 

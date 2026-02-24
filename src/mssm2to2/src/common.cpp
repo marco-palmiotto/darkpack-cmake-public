@@ -1,25 +1,16 @@
+#include "common.h"
 #include "clooptools.h"
 #include "marty/core/looptools_init.h"
-#include <cmath>
 #include "stdbool.h"
-#include "common.h"
+#include <cmath>
 
-namespace mssm2to2 {
-
-void setMu(const double mu)
+namespace mssm2to2
 {
-    setmudim(mu * mu);
-}
 
-void setLambda2(const double lambda2)
-{
-    setlambda(lambda2);
-}
+  void setMu(const double mu) { setmudim(mu * mu); }
 
-void setUVDiv(const double x)
-{
-    setuvdiv(x);
-}
+  void setLambda2(const double lambda2) { setlambda(lambda2); }
+
+  void setUVDiv(const double x) { setuvdiv(x); }
 
 } // End of namespace mssm2to2
-

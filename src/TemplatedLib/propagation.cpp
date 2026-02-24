@@ -317,7 +317,7 @@ namespace __SPEC_LIB_NAME__
       {
         /* The zero of J0 Bessel function is between z and z+dz */
         zero = find_zero_secant(z, z + dz, besselj0, tol);
-        alpha_i[n_zero] = zero;
+        alpha_i[n_zero - 1] = zero;
         n_zero += 1;
       }
     }

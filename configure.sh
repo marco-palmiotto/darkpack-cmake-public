@@ -7,7 +7,7 @@ cmake -S . -B ./build \
       -DENABLE_CLANG_TIDY=OFF \
       -DENABLE_SUBMODULE_CMA=OFF \
       -G Ninja \
-      -DMODELS_LIBS_NAMES="dp_scalar2to2"
+      -DMODELS_LIBS_NAMES="dp_mssm2to2"
 
 if [[ $(clang-format --version | cut -f 3 -d " ") == "19.1.7" ]]; then
     cmake --build ./build --target format || exit 1   

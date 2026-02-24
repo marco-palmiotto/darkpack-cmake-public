@@ -109,6 +109,56 @@ generate_param_t_comparison()
 
 }
 
+update_reset_function()
+{
+# Updates the reset() function to include new width parameters
+  local params_file=$1
+  
+  # Get the count of real parameters from the reset function
+  local current_count=$(grep -oP 'real_params = std::array<csl::InitSanitizer<real_t>\*,\s*\K[0-9]+' "$params_file")
+  local new_count=$((current_count + 3))  # Add 3 new widths
+  
+  # Update the array size
+  sed -i "s/real_params = std::array<csl::InitSanitizer<real_t>\*, *$current_count>/real_params = std::array<csl::InitSanitizer<real_t>*, $new_count>/" "$params_file"
+  
+  # Add the new widths to the reset function's real_params initialization
+  local insertion_point=$(grep -n "&Gamma_nutaul," "$params_file" | tail -1 | cut -d: -f1)
+  if [[ -n "$insertion_point" ]]; then
+    sed -i "${insertion_point}a\\                &Gamma_W, &Gamma_Hp, &Gamma_top," "$params_file"
+  fi
+}
+
+find_widths()
+{
+  local cpp_params_file=../../$libname/include/params.h
+  local c_params_file=../../$libname/clib/cparams.h
+
+  echo "Scanning for Gamma_* widths..."
+
+  # Extract all Gamma_* parameter names
+  mapfile -t widths < <(
+    grep -oE 'InitSanitizer<real_t>[[:space:]]+Gamma_[A-Za-z0-9_]+' \
+      "$cpp_params_file" | awk '{print $2}'
+  )
+
+  for width in "${widths[@]}"
+  do
+    particle=${width#Gamma_}
+    define="WIDTH_${particle}"
+
+    # Add define if missing
+    if ! grep -q "#define $define" "$cpp_params_file"; then
+      echo "  Adding #define $define"
+      sed -i '1i#define '"$define" "$cpp_params_file"
+    fi
+  done
+
+  echo "Width define scan complete."
+}
+
+
+
+
 generate_copy_to_c_struct()
 {
 # This function has to be launched inside the $auxfolder_model
@@ -216,6 +266,8 @@ curdir=$(pwd)
 cd $auxfolder_model
 generate_param_t_comparison 
 generate_copy_to_c_struct
+# Inject missing width parameters that MARTY skips
+find_widths
 cd $curdir
 
 exit $exit_code

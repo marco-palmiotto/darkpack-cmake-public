@@ -165,6 +165,7 @@ else()
 endif()
 
 add_subdirectory(src/Unit_tests)
+add_subdirectory(src/Test)
 
 # Add a custom target to run clang-format on all source files
 find_program(CLANG_FORMAT_BIN clang-format)
@@ -254,4 +255,5 @@ if(ENABLE_CLANG_TIDY)
         ${FILTERED_SOURCE_FILES}
     )
 endif()
+
 

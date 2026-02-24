@@ -16,5 +16,4 @@ constexpr const char * FILENAME_H_ON_HE = "@__HONHE__@";
 constexpr const char * XSECTION_ERRORS = "@__XSECTION_ERRORS__@";
 constexpr const char * PRIMARY_PBAR_SOURCES = "@__PRIMARY_SOURCES__@";
 
-
 #endif // CONFIG_HPP__SPEC_LIB_NAME__

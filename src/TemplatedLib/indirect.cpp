@@ -1,6 +1,6 @@
 #include "indirect.hpp"
 // #define DEBUG
-#define AVG_SV_CALCULATOR
+// #define AVG_SV_CALCULATOR
 
 template <typename T> static inline T SQUARE(const T x) { return x * x; }
 
@@ -88,18 +88,33 @@ namespace __SPEC_LIB_NAME__
     for (size_t i = 0; i < Processes.size(); i++)
     {
 #ifndef AVG_SV_CALCULATOR
+      Param_t input_copy =
+          input; // Create a copy of the input parameters to avoid modifying the original ones during the running
       Process2to2 p = Processes[i];
+
       const real_t m1 = p.getMass(1, input);
-      const real_t m3 = p.getMass(3, input);
-      const real_t m4 = p.getMass(4, input);
+
 
       const real_t sqrt_s = 2 * m1; // s at threshold
+
+
 
   #ifdef INTEGRATION_SQAMP
       real_t temp_squared_amp = p.integrate_sum_squared_ampl(input, sqrt_s, nullptr);
   #endif
   #ifndef INTEGRATION_SQAMP
-      real_t temp_squared_amp = p.getSumSquaredAmpl(input, sqrt_s, 0.);
+      // RunningSM* runptr = new RunningSM(input);
+      std::cout << "Before running: " << input_copy.m_b << "\n";
+      std::cout << input_copy.Running_scale << "\n";
+      // runptr->HandleParamRunning(input_copy, sqrt_s);
+
+      // p.setRunningData(runptr);
+      // p.setRunningExternal();
+
+      real_t temp_squared_amp = p.getSumSquaredAmpl(input_copy, sqrt_s, 0.);
+      const real_t m3 = p.getMass(3, input_copy);
+      const real_t m4 = p.getMass(4, input_copy);
+      std::cout << "After running: " << input_copy.m_b << "\n";
   #endif
       std::cout << "Process: " << p.getName() << " at energy " << sqrt_s << " with squared amplitude "
                 << temp_squared_amp << "\n";
@@ -121,6 +136,7 @@ namespace __SPEC_LIB_NAME__
           (taylor_0 != 0.) ? taylor_0 * 3.8937966e+8 * 2.997900e-26 / ((*p_ptr)[0].getSf34()) / (4 * SQUARE(m1)) : 0.;
       std::cout << "Process: " << (*p_ptr)[0].getName() << " with thermally averaged cross section " << s_v << "\n";
 #endif
+      // delete runptr;
       sigma_v_process.push_back(s_v);
       total_sigma_v += s_v;
     }

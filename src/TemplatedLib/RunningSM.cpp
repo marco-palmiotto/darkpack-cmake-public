@@ -1,10 +1,11 @@
 #include "RunningSM.hpp"
+#include "leshouchesfrommarty.hpp"
 #include <algorithm>
 // Needed for TestRunning masses
 #include <fstream>
 #include <iomanip>
 
-// #define NO_RUN
+//  #define NO_RUN
 
 namespace __SPEC_LIB_NAME__
 {
@@ -95,7 +96,7 @@ namespace __SPEC_LIB_NAME__
   {
     setSanitNames();
     runlightquarks = false;
-    runcharm = true;
+    runcharm = false;
     higgsloops = true;
 
     // Initialising class fixed parametrs

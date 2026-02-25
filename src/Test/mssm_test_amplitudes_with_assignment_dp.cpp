@@ -114,8 +114,16 @@ void test_getSingle_ext(Process2to2 p, mssm2to2::Param_t input, bool wantrun = f
     // Cycling on the energies
     for (double Ecm : abscissas)
     {
-      if (wantrun)
+      if (wantrun && Ecm == abscissas[0] &&
+          (p.getField(3) == corr::H0 || p.getField(3) == corr::W || p.getField(3) == corr::b))
+      {
+        std::cout << input.A_t << "\n";
+        std::cout << "Before running: " << input.m_b << "\n";
+        std::cout << input.Running_scale << "\n";
         runptr->HandleParamRunning(input, Ecm);
+        std::cout << "After running: " << input.m_b << "\n";
+        std::cin.get();
+      }
       double SumSquaredAmpl = p.getSumSquaredAmpl(input, Ecm, cosine);
       // In SuperIso it is the fomula multiplied by 8 pi
       double contrib = p.get_g2_dweff_dcos(input, Ecm, cosine) * 8 * M_PI;
@@ -123,6 +131,8 @@ void test_getSingle_ext(Process2to2 p, mssm2to2::Param_t input, bool wantrun = f
         continue;
       outf << Ecm << "\t" << SumSquaredAmpl << std::endl;
       outft << Ecm << "\t" << contrib << std::endl;
+      if (wantrun && p.getField(3) == corr::b)
+        std::cout << "Energy " << Ecm << " with sum of squared amplitudes " << SumSquaredAmpl << std::endl;
     }
   }
   if (wantrun)
@@ -169,6 +179,8 @@ int main(int argc, char** argv)
   std::cout << "Reading inputs from " << argv[1] << std::endl;
 
   struct Param_t input(argv[1]); // We need a Param_t struct to store data in the format we're going to use
+  std::cout << input.m_b << "\n";
+  std::cin.get();
   int err;
   // superisosupport::ReadLHA(input, argv[1], &err);
   //      input = readmodule::ReadLHA(argv[1]);

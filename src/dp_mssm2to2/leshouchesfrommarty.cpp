@@ -90,32 +90,6 @@ namespace mssm2to2::readmodule
     param.mtop_pole = get_value(data, "SMINPUTS", 6, get_value(data, "MASS", 6, pdg2016Value::m_top_pole));
     param.m_b = get_value(data, "SMINPUTS", 5, pdg2016Value::mb_mb);
     param.mbmb = param.m_b;
-
-#ifdef DEBUG
-    std::cout << "Defining a running structure to compute mtop(mtop)\n";
-#endif
-    param.Running_scale = -2.;
-    RunningSM run(param);
-
-    param.m_t = run.GetMtopMtop();
-
-#ifdef DEBUG
-    std::cout << "Light quark masses have been initialised:\n";
-    param.Print();
-#endif
-
-#ifdef DEBUG
-    std::cout << "Assigning leptons' masses\n";
-#endif
-    //     param.m_e = param.m_el_pole.get();
-    param.m_e = get_value(data, "MASS", 11, get_value(data, "SMINPUTS", 11, pdg2016Value::m_el_pole));
-    //     param.m_mu = param.m_mu_pole.get();
-    param.m_mu = get_value(data, "MASS", 13, get_value(data, "SMINPUTS", 13, pdg2016Value::m_mu_pole));
-    //     param.m_tau = param.m_tau_pole.get();
-    param.m_tau = get_value(data, "MASS", 15, get_value(data, "SMINPUTS", 7, pdg2016Value::m_tau_pole));
-
-    param.reg_prop = 0;
-
     // CKM matrix assignment
     real_t s12, s13, s23, c12, c13, c23;
     complex_t expid;
@@ -172,6 +146,33 @@ namespace mssm2to2::readmodule
     param.V_td = CKM[3][1];
     param.V_ts = CKM[3][2];
     param.V_tb = CKM[3][3].real();
+#ifdef DEBUG
+    std::cout << "Defining a running structure to compute mtop(mtop)\n";
+#endif
+    param.Running_scale = -2.;
+    param.A_t = 0.; // dummy values for these variables so the running can be performed
+    param.A_b = 0.;
+    param.A_tau = 0.;
+    param.m_t = 0.;
+    RunningSM run(param);
+    param.m_t = run.GetMtopMtop();
+
+#ifdef DEBUG
+    std::cout << "Light quark masses have been initialised:\n";
+    param.Print();
+#endif
+
+#ifdef DEBUG
+    std::cout << "Assigning leptons' masses\n";
+#endif
+    //     param.m_e = param.m_el_pole.get();
+    param.m_e = get_value(data, "MASS", 11, get_value(data, "SMINPUTS", 11, pdg2016Value::m_el_pole));
+    //     param.m_mu = param.m_mu_pole.get();
+    param.m_mu = get_value(data, "MASS", 13, get_value(data, "SMINPUTS", 13, pdg2016Value::m_mu_pole));
+    //     param.m_tau = param.m_tau_pole.get();
+    param.m_tau = get_value(data, "MASS", 15, get_value(data, "SMINPUTS", 7, pdg2016Value::m_tau_pole));
+
+    param.reg_prop = 0;
   }
 
   void ReadBSMparams(Param_t& param, const std::string& namefile)
@@ -575,7 +576,6 @@ namespace mssm2to2::readmodule
     param.Print();
     std::cout << "Fixing trilinears\n";
 #endif
-
     input_manip::FixTrilinears(param);
 
 #ifdef DEBUG

@@ -108,25 +108,6 @@ private:
     bool EP13calculation(const Param_t& input, const real_t& sqrts, real_t& p1, real_t& p3, real_t& E1,
                          real_t& E3) const;
 
-    /**
-     * @brief Set the kinematical variables for the process.
-     *
-     * @param input The numerical parameters.
-     * @param sqrts The centre-of-mass energy.
-     * @param ctheta The cosine of the angle between particles 1 and 3 in the centre-of-mass frame.
-     * @param p1 The momentum of particle 1.
-     * @param p3 The momentum of particle 3.
-     * @param sigdfj Matrix containing the scalar products of the momenta of the particles in the process, in the for
-     * s_ij = p_i * p_j.
-     * @return true If the process is kinematically allowed and the calculation was successful.
-     * @return false Otherwise.
-     */
-    bool setKinematics(Param_t& input, const real_t& sqrts, const real_t& ctheta, real_t& p1, real_t& p3,
-                       real_t sij[5][5]) const;
-
-    bool set_kinematics_from_t(Param_t& input, const real_t& s, const real_t& t, real_t& p1, real_t& p3,
-                               real_t sij[5][5]) const;
-
     // Constructors
 public:
     /**
@@ -387,6 +368,25 @@ public:
       input.Print();
   #endif
     };
+
+    /**
+     * @brief Set the kinematical variables for the process.
+     *
+     * @param input The numerical parameters.
+     * @param sqrts The centre-of-mass energy.
+     * @param ctheta The cosine of the angle between particles 1 and 3 in the centre-of-mass frame.
+     * @param p1 The momentum of particle 1.
+     * @param p3 The momentum of particle 3.
+     * @param sigdfj Matrix containing the scalar products of the momenta of the particles in the process, in the for
+     * s_ij = p_i * p_j.
+     * @return true If the process is kinematically allowed and the calculation was successful.
+     * @return false Otherwise.
+     */
+    bool setKinematics(Param_t& input, const real_t& sqrts, const real_t& ctheta, real_t& p1, real_t& p3,
+                       real_t sij[5][5]) const;
+
+    bool set_kinematics_from_t(Param_t& input, const real_t& s, const real_t& t, real_t& p1, real_t& p3,
+                               real_t sij[5][5]) const;
 
     /**
      * @brief Returns the sum of the sum of the squared amplitudes for the instance of the class.

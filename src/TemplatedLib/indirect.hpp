@@ -33,10 +33,11 @@ namespace __SPEC_LIB_NAME__
   class Indirectparam_t //< Class containing the parameters and methods for indirect detection
   {
 private:
-    Param_t input;                                   //!< Input parameters.
-    RunningSM run;                                   //!< Handles the running of SM parameters.
-    std::shared_ptr<std::vector<Process2to2>> p_ptr; //!< Pointer to the list of processes
-    std::vector<real_t> energy_table;                //!< Table containing the different energies for outgoing particles
+    Param_t input; //!< Input parameters.
+    RunningSM run; //!< Handles the running of SM parameters.
+    std::shared_ptr<std::vector<Process2to2>>
+        p_ptr;                        //!< Pointer to the list of processes (running is external to the processes)
+    std::vector<real_t> energy_table; //!< Table containing the different energies for outgoing particles
     std::array<std::vector<real_t>, 14>
         sigma_v_table; //!< Table containing the values of &sigma;*v for each channel at different energies
     std::vector<real_t> sigma_v_process; //!< Vector for the thermally averaged cross section of each process
@@ -74,7 +75,7 @@ public:
      * @brief Finds the thermally averaged cross section for a 2 to 2 process using a low velocity approximation.
      *
      */
-    void sigma_v(std::vector<Process2to2> Processes);
+    void sigma_v(std::vector<Process2to2>& Processes);
 
     /**
      * @brief Finds the decay processes present in the 1 to 2 hash table for a given particle

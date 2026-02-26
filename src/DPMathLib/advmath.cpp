@@ -349,6 +349,7 @@ namespace advmath
 
       iter++;
     }
+    return xnew; // Return the best guess after max iterations
   }
 
   complex_floating_t digamma(complex_floating_t z)

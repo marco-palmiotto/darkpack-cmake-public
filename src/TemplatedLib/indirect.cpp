@@ -1,7 +1,7 @@
 #include "indirect.hpp"
+#include "copy_to_c_struct.hpp"
 // #define DEBUG
 // #define AVG_SV_CALCULATOR
-
 template <typename T> static inline T SQUARE(const T x) { return x * x; }
 
 template <typename T> static inline T SQRT(const T x) { return pow(x, 0.5); }
@@ -12,6 +12,7 @@ namespace __SPEC_LIB_NAME__
   {
     // This constructor assumes that the Param_t object input has been refreshed
     // for a proper assignment of the masses vector
+    run.RunCharmMass();
     p_ptr = std::make_shared<std::vector<Process2to2>>();
     total_sigma_v = 0;
     find_annihilation_processes();
@@ -78,55 +79,38 @@ namespace __SPEC_LIB_NAME__
         }
       }
     }
+    for (auto& process : *p_ptr)
+    {
+      process.setRunningData(&run);
+      process.setRunningExternal();
+    }
   };
 
 
-  void Indirectparam_t::sigma_v(std::vector<Process2to2> Processes)
+  void Indirectparam_t::sigma_v(std::vector<Process2to2>& Processes)
   {
     // This function computes the thermally averaged cross section for a 2 to 2 process
     // using a low velocity approximation (assuming processes with two identical particles in the initial state)
-    for (size_t i = 0; i < Processes.size(); i++)
+
+    real_t sqrt_s = 2 * input.getLightestBSMmass(); // s at threshold
+    run.HandleParamRunning(input, sqrt_s);          // Run the parameters to the threshold energy
+    std::cout << "After first running: " << input.m_b << "\n";
+    for (Process2to2& p : Processes)
     {
-#ifndef AVG_SV_CALCULATOR
-      Param_t input_copy =
-          input; // Create a copy of the input parameters to avoid modifying the original ones during the running
-      Process2to2 p = Processes[i];
-
+      std::cout << "Process found: " << p.getName() << "\n";
       const real_t m1 = p.getMass(1, input);
+      const real_t threshold = 2. * m1; // Threshold energy for the process
 
+      if (std::abs((sqrt_s - threshold) / (sqrt_s + threshold) > 1e-3))
+      {
+        sqrt_s = threshold;
+        run.HandleParamRunning(input, sqrt_s); // Run the parameters to the threshold energy
+        std::cout << "After next running: " << input.m_b << "\n";
+      }
+      const real_t m3 = p.getMass(3, input);
+      const real_t m4 = p.getMass(4, input);
 
-      const real_t sqrt_s = 2 * m1; // s at threshold
-
-
-
-  #ifdef INTEGRATION_SQAMP
-      real_t temp_squared_amp = p.integrate_sum_squared_ampl(input, sqrt_s, nullptr);
-  #endif
-  #ifndef INTEGRATION_SQAMP
-      // RunningSM* runptr = new RunningSM(input);
-      std::cout << "Before running: " << input_copy.m_b << "\n";
-      std::cout << input_copy.Running_scale << "\n";
-      // runptr->HandleParamRunning(input_copy, sqrt_s);
-
-      // p.setRunningData(runptr);
-      // p.setRunningExternal();
-
-      real_t temp_squared_amp = p.getSumSquaredAmpl(input_copy, sqrt_s, 0.);
-      const real_t m3 = p.getMass(3, input_copy);
-      const real_t m4 = p.getMass(4, input_copy);
-      std::cout << "After running: " << input_copy.m_b << "\n";
-  #endif
-      std::cout << "Process: " << p.getName() << " at energy " << sqrt_s << " with squared amplitude "
-                << temp_squared_amp << "\n";
-
-
-
-      real_t s_v = (temp_squared_amp != 0.) ? temp_squared_amp / (128. * M_PI * SQUARE(m1)) *
-                                                  SQRT(1. - (m3 * m3 + m4 * m4) / (2. * m1 * m1) +
-                                                       (pow(m3 * m3 - m4 * m4, 2.)) / (16. * pow(m1, 4.))) *
-                                                  3.8937966e+8 * 2.997900e-26 / (p.getSf34())
-                                            : 0.;
-#else
+#ifdef AVG_SV_CALCULATOR
       std::shared_ptr<std::vector<Process2to2>> p_ptr = std::make_shared<std::vector<Process2to2>>(1, Processes[i]);
       const real_t m1 = (*p_ptr)[0].getMass(1, input);
       AvgSvCalculator avg_sv_calculator(input, p_ptr);
@@ -135,8 +119,53 @@ namespace __SPEC_LIB_NAME__
       real_t s_v =
           (taylor_0 != 0.) ? taylor_0 * 3.8937966e+8 * 2.997900e-26 / ((*p_ptr)[0].getSf34()) / (4 * SQUARE(m1)) : 0.;
       std::cout << "Process: " << (*p_ptr)[0].getName() << " with thermally averaged cross section " << s_v << "\n";
+#else
+      real_t p1, p3, sij[5][5];
+
+      // Returning 0 if the process is kinematically forbidden
+      if (!p.setKinematics(input, sqrt_s, 0., p1, p3, sij))
+      {
+        std::cerr << "Process " << p.getName() << " is kinematically forbidden at energy " << sqrt_s
+                  << ". Skipping...\n";
+        continue;
+      }
+
+      update_kinematics(input, sij);
+
+      cparam_s c_input = copy_to_c_struct(input);
+
+      // Defining a lambda function for the amplitude
+      // Everything has to be passed by value because we use multithreading
+      auto lambda_opti = [=, this](real_t cosine) mutable
+      {
+        real_t p1_local, p3_local, sij_local[5][5];
+        if (!p.setKinematics(input, sqrt_s, cosine, p1_local, p3_local, sij_local))
+          return 0.;
+        update_kinematics(input, sij_local);
+        c_input = update_c_kinematics(input, c_input);
+        const real_t SumSquaredAmpl = p.getSumSquaredAmpl_ptr()(&c_input).real;
+        return (std::isnormal(SumSquaredAmpl) && SumSquaredAmpl > 0.) ? SumSquaredAmpl : 0.0;
+      };
+
+      real_t integral, discrepancy;
+      const real_t maxdiscrepancy = 5.0e-3;
+
+      integral = advmath::integrate_gauss_comparative(-1., 1., lambda_opti, maxdiscrepancy, &discrepancy);
+
+      if (discrepancy > maxdiscrepancy)
+        integral = advmath::integrate_trap(-1., 1., lambda_opti, maxdiscrepancy, &discrepancy);
+
+      real_t temp_squared_amp = integral / 2.;
+
+      std::cout << "Process: " << p.getName() << " at energy " << sqrt_s << " with squared amplitude "
+                << temp_squared_amp << "\n";
+
+      real_t s_v = (std::isnormal(temp_squared_amp)) ? temp_squared_amp / (128. * M_PI * SQUARE(m1)) *
+                                                           SQRT(1. - (m3 * m3 + m4 * m4) / (2. * m1 * m1) +
+                                                                (pow(m3 * m3 - m4 * m4, 2.)) / (16. * pow(m1, 4.))) *
+                                                           3.8937966e+8 * 2.997900e-26 / (p.getSf34())
+                                                     : 0.;
 #endif
-      // delete runptr;
       sigma_v_process.push_back(s_v);
       total_sigma_v += s_v;
     }

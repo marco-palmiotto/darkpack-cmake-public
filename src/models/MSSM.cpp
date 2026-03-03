@@ -416,19 +416,32 @@ int main()
 
   // For the sake of clarity we save the total number of processes in a new variable
   const size_t n_decays = vec2.process.size();
+  std::cout << "We just read " << n_decays << " decay processes\n";
+  std::cin.get();
 
   // Setting Feynman gauge to each process as default
 
   for (size_t i = 0; i < n_decays; i++)
   {
+    // If either of the final state particles is a photon or a gluon, we know that the process is forbidden at tree level and we set it to be computed at one loop level. This is a workaround to avoid computing the amplitudes and then checking that they are zero.
+    if (vec2.namesiso[i].back() == 'a' || vec2.namesiso[i].back() == 'g' || *(vec2.namesiso[i].end() - 2) == 'a' ||
+        *(vec2.namesiso[i].end() - 2) == 'g')
+    {
+      vec2.order.push_back(mty::Order::OneLoop);
+      vec2.Wgauge.push_back(mty::gauge::Type::Feynman);
+      vec2.leading_order.push_back(true);
+    }
+
+    else
+    {
     vec2.order.push_back(mty::Order::TreeLevel);
     vec2.Wgauge.push_back(mty::gauge::Type::Feynman);
     vec2.leading_order.push_back(false);
+    }
   }
 
   std::vector<Process2to2ToCompute> list_of_processes_1to2 = convertToVecofP(vec2);
 
-  std::cout << "We just read\n";
 
   for (size_t i = 0; i < list_of_processes_1to2.size(); i++)
   {

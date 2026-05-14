@@ -9,6 +9,7 @@
 constexpr const char * OUTPATH = "@__OUTPATH__@";
 constexpr const char * PROJECTPATH = "@CMAKE_SOURCE_DIR@";
 constexpr const char * FILEPATH_PPPC4DMID = "@__PPPC4DMID__@";
+constexpr const char * FILEPATH_FERMI = "@__FERMIDATA__@";
 constexpr const char * FILENAME_H_ON_H = "@__HONH__@";
 constexpr const char * FILENAME_HE_ON_H = "@__HEONH__@";
 constexpr const char * FILENAME_HE_ON_HE = "@__HEONHE__@";

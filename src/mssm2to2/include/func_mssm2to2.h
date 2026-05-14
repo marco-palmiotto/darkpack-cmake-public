@@ -259,163 +259,547 @@ complex_t sumSqAmpl_N_1_N_1_to_A0_Z(
 
 struct param_t;
 
-complex_t sumSqAmpl_h_to_anti_mu_mu(
-        param_t const &param
-        );
-
-struct param_t;
-
-complex_t sumSqAmpl_h_to_anti_tau_tau(
-        param_t const &param
-        );
-
-struct param_t;
-
-complex_t sumSqAmpl_h_to_anti_s_s(
-        param_t const &param
-        );
-
-struct param_t;
-
-complex_t sumSqAmpl_h_to_anti_c_c(
-        param_t const &param
-        );
-
-struct param_t;
-
-complex_t sumSqAmpl_h_to_anti_b_b(
-        param_t const &param
-        );
-
-struct param_t;
-
-complex_t sumSqAmpl_h_to_anti_t_t(
-        param_t const &param
-        );
-
-struct param_t;
-
-complex_t sumSqAmpl_h_to_anti_W_W(
-        param_t const &param
-        );
-
-struct param_t;
-
-complex_t sumSqAmpl_h_to_Z_Z(
-        param_t const &param
-        );
-
-struct param_t;
-
-complex_t sumSqAmpl_H0_to_anti_mu_mu(
-        param_t const &param
-        );
-
-struct param_t;
-
-complex_t sumSqAmpl_H0_to_anti_tau_tau(
-        param_t const &param
-        );
-
-struct param_t;
-
-complex_t sumSqAmpl_H0_to_anti_s_s(
-        param_t const &param
-        );
-
-struct param_t;
-
-complex_t sumSqAmpl_H0_to_anti_c_c(
-        param_t const &param
-        );
-
-struct param_t;
-
-complex_t sumSqAmpl_H0_to_anti_b_b(
-        param_t const &param
-        );
-
-struct param_t;
-
-complex_t sumSqAmpl_H0_to_anti_t_t(
-        param_t const &param
-        );
-
-struct param_t;
-
-complex_t sumSqAmpl_H0_to_anti_W_W(
-        param_t const &param
-        );
-
-struct param_t;
-
-complex_t sumSqAmpl_H0_to_Z_Z(
-        param_t const &param
-        );
-
-struct param_t;
-
-complex_t sumSqAmpl_H0_to_h_h(
-        param_t const &param
-        );
-
-struct param_t;
-
-complex_t sumSqAmpl_A0_to_anti_mu_mu(
-        param_t const &param
-        );
-
-struct param_t;
-
-complex_t sumSqAmpl_A0_to_anti_tau_tau(
-        param_t const &param
-        );
-
-struct param_t;
-
-complex_t sumSqAmpl_A0_to_anti_s_s(
-        param_t const &param
-        );
-
-struct param_t;
-
-complex_t sumSqAmpl_A0_to_anti_c_c(
-        param_t const &param
-        );
-
-struct param_t;
-
-complex_t sumSqAmpl_A0_to_anti_b_b(
-        param_t const &param
-        );
-
-struct param_t;
-
-complex_t sumSqAmpl_A0_to_anti_t_t(
-        param_t const &param
-        );
-
-struct param_t;
-
-complex_t sumSqAmpl_A0_to_h_Z(
-        param_t const &param
-        );
-
-struct param_t;
-
-complex_t sumSqAmpl_Hp_to_W_h(
-        param_t const &param
-        );
-
-struct param_t;
-
-complex_t sumSqAmpl_Hp_to_W_A0(
-        param_t const &param
-        );
-
-struct param_t;
-
 complex_t width_h(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_h_to_anti_b_b(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_h_to_anti_c_c(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_h_to_anti_d_d(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_h_to_anti_e_e(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_h_to_anti_s_s(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_h_to_anti_t_t(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_h_to_anti_u_u(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_h_to_A0_A0(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_h_to_Z_A0(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_h_to_H0_H0(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_h_to_anti_Hp_Hp(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_h_to_W_Hp(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_h_to_anti_mu_mu(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_h_to_anti_tau_tau(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_h_to_anti_W_W(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_h_to_Z_Z(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t width_H0(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_H0_to_anti_b_b(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_H0_to_anti_c_c(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_H0_to_anti_d_d(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_H0_to_anti_e_e(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_H0_to_h_h(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_H0_to_anti_s_s(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_H0_to_anti_t_t(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_H0_to_anti_u_u(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_H0_to_A0_A0(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_H0_to_Z_A0(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_H0_to_anti_Hp_Hp(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_H0_to_W_Hp(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_H0_to_anti_mu_mu(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_H0_to_anti_tau_tau(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_H0_to_anti_W_W(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_H0_to_Z_Z(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t width_Hp(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_Hp_to_W_h(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_Hp_to_d_t(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_Hp_to_s_t(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_Hp_to_W_A0(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_Hp_to_W_H0(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_Hp_to_b_c(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_Hp_to_c_d(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_Hp_to_c_s(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_Hp_to_b_t(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_Hp_to_b_u(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_Hp_to_d_u(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_Hp_to_s_u(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t width_A0(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_A0_to_anti_b_b(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_A0_to_anti_c_c(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_A0_to_anti_d_d(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_A0_to_anti_e_e(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_A0_to_anti_s_s(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_A0_to_anti_t_t(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_A0_to_anti_u_u(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_A0_to_Z_h(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_A0_to_Z_H0(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_A0_to_W_Hp(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_A0_to_anti_mu_mu(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_A0_to_anti_tau_tau(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_W_to_b_c(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_W_to_c_d(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_W_to_c_s(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_W_to_b_t(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_W_to_d_t(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_W_to_s_t(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_W_to_b_u(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_W_to_d_u(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_W_to_s_u(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_W_to_h_Hp(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_W_to_H0_Hp(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_W_to_A0_Hp(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_Z_to_anti_W_W(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_Z_to_anti_b_b(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_Z_to_anti_c_c(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_Z_to_anti_d_d(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_Z_to_anti_e_e(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_Z_to_anti_s_s(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_Z_to_anti_t_t(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_Z_to_anti_u_u(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_Z_to_h_A0(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_Z_to_A0_H0(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_Z_to_anti_Hp_Hp(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_Z_to_anti_mu_mu(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_Z_to_anti_tau_tau(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_t_to_W_b(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_t_to_W_d(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_t_to_W_s(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_t_to_b_Hp(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_t_to_d_Hp(
+        param_t const &param
+        );
+
+struct param_t;
+
+complex_t partWidth_t_to_s_Hp(
         param_t const &param
         );
 
@@ -434,24 +818,6 @@ complex_t width_Z(
 struct param_t;
 
 complex_t width_t(
-        param_t const &param
-        );
-
-struct param_t;
-
-complex_t width_H0(
-        param_t const &param
-        );
-
-struct param_t;
-
-complex_t width_Hp(
-        param_t const &param
-        );
-
-struct param_t;
-
-complex_t width_A0(
         param_t const &param
         );
 

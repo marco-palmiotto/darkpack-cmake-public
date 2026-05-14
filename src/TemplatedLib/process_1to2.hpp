@@ -33,11 +33,11 @@ private:
     csl::InitSanitizer<std::string> Key; //!< Key matching this process in the hash table.
     csl::InitSanitizer<bool> Exists;     //!< Flag indicating if the process exists in the library.
 
-    csl::InitSanitizer<CXXfptr_t> sumSquaredAmpl{
-        "sumSquaredAmpl_CXXfptr"};                  //!< Function pointer to the sum of squared amplitudes.
-    csl::InitSanitizer<short int> Sf34{"Sf34"};     //!< Symmetry factor for the final state.
-    csl::InitSanitizer<short int> CPfac{"CPfac"};   //!< CP symmetry factor for the reaction
-    csl::InitSanitizer<short int> combinFac{"dof"}; //!< Combinatorial factor for the reaction
+    csl::InitSanitizer<int> Sf34{"Sf34"}; //!< Symmetry factor of the process.
+
+    csl::InitSanitizer<CXXfptr_t> partWidth{
+        "partWidth_CXXfptr"}; //!< Function pointer to the partial width of the process.
+
 
     RunningSM*
         runptr; //!< Pointer to the RunningSM instace to be used for the running in the current instance of Process2to2
@@ -157,12 +157,45 @@ public:
     };
 
     /**
+     * @brief Enables external running, by taking the pointer of the RunningSM instance as input.
+     *
+     * @param runin the pointer of the external RunningSM instance to be used for running
+     */
+    inline void set_running_data(RunningSM* runin)
+    {
+      runptr = runin;
+      isRunDataExternal = true;
+    };
+
+    /**
+     * @brief Sets to true the flag indicating that the running is external.
+     *
+     */
+    inline void set_running_external() { isRunningExternal = true; };
+
+    /**
+     * @brief Sets to false the flag indicating that the running is external.
+     *
+     */
+    inline void set_running_internal() { isRunningExternal = false; };
+
+    /**
+     * @brief Sets the running as internal, by creating a new instance of RunningSM.
+     *
+     * @param input The parameters needed to create the RunningSM instance.
+     */
+    inline void set_run_data_internal(Param_t& input)
+    {
+      runptr = new RunningSM(input);
+      isRunDataExternal = false;
+    };
+    /**
      * @brief Get the Field object corresponding to the i-th particle in the process.
      *
      * @param i Number of the field (1-3).
      * @return The enumeration corresponding to the field of the i-th particle in the process.
      */
-    inline int get_field(const size_t i) const { return p[i]; };
+    inline int get_field(const size_t i) const { return p[i - 1]; };
 
     /**
      * @brief Returns true if the i-th particle is a particle, false if it is an antiparticle.
@@ -171,7 +204,7 @@ public:
      * @return true if the i-th particle is a particle
      * @return false otherwise
      */
-    inline bool get_matter(const size_t i) const { return ap[i]; };
+    inline bool get_matter(const size_t i) const { return ap[i - 1]; };
 
     /**
      * @brief Returns the key of the process in the hash table.
@@ -208,13 +241,6 @@ public:
      */
     inline short int get_sf34() const { return Sf34; };
 
-    /**
-     * @brief Get the degrees of freedom for the process.
-     *
-     * @return short int the degrees of freedom for the process.
-     */
-    inline short int get_dof() const { return combinFac; };
-
     inline bool is_allowed_at_zero_momentum(const Param_t& input) const
     {
       return (get_mass(2, input) + get_mass(3, input)) <= get_mass(1, input);
@@ -224,6 +250,7 @@ public:
 
     inline void handle_running(Param_t& input, const real_t& Ecm)
     {
+      std::cout << "We running" << std::endl;
       if (runptr == nullptr)
       {
         runptr = new RunningSM(input);
@@ -237,13 +264,26 @@ public:
     };
 
     /**
+     * @brief Applies an approximation of three body phase space for decays containing one virtual vector boson.
+     *
+     * @param input Param_t object containing numerical inputs.
+     *
+     * @param part_width_temp The intermediate partial width returned by MARTY's symbolic expression.
+     *
+     * @param m_vec Array containing the masses of the particles in the process.
+     *
+     * @return real_t \f$\Gamma\f$ for the instance of the class.
+     */
+    void three_body_approximation(const Param_t& input, real_t& part_width_temp, const real_t m_vec[3]);
+
+    /**
      * @brief Calculates the partial width associated with the process.
      *
      * @param input Param_t object containing numerical inputs.
      *
      * @return real_t \f$\Gamma\f$ for the instance of the class.
      */
-    real_t get_partial_width(Param_t& input);
+    real_t compute_partial_width(Param_t& input);
 
     /**
      * @brief Calculates the branching ratio associated to the process.
@@ -252,7 +292,7 @@ public:
      *
      * @return real_t Branching ratio for the instance of the class.
      */
-    real_t get_branching_ratio(Param_t& input);
+    real_t compute_branching_ratio(Param_t& input);
   }; // end of class Process_1to2
 
 } // end of namespace __SPEC_LIB_NAME__

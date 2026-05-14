@@ -33,26 +33,28 @@ namespace __SPEC_LIB_NAME__
   constexpr const double x_pbar_scan_max = 1.0;
   constexpr const int NINT_PRODUCTION = 50000;
   constexpr const double R_GAL = 20.0;
-  constexpr const double DENSITE_H_DISC = 0.9;           // in cm^{-3}
-  constexpr const double DENSITE_HE_DISC = 0.1;          // in cm^{-3}
-  constexpr const double E_DISC = 0.1;                   // in kpc
-  constexpr const double RHO_CHI_0 = 1.0;                // in GeV cm^{-3}
+  constexpr const double DENSITY_H_DISC = 0.9;  // in cm^{-3}
+  constexpr const double DENSITY_HE_DISC = 0.1; // in cm^{-3}
+  constexpr const double E_DISC = 0.1;          // in kpc
+  constexpr const double RHO_CHI_0 = 1.0;       // in GeV cm^{-3}
+  constexpr const double sigma_v_annihilation = 3.e-26;
   constexpr const double RC_SMBH = 0.1;                  // in kpc
   constexpr const double CELERITY_LIGHT = 2.99792458e10; // in cm s^{-1}
-  constexpr const double CM_PAR_KPC = 3.0856775807e+21;
+  constexpr const double CM_TO_KPC = 3.0856775807e21;
+  constexpr const double SEC_TO_MGYR = 3.15581498e13;
   constexpr const double mb_cm2 = 1.e-27;
-  constexpr const double MASSE_PROTON = 0.938272013;       // in GeV
+  constexpr const double PROTON_MASS = 0.938;              // in GeV
   constexpr const double K_BOLTZMANN = 8.617385e-14;       // in GeV K^{-1}
   constexpr const double H_BAR = 6.58211915e-25;           // in GeV s
   constexpr const double MASSE_ELECTRON = 0.510998928e-03; // in GeV
   constexpr const double RADIUS_ELECTRON = 2.818e-13;      // in cm
   constexpr const double V_ION_H = 19.e-9;                 // in GeV
   constexpr const double V_ION_HE = 44.e-9;                // in GeV
-  constexpr const double DENSITE_FREE_ELECTRON = 0.033;    // in cm^{-3}
+  constexpr const double DENSITY_FREE_ELECTRON = 0.033;    // in cm^{-3}
   constexpr const double T_ELECTRONIC = 3.e5;              // in K
   constexpr const double T_PBAR_MIN = 0.1;                 // in GeV
   constexpr const double T_PBAR_MAX = 1.e5;                // in GeV
-  constexpr const double E_PROTON_MIN = 7. * MASSE_PROTON;
+  constexpr const double E_PROTON_MIN = 7. * PROTON_MASS;
   constexpr const double E_PROTON_MAX = 1.e6;
   /* Valid for the interval: 3.0-2100 GeV/c */
   constexpr const double p_seuil_pp_tot = 2.83;
@@ -118,44 +120,6 @@ namespace __SPEC_LIB_NAME__
                                                              const std::vector<std::vector<real_t>>&);
     using density_profile_t = real_t (*)(real_t, real_t);
 
-private:
-    int sample_option; //!< Specifies whether the conservative, standard or stringent samples are in use when analyzing
-                       //!< the data.
-    std::array<real_t, 5> equation_parameters; //!< Parameters for the propagation equation
-    real_t r_earth;                            //!< Distance between the Earth and the galactic center
-    real_t rho_chi_local;                      //!< Local density of dark matter
-    density_profile_t halo_profile;            //!< Pointer to the dark matter halo profile function
-    Param_t input;                             //!< Input parameters.
-    Indirectparam_t ind_param;                 //!< Indirect detection parameters, for storing the dark matter masses
-    std::vector<real_t> alpha_i;               //< Vector containing the zeros of the Bessel function J0
-    std::vector<real_t> q_i;                   //< Bessel coefficients of the primary cosmic ray flux
-    std::vector<std::vector<real_t>> bessel_coef_proton_i;
-    std::vector<std::vector<real_t>>
-        bessel_coef_helium_i; //!< Bessel coefficients of the source term for protons and helium
-    std::vector<std::vector<real_t>>
-        h_on_h_xsection; //!< Table of differential cross sections for p + p -> pbar + X processes
-    std::vector<std::vector<real_t>>
-        he_on_h_xsection; //!< Table of differential cross sections for He + p -> pbar + X processes
-    std::vector<std::vector<real_t>>
-        he_on_he_xsection; //!< Table of differential cross sections for He + He -> pbar + X processes
-    std::vector<std::vector<real_t>>
-        h_on_he_xsection; //!< Table of differential cross sections for p + He -> pbar + X processes
-    std::vector<std::vector<real_t>>
-        bessel_pri_pbar_spec; //!< Table containing the bessel coefficients for the spectrum of primary antiprotons
-    std::vector<std::vector<real_t>>
-        bessel_sec_pbar_spec; //!< Table containing the bessel coefficients for the spectrum of secondary antiprotons
-    std::vector<std::vector<real_t>>
-        bessel_ter_pbar_spec; //!< Table containing the bessel coefficients for the spectrum of tertiary antiprotons
-    std::vector<std::vector<real_t>>
-        bessel_tot_pbar_spec; //!< Table containing the bessel coefficients for the total spectrum of antiprotons
-    std::vector<std::vector<real_t>> table_abar; //!< Table containing the antiproton A_i coefficients, as they are used
-                                                 //!< for computing and evolving all three spectra.
-    std::vector<std::vector<real_t>>
-        xs_uncertainties; //!< Table containing the antiproton energies, along with their respective lower and upper
-                          //!< bounds for the secondary spectra (accounting for cross section uncertainties).
-    real_t chi2_noDM;     //!< Chi squared value for the background-only hypothesis (AMS-02)
-    std::array<real_t, 47>
-        logL_noDM; //!< Log-likelihood values for all dSph for the background-only hypothesis (Fermi-LAT)
 public:
     /**
      * @brief Enumeration for defining the propagation model to be used, affecting the 5 free parameters of the
@@ -178,7 +142,56 @@ public:
       EINASTO = 3
     };
 
+    /**
+     * @brief Enumeration for defining which sample of dSph's to use.
+     */
+    enum sample_options : short int
+    {
+      CONSERVATIVE = -1,
+      NOMINAL = 0,
+      INCLUSIVE = 1
+    };
 
+private:
+    enum sample_options sample_option; //!< Specifies whether the conservative, standard or stringent samples are in use
+                                       //!< when analyzing the data.
+    std::array<real_t, 5> equation_parameters; //!< Parameters for the propagation equation
+    real_t r_earth;                            //!< Distance between the Earth and the galactic center
+    real_t rho_chi_local;                      //!< Local density of dark matter
+    density_profile_t halo_profile;            //!< Pointer to the dark matter halo profile function
+    Param_t input;                             //!< Input parameters.
+    Indirect_param_t ind_param;                //!< Indirect detection parameters, for storing the dark matter masses
+    std::vector<real_t> alpha_i;               //!< Vector containing the zeros of the Bessel function J0
+    std::vector<real_t> q_i;                   //!< Bessel coefficients of the primary cosmic ray flux
+    std::vector<std::vector<real_t>> bessel_coef_proton;
+    std::vector<std::vector<real_t>>
+        bessel_coef_helium; //!< Bessel coefficients of the source term for protons and helium
+    std::vector<std::vector<real_t>>
+        h_on_h_xsection; //!< Table of differential cross sections for p + p -> pbar + X processes
+    std::vector<std::vector<real_t>>
+        he_on_h_xsection; //!< Table of differential cross sections for He + p -> pbar + X processes
+    std::vector<std::vector<real_t>>
+        he_on_he_xsection; //!< Table of differential cross sections for He + He -> pbar + X processes
+    std::vector<std::vector<real_t>>
+        h_on_he_xsection; //!< Table of differential cross sections for p + He -> pbar + X processes
+    std::vector<std::vector<real_t>>
+        bessel_pri_pbar_spec; //!< Table containing the bessel coefficients for the spectrum of primary antiprotons
+    std::vector<std::vector<real_t>>
+        bessel_sec_pbar_spec; //!< Table containing the bessel coefficients for the spectrum of secondary antiprotons
+    std::vector<std::vector<real_t>>
+        bessel_ter_pbar_spec; //!< Table containing the bessel coefficients for the spectrum of tertiary antiprotons
+    std::vector<std::vector<real_t>>
+        bessel_tot_pbar_spec; //!< Table containing the bessel coefficients for the total spectrum of antiprotons
+    std::vector<std::vector<real_t>> table_abar; //!< Table containing the antiproton A_i coefficients, as they are used
+                                                 //!< for computing and evolving all three spectra.
+    std::vector<std::vector<real_t>>
+        xs_uncertainties; //!< Table containing the antiproton energies, along with their respective lower and upper
+                          //!< bounds for the secondary spectra (accounting for cross section uncertainties).
+    real_t chi2_noDM;     //!< Chi squared value for the background-only hypothesis (AMS-02)
+    std::array<real_t, 45>
+        logL_noDM; //!< Log-likelihood values for all dSph for the background-only hypothesis (Fermi-LAT)
+    std::vector<real_t> optimal_J_factors; //!< Stores the optimal J-factors after maximizing each dSph's likelihood
+public:
     /**
      * @brief Construct a new Propagation_param_t object specifying the propagation and halo models.
      *
@@ -190,13 +203,8 @@ public:
      * @param halo_model Integer that defines the dark matter halo profile. It can be set to 1 (NFW), 2 (Burkert) or 3
      * (Einasto).
      *
-     * @param r_earth_in Distance between the Earth and the galactic center [kpc].
-     *
-     * @param rho_chi_local_in Local density of dark matter [GeV/cm^3].
-     *
      */
-    Propagation_param_t(const Param_t& input_in, enum propagation_models p_model, enum halo_profiles halo_model,
-                        real_t r_earth_in, real_t rho_chi_local_in);
+    Propagation_param_t(const Param_t& input_in, enum propagation_models p_model, enum halo_profiles halo_model);
 
     /**
      * @brief Destructor for the Propagation_param_t class.
@@ -239,11 +247,11 @@ public:
      *
      * @param xtra Vector whose first element is the J-factor uncertainty and the second is the dSph index.
      *
-     * @param spec Dummy variable, only present for compatibility with optimization methods.
+     * @param spect Dummy variable, only present for compatibility with optimization methods.
      *
      */
     real_t max_likelihood_aux_func(const std::vector<real_t>& logJ, const std::vector<real_t>& xtra,
-                                   const std::vector<std::vector<real_t>>& spec);
+                                   const std::vector<std::vector<real_t>>& spect);
 
     /**
      * @brief Obtains the maximum likelihood for a given dSph by varying the J-factor.
@@ -253,15 +261,17 @@ public:
      * @param logJ_factors Vector of vectors containing the logarithm of the J-factor, its error and the sample
      * (conservative, standard or stringent) for all dSphs.
      *
+     * @param IDpowell_result Integer that assesses whether IDpowell ran without issues.
      */
-    real_t max_likelihood_one_dsph(const int& dsph, std::vector<std::vector<real_t>>& logJ_factors);
+    real_t max_likelihood_one_dsph(const int& dsph, std::vector<std::vector<real_t>>& logJ_factors,
+                                   int& IDpowell_result);
 
     /**
      * @brief Sums the maximum likelihood for all dSphs. Can provide a different answer depending on whether the
      * sample_option is set to -1, 0 or 1 (conservative, standard or stringent).
      *
      */
-    real_t likelihood_all_dwarfs();
+    real_t likelihood_all_dwarfs(int& IDpowell_result);
 
     /**
      * @brief Searches for the zeroes of the J0 Bessel function.
@@ -269,7 +279,7 @@ public:
      * @param tol The tolerance of the zero search.
      *
      */
-    void search_zeros_J0(real_t tol);
+    void search_zeroes_J0(const real_t tol);
 
     /**
      * @brief Returns the distribution of primary sources of cosmic rays in the galactic plane.
@@ -277,7 +287,7 @@ public:
      * @param u Radial distance from the galactic center, in terms of the galactic radius.
      *
      */
-    real_t f_PSRD(real_t u);
+    real_t f_pulsar_distribution(real_t u);
 
     /**
      * @brief Obtains the bessel coefficients for the flux of primary cosmic rays, q_i.
@@ -291,14 +301,14 @@ public:
      * @param E_proton The proton energy.
      *
      */
-    real_t flux_proton_EXP(double E_proton);
+    real_t flux_proton_EXP(real_t E_proton);
 
     /**
      * @brief Obtains the differential flux of interstellar helium, with respect to the energy per nucleon.
      *
      * @param E_nucleon The energy per nucleon of the helium nucleus.
      */
-    real_t flux_helium_EXP(double E_nucleon);
+    real_t flux_helium_EXP(real_t E_nucleon);
 
     /**
      * @brief Obtains the bessel coefficients for the fluxes of proton and helium cosmic rays, for a given energy per
@@ -306,15 +316,15 @@ public:
      *
      * @param E_nucleon The proton energy/energy per nucleon of the helium nucleus.
      *
-     * @param bessel_coef_proton Dummy array to be filled with the proton bessel coefficients.
+     * @param bessel_coef_proton_i Dummy array to be filled with the proton bessel coefficients.
      *
-     * @param bessel_coef_helium Dummy array to be filled with the helium bessel coefficients.
+     * @param bessel_coef_helium_i Dummy array to be filled with the helium bessel coefficients.
      */
-    void calcul_method_B_BESSEL_i(real_t E_nucleon, std::vector<real_t>& bessel_coef_proton,
-                                  std::vector<real_t>& bessel_coef_helium);
+    void calcul_method_BESSEL_i(real_t E_nucleon, std::vector<real_t>& bessel_coef_proton_i,
+                                std::vector<real_t>& bessel_coef_helium_i);
 
     /**
-     * @brief Applies calcul_method_B_BESSEL_i to all values of the nucleon energy.
+     * @brief Applies calcul_method_BESSEL_i to all values of the nucleon energy.
      */
     void calculation_BESSEL_Ep_i();
 
@@ -327,8 +337,7 @@ public:
      *
      * @param primary_source_term The values of the primary cosmic ray source term.
      */
-    void calculation_BESSEL_PBAR_PRIMARY_Epbar_i(long int n_vert, long int n_rad,
-                                                 std::vector<real_t>& primary_source_term);
+    void calculation_BESSEL_PBAR_PRIMARY(long int n_vert, long int n_rad, std::vector<real_t>& primary_source_term);
 
     /**
      * @brief Reads the tabulated primary spectra at production for masses m_inf and m_sup such that
@@ -340,32 +349,30 @@ public:
      *
      * @param primary_source_terms_sup 2D vector to store the primary source terms for mass m_sup.
      */
-    std::vector<real_t> DNPBAR_ON_DTPBAR_gaelle_read_file(real_t mass_chi,
-                                                          std::vector<std::vector<real_t>>& primary_source_terms_inf,
-                                                          std::vector<std::vector<real_t>>& primary_source_terms_sup);
+    std::vector<real_t> DNPBAR_ON_DTPBAR_read_file(real_t mass_chi,
+                                                   std::vector<std::vector<real_t>>& primary_source_terms_inf,
+                                                   std::vector<std::vector<real_t>>& primary_source_terms_sup);
 
     /**
      * @brief Parses the values from the tabulated primary spectra at production with the cross sections per channel
-     * from an Indirectparam_t object.
+     * from an Indirect_param_t object.
      *
      * @param dNpbar_on_dEpbar_vec Dummy vector to store the value of dNpbar/dEpbar for all values of the antiproton
      * energy.
      */
-    real_t dNpbar_on_dEpbar_primary_calculation_Br(std::vector<real_t>& dNpbar_on_dEpbar_vec);
+    int dNpbar_on_dEpbar_calculation(std::vector<real_t>& dNpbar_on_dEpbar_vec);
 
     /**
      * @brief Finalizes the primary source term calculation.
      *
      * @param mass_chi Dark matter mass.
      *
-     * @param sigmav Total thermally averaged cross section for the annihilation of dark matter particles.
-     *
      * @param dNpbar_on_dEpbar_vec Dummy vector to store the value of dNpbar/dEpbar for all values of the antiproton
      * energy.
      *
      * @param primary_source_term Dummy vector to store the primary source term.
      */
-    void primary_source_calculation(real_t mass_chi, real_t sigmav, std::vector<real_t>& dNpbar_on_dEpbar_vec,
+    void primary_source_calculation(real_t mass_chi, std::vector<real_t>& dNpbar_on_dEpbar_vec,
                                     std::vector<real_t>& primary_source_term);
 
     /**
@@ -378,18 +385,17 @@ public:
      *
      * @param PBAR_SPECTRUM 2D vector to store the primary antiproton spectrum.
      */
-    void primary_spectra_BCGS_2014_Br(std::vector<real_t>& dNpbar_on_dEpbar_vec,
-                                      std::vector<real_t>& primary_source_term,
-                                      std::vector<std::vector<real_t>>& PBAR_SPECTRUM);
+    void primary_spectra_BCGS_2014(std::vector<real_t>& dNpbar_on_dEpbar_vec, std::vector<real_t>& primary_source_term,
+                                   std::vector<std::vector<real_t>>& PBAR_SPECTRUM);
 
 
     /**
      * @brief Calculates the Bessel coefficients for the secondary antiproton flux.
      */
-    void calculation_BESSEL_PBAR_SECONDARY_Epbar_i();
+    void calculation_BESSEL_PBAR_SECONDARY();
 
     /**
-     * @brief Calculates the Bessel coefficients for the secondary antiproton flux, for both the lower and upper bounds.
+     * @brief Calculates the lower and upper bounds of the secondary antiproton flux.
      */
     void preliminary_secondary_spectrum_IS_calculation();
 
@@ -416,12 +422,12 @@ public:
     /**
      * @brief Calculates the Bessel coefficients for the tertiary antiproton flux.
      */
-    void calculation_BESSEL_PBAR_TERTIARY_Epbar_i();
+    void calculation_BESSEL_PBAR_TERTIARY();
 
     /**
      * @brief Calculates the sum of Bessel coefficients for the primary, secondary, and tertiary antiproton flux.
      */
-    void calculation_BESSEL_PBAR_SUM_123_Epbar_i();
+    void calculation_BESSEL_PBAR_SUM();
 
     /**
      * @brief Computes the total spectrum after solar modulation using a force-field approximation.
@@ -450,11 +456,10 @@ public:
      *
      * @param Z_em The electric charge of the cosmic ray particle (in multiples of e).
      *
-     * @param BESSEL_COEFFICIENTi Vector containing the bessel coefficients.
+     * @param bes_coef Vector containing the bessel coefficients.
      *
      */
-    real_t GENERIC_FLUX(real_t r, real_t z, real_t energy, real_t mass, real_t Z_em,
-                        std::vector<real_t> BESSEL_COEFFICIENTi);
+    real_t GENERIC_FLUX(real_t r, real_t z, real_t energy, real_t mass, real_t Z_em, std::vector<real_t> bes_coef);
 
     /**
      * @brief Returns the flux of cosmic rays at a given position and energy, computed from a set of bessel
@@ -470,17 +475,16 @@ public:
      *
      * @param Z_em The electric charge of the cosmic ray particle (in multiples of e).
      *
-     * @param BESSEL_COEFFICIENTi Vector containing the bessel coefficients.
+     * @param bes_coef Vector containing the bessel coefficients.
      *
      */
-    real_t GENERIC_FLUX_04(real_t r, real_t z, real_t enerçgy, real_t mass, real_t Z_em,
-                           std::vector<real_t> BESSEL_COEFFICIENTi);
+    real_t GENERIC_FLUX_04(real_t r, real_t z, real_t enerçgy, real_t mass, real_t Z_em, std::vector<real_t> bes_coef);
 
     /**
      * @brief Solves the diffusion equation describing the energy behaviour of the Bessel transforms for all values of
      * the antiproton energy.
      */
-    void calculation_BESSEL_PBAR_TOT_direct_inversion_A();
+    void calculation_BESSEL_PBAR_direct_inversion();
 
     /**
      * @brief This routine solves the matrix equation [A] * [u] = [r] in the case of a tridiagonal matrix [A]. Pivoting
@@ -496,9 +500,9 @@ public:
      *
      * @param r The vector in the right-hand side of the matrix equation.
      */
-    void inversion_tridiagonal(std::array<real_t, DIM_TAB_PBAR + 1> a, std::array<real_t, DIM_TAB_PBAR + 1> b,
-                               std::array<real_t, DIM_TAB_PBAR + 1> c, std::array<real_t, DIM_TAB_PBAR + 1> r,
-                               std::array<real_t, DIM_TAB_PBAR + 1> u);
+    void inversion_tridiagonal(std::array<real_t, DIM_TAB_PBAR + 1>& a, std::array<real_t, DIM_TAB_PBAR + 1>& b,
+                               std::array<real_t, DIM_TAB_PBAR + 1>& c, std::array<real_t, DIM_TAB_PBAR + 1>& r,
+                               std::array<real_t, DIM_TAB_PBAR + 1>& u);
 
     /**
      * @brief Computes the spatial diffusion term in the diffusion equation.
@@ -567,7 +571,7 @@ public:
      * @brief Computes the total cross section for non-annihilating inelastic collisions between proton cosmic rays and
      * interstellar hydrogen.
      *
-     * @param E_proton The antiproton energy.
+     * @param E_pbar The antiproton energy.
      */
     real_t sigma_inelastic_NOANN_pbarH_TAN_and_NG(real_t E_pbar);
 
@@ -742,10 +746,10 @@ public:
      *
      * @param factor Set to 1 for minimization and -1 for maximization.
      */
-    void IDbraket(int n, input_function_t func, const std::vector<real_t>& xtra,
-                  const std::vector<std::vector<real_t>>& spect, real_t* a0, real_t* x0, real_t* b0,
-                  std::vector<real_t> xinit, std::vector<real_t> xi, const std::vector<real_t>& xlim_min,
-                  const std::vector<real_t>& xlim_max, real_t factor);
+    void IDbracket(int n, input_function_t func, const std::vector<real_t>& xtra,
+                   const std::vector<std::vector<real_t>>& spect, real_t* a0, real_t* x0, real_t* b0,
+                   std::vector<real_t> xinit, std::vector<real_t> xi, const std::vector<real_t>& xlim_min,
+                   const std::vector<real_t>& xlim_max, real_t factor);
     /**
      * @brief Adds two spectra together. Returns 0 if the spectra are not of the same size.
      *
@@ -755,28 +759,29 @@ public:
      *
      * @param add Dummy vector to store the resulting summed spectrum.
      */
-    int add_spectra(const std::vector<std::vector<real_t>>& a1, const std::vector<std::vector<real_t>>& a2,
-                    std::vector<std::vector<real_t>>& add);
+    void add_spectra(const std::vector<std::vector<real_t>>& a1, const std::vector<std::vector<real_t>>& a2,
+                     std::vector<std::vector<real_t>>& add);
 
     /**
      * @brief Returns the chi squared from the AMS-02 experiment in the background-only hypothesis.
      *
-     * @param param Vector of nuisance parameters, A and phi_f (uncertainties from cross sections and solar modulation,
+     * @param param Vector of nuisance parameters, A and \f$\phi_f\f$ (uncertainties from cross sections and solar modulation,
      * respectively).
      *
      * @param logE The antiproton energies in log space (the tabulated spectra are interpolated to these values).
      *
-     * @param spec Dummy variable, only present for compatibility with optimization methods.
+     * @param spect Dummy variable, only present for compatibility with optimization methods.
      */
     real_t dchi_bkg(const std::vector<real_t>& param, const std::vector<real_t>& logE,
-                    const std::vector<std::vector<real_t>>& spec);
+                    const std::vector<std::vector<real_t>>& spect);
 
     /**
-     * @brief Finds the combination of A and phi_f that minimizes the chi squared in the background only hypothesis.
+     * @brief Finds the combination of A and \f$\phi_f\f$ that minimizes the chi squared in the background only hypothesis.
      * Stores the result in chi2_noDM.
      *
+     * @param IDpowell_result Integer that assesses whether IDpowell ran without issues.
      */
-    void chi2_bkg();
+    std::vector<real_t> chi2_bkg(int& IDpowell_result);
 
     /**
      * @brief Compares a given spectrum with the values tabulated by AMS-02 to return its respective chi squared value.
@@ -784,7 +789,7 @@ public:
      * @param spectrum 2D vector containing the antiproton energy values and the spectrum at Earth after solar
      * modulation.
      */
-    real_t chi_2AMS(const std::vector<std::vector<real_t>>& spectrum);
+    real_t chi2_AMS(const std::vector<std::vector<real_t>>& spectrum);
 
     /**
      * @brief Returns the chi squared for the sum of the primary and secondary spectrum.
@@ -794,55 +799,99 @@ public:
      * @param logE The antiproton energies of the background spectrum in log space (the primary spectrum is interpolated
      * to these values).
      *
-     * @param spec 2D vector containing the antiproton energy values and the primary spectrum at Earth before solar
+     * @param spect 2D vector containing the antiproton energy values and the primary spectrum at Earth before solar
      * modulation.
      */
     real_t dchi_tot(const std::vector<real_t>& param, const std::vector<real_t>& logE,
-                    const std::vector<std::vector<real_t>>& spec);
+                    const std::vector<std::vector<real_t>>& spect);
 
     /**
-     * @brief Finds the values of A and phi_f that minimize the chi squared for the total spectrum. Subtracts the chi
-     * squared of the background-only hypothesis to return deltachi2_AMS.
-     *
+     * @brief Finds the values of A and \f$\phi_f\f$ that minimize the \f$\chi^2\f$ for the total spectrum. Subtracts the \f$\chi^2\f$
+     * of the background-only hypothesis to return deltachi2_AMS.
+     * @param IDpowell_result Integer that assesses whether IDpowell ran without issues.
      */
-    real_t deltachi2_AMS();
+    real_t deltachi2_AMS(int& IDpowell_result, std::vector<real_t>& xmin);
 
     /**
      * @brief Computes the delta log-likelihood for the Fermi-LAT data.
      *
+     * @param IDpowell_result Integer that assesses whether IDpowell ran without issues.
      */
-    real_t deltalikelihood_fermi();
+    real_t deltalikelihood_fermi(int& IDpowell_result);
 
     inline std::vector<real_t> get_alpha_i() const { return alpha_i; };
 
-    inline real_t test_func(const std::vector<real_t>& x, const std::vector<real_t>& xtra,
-                            const std::vector<std::vector<real_t>>& spec)
-    {
-      real_t a = xtra[0];
-      real_t b = xtra[1];
-      real_t c = xtra[2];
-      real_t d = xtra[3];
-      real_t e = xtra[4];
+    inline std::vector<real_t> get_q_i() const { return q_i; };
 
-      return a * pow(x[0], 2.) + c * pow(x[1], 2.) + b * x[0] * x[1] + d * x[0] + e * x[1];
-    };
+    inline std::vector<std::vector<real_t>> get_bessel_coef_proton() const { return bessel_coef_proton; };
 
-    inline real_t test_func_spec(const std::vector<real_t>& x, const std::vector<real_t>& xtra,
-                                 const std::vector<std::vector<real_t>>& spec)
+    inline std::vector<std::vector<real_t>> get_bessel_coef_helium() const { return bessel_coef_helium; };
+
+    inline std::vector<std::vector<real_t>> get_xs_uncertainties() const { return xs_uncertainties; };
+
+    inline real_t get_chi2_noDM() const { return chi2_noDM; };
+
+    inline std::vector<real_t> get_optimal_J_factors() const { return optimal_J_factors; };
+
+    inline std::array<real_t, 24> get_fermi_eflux() { return ind_param.get_fermi_eflux(); };
+
+    inline std::vector<real_t> get_DM_masses() { return ind_param.get_DM_masses(); };
+
+    inline std::vector<std::vector<real_t>> get_logJ_factors() { return ind_param.get_logJ_factors(); };
+
+    inline real_t get_total_sigma_v() { return ind_param.get_total_sigma_v(); };
+
+    inline int get_dof() { return ind_param.get_dof(); };
+
+    inline std::vector<Process2to2> get_processes() { return ind_param.get_processes(); };
+
+    inline std::vector<real_t> get_sigma_v_process() { return ind_param.get_sigma_v_process(); };
+
+    inline std::array<std::vector<real_t>, 14> get_sigma_v_table() { return ind_param.get_sigma_v_table(); };
+
+    inline std::vector<real_t> get_energy_table() { return ind_param.get_energy_table(); };
+
+
+    /**
+     * @brief Changes the private Indirect_param_t member.
+     *
+     * @param new_sigma_v New value for the total \f$\langle \sigma v \rangle\f$. If set to zero, this parameter is not changed.
+     * 
+     * @param new_mass_DM New value for the DM mass. If set to zero, this parameter is not changed.
+     */
+    inline void change_ind_param(real_t new_sigma_v, real_t new_mass_DM)
     {
-      real_t result = 0;
-      for (int i = 0; i < spec.size(); i++)
+      if (new_mass_DM != 0.)
       {
-        for (int j = 0; j < spec[i].size(); j++)
-        {
-          result += spec[i][j] * (pow(x[0], i + 2));
-        }
+        ind_param.change_mass_DM(new_mass_DM);
+        input.masses_vector.at(input.getLightestBSMpart()) = new_mass_DM;
+        input.m_N_1 = new_mass_DM;
       }
 
-      result /= xtra[0] * (x[0] - 1);
+      auto energy_table = ind_param.get_energy_table();
+      auto sigma_v_process = ind_param.get_sigma_v_process();
+      auto processes = ind_param.get_processes();
+      int DM_candidate = input.getLightestBSMpart();
+      real_t mass_chi = input.masses_vector.at(DM_candidate);
 
-      return result;
-    };
+      if (new_sigma_v != 0.)
+      {
+        ind_param.change_sigma_v(new_sigma_v);
+      }
+    }
+
+    /**
+     * @brief Removes all elements from sigma_v_table in the Indirect_param_t member, for all but one channel.
+     *
+     * @param particle The particle whose channel is to be singled out.
+     */
+    inline void single_out_annihilation_channel(int particle) { ind_param.single_out_annihilation_channel(particle); };
+
+
+    real_t test_func(const std::vector<real_t>& x, const std::vector<real_t>& xtra,
+                     const std::vector<std::vector<real_t>>& spect);
+    real_t test_func_spec(const std::vector<real_t>& x, const std::vector<real_t>& xtra,
+                          const std::vector<std::vector<real_t>>& spect);
 
   }; // class Propagation_param_t
 } // namespace __SPEC_LIB_NAME__

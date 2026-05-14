@@ -1,7 +1,277 @@
+#define PARTICLEDECAYS
+
+
+
+csl::Expr squaredAmplitudeToPartialWidth_new(csl::Expr const& squaredAmplitude,
+                                             std::vector<Insertion> const& insertions,
+                                             mty::Amplitude const& initialAmplitude, bool applyMassCondition)
+{
+  csl::Expr squared = csl::DeepCopy(squaredAmplitude);
+  auto pi = initialAmplitude.getKinematics().getOrderedMomenta();
+  csl::Index mu = MinkowskiIndex();
+  csl::Expr s12_init = pi[0](mu) * pi[1](+mu);
+  csl::Expr s13_init = pi[0](mu) * pi[2](+mu);
+  csl::Expr s23_init = pi[1](mu) * pi[2](+mu);
+  csl::Expr M = insertions[0].getField()->getMass();
+  csl::Expr m1 = insertions[1].getField()->getMass();
+  csl::Expr m2 = insertions[2].getField()->getMass();
+  csl::Expr E1 = (M * M + m1 * m1 - m2 * m2) / (2 * M);
+  csl::Expr E2 = (M * M + m2 * m2 - m1 * m1) / (2 * M);
+  csl::Expr p2 = E1 * E1 - m1 * m1;
+  csl::Expr s12 = csl::Abbrev::makeAbbreviation(M * E1);
+  csl::Expr s13 = csl::Abbrev::makeAbbreviation(M * E2);
+  csl::Expr s23 = csl::Abbrev::makeAbbreviation(E1 * E2 + p2);
+  csl::Replace(squared, s12_init, s12);
+  csl::Replace(squared, s13_init, s13);
+  csl::Replace(squared, s23_init, s23);
+  squared *= csl::sqrt_s(csl::abs_s(p2)) / (8 * CSL_PI * M * M);
+
+  std::string name_1 = insertions[1].getField()->getName();
+  std::string name_2 = insertions[2].getField()->getName();
+
+
+  csl::Expr squared_approx = CSL_0;
+
+  if ((name_1 == "Z" && name_2 == "Z") || (name_1 == "W" && name_2 == "W"))
+  {
+    squared_approx = csl::DeepCopy(squared);
+    csl::Expr x = (m1 * m2) / (M * M);
+    csl::Expr term_1 = (1 - 8 * x + 20 * csl::pow_s(x, 2)) / (csl::sqrt_s(4 * x - 1));
+    csl::Expr term_2 = csl::acos_s((3 * x - 1) / (2 * csl::pow_s(x, 1.5)));
+    csl::Expr term_3 = (1 - x) / (2 * x) * (2 - 13 * x + 47 * csl::pow_s(x, 2));
+    csl::Expr term_4 = (1 - 6 * x + 4 * csl::pow_s(x, 2)) * csl::log_s(x);
+    csl::Expr F = 3 * term_1 * term_2 - term_3 - 1.5 * term_4;
+
+    squared_approx *= F;
+  }
+  if (applyMassCondition)
+  {
+    csl::Expr final =
+        csl::booleanOperator_s(csl::BooleanOperator::GreaterThanOrEqualTo, M, m1 + m2, squared, squared_approx);
+    return final;
+  }
+
+  return squared;
+}
+
+
+
+static std::vector<std::vector<mty::Insertion>> getIndependentDecays(std::vector<mty::Insertion> const& insertions)
+{
+  HEPAssert(insertions.size() == 3, mty::error::TypeError,
+            "This function should only be used for 1->2 processes, " + std::to_string(insertions.size()) +
+                " insertions given.") std::vector<std::vector<mty::Insertion>>
+      res;
+  res.reserve(4);
+  res.push_back(insertions);
+  if (!insertions[1].getField()->isSelfConjugate())
+  {
+    res.push_back({insertions[0], AntiPart(insertions[1]), insertions[2]});
+    if (!insertions[2].getField()->isSelfConjugate())
+    {
+      if (insertions[1].getField() != insertions[2].getField())
+        res.push_back({insertions[0], insertions[1], AntiPart(insertions[2])});
+      res.push_back({insertions[0], AntiPart(insertions[1]), AntiPart(insertions[2])});
+    }
+  }
+  else if (!insertions[2].getField()->isSelfConjugate())
+  {
+    res.push_back({insertions[0], insertions[1], AntiPart(insertions[2])});
+  }
+  return res;
+}
+
+csl::Expr computeWidth_new(mty::Model& model, mty::Insertion const& particle, std::vector<Particle> psm,
+                           std::vector<Particle> pbsm)
+{
+  int order = mty::Order::TreeLevel;
+  if (particle.getField()->getMass() == CSL_0)
+  {
+    // No width for massless particles
+    return CSL_0;
+  }
+  csl::ScopedProperty silent(&mty::option::verboseAmplitude, false);
+  std::vector<csl::Expr> contributions;
+  contributions.reserve(100);
+  const auto& physicalParticles = model.getPhysicalParticles(
+      [](Particle const& p) { return !IsOfType<GoldstoneBoson>(p) && !IsOfType<GhostBoson>(p); });
+  for (size_t i = 0; i != physicalParticles.size(); ++i)
+  {
+    const auto& p1 = physicalParticles[i];
+    for (size_t j = i; j != physicalParticles.size(); ++j)
+    {
+      const auto& p2 = physicalParticles[j];
+
+      auto insertions = getIndependentDecays({Incoming(particle), Outgoing(p1), Outgoing(p2)});
+      for (const auto& ins : insertions)
+      {
+        order = mty::Order::TreeLevel;
+        mty::Amplitude ampl = model.computeAmplitude(order, ins);
+
+        if (ampl.empty())
+        {
+          /*
+          auto it_1 = std::find(pbsm.begin(), pbsm.end(), p1);
+          auto it_2 = std::find(pbsm.begin(), pbsm.end(), p2);
+          if ((ins[1].getField()->getName() == "A" || ins[2].getField()->getName() == "A" ||
+               ins[1].getField()->getName() == "G" || ins[2].getField()->getName() == "G") &&
+              (it_1 != pbsm.end() || it_2 != pbsm.end()))
+          {
+            order = mty::Order::OneLoop;
+            std::cout << "Tree-level amplitude is null for decay " << particle.getField()->getName() << " -> "
+                      << p1->getName() << " + " << p2->getName() << ". Let's compute the one-loop amplitude.\n";
+            ampl = model.computeAmplitude(order, ins);
+          }
+            */
+          std::cout << "Tree-level amplitude is null for decay " << particle.getField()->getName() << " -> "
+                    << p1->getName() << " + " << p2->getName() << ". Let's go to the next decay.\n";
+          continue;
+        }
+        csl::Expr squared;
+        squared = model.computeSquaredAmplitude(ampl);
+
+        if (squared != 0)
+        {
+          std::string decaying_part = ins[0].getField()->getName();
+          std::string prod_1 = ins[1].getField()->getName();
+          std::string prod_2 = ins[2].getField()->getName();
+          std::cout << "Found decay ";
+          std::cout << decaying_part << " -> ";
+          std::cout << prod_1 << " + ";
+          std::cout << prod_2 << std::endl;
+          contributions.push_back(squaredAmplitudeToPartialWidth_new(squared, ins, ampl, true));
+        }
+      }
+    }
+  }
+  std::cout << contributions.size() << " independent " << particle.getField()->getName() << " decays found.\n";
+  return csl::sum_s(contributions);
+}
+
+
+
+void getArguments(csl::Expr a, mty::Model& model, std::vector<Particle> psm, std::vector<Particle> pbsm,
+                  mty::Library& lib, std::vector<std::string>& process_names, std::vector<Process>& processes,
+                  std::vector<csl::Expr>& expressions)
+{
+  for (size_t i = 0; i < Size(a); i++)
+  {
+    std::cout << i << std::endl;
+    std::string procname;
+    Process proc;
+    if (Size(a[i]) < 2)
+      continue;
+    std::string test_decay = toString(a[i][0]);
+    if (test_decay.size() < 2)
+    {
+      getArguments(a[i], model, psm, pbsm, lib, process_names, processes, expressions);
+      continue;
+    }
+    std::vector<std::string> terms;
+    std::string test_prods = toString(a[i][1]);
+    test_decay.erase(0, 2);
+    mty::Insertion ins_decay(test_decay);
+    if (test_prods[0] == '2')
+    {
+      test_prods.erase(0, 4);
+      terms.push_back(test_prods);
+      terms.push_back(test_prods);
+      mty::Insertion ins_prod(test_prods);
+
+      if (!ins_prod.getField()->isSelfConjugate())
+      {
+        proc = {Incoming(model.getParticle(test_decay)), Outgoing(AntiPart(test_prods)), Outgoing(test_prods)};
+      }
+      else
+      {
+        proc = {Incoming(model.getParticle(test_decay)), Outgoing(test_prods), Outgoing(test_prods)};
+      }
+      procname = "partWidth_" + processName(proc);
+
+      if (process_names.size() > 0)
+      {
+        auto it_name = std::find(process_names.begin(), process_names.end(), procname);
+        if (it_name != process_names.end())
+        {
+          std::cout << "bingas " << procname << std::endl;
+          continue;
+        }
+      }
+    }
+    else
+    {
+      std::cout << "case 2" << std::endl;
+      std::stringstream ss(test_prods);
+      std::string term;
+      while (std::getline(ss, term, '+'))
+      {
+        term.erase(remove(term.begin(), term.end(), ' '), term.end());
+        term.erase(0, 2);
+        terms.push_back(term);
+      }
+      if (terms.size() < 2)
+        continue;
+      mty::Insertion ins_term0(terms[0]), ins_term1(terms[1]);
+      for (size_t i = 0; i < terms.size(); i++)
+      {
+        std::cout << terms[i] << std::endl;
+      }
+      proc = {Incoming(ins_decay), Outgoing(ins_term0), Outgoing(ins_term1)};
+      procname = "partWidth_" + processName(proc);
+      if (process_names.size() > 0)
+      {
+        auto it_name = std::find(process_names.begin(), process_names.end(), procname);
+        if (it_name != process_names.end())
+        {
+          std::cout << "bingas " << procname << std::endl;
+          continue;
+        }
+      }
+    }
+
+    std::cout << test_decay << " -> " << terms[0] << " + " << terms[1] << std::endl;
+    std::cout << procname << std::endl;
+
+
+    auto decay_part = model.getParticle(test_decay);
+    auto part_1 = model.getParticle(terms[0]);
+    auto part_2 = model.getParticle(terms[1]);
+    auto it_1 = std::find(pbsm.begin(), pbsm.end(), part_1);
+    auto it_2 = std::find(pbsm.begin(), pbsm.end(), part_2);
+    if (it_1 != pbsm.end() || it_2 != pbsm.end() || decay_part == part_1 || decay_part == part_2)
+      continue;
+    else
+    {
+
+      auto temp_a = csl::Evaluated(a[i], csl::eval::abbreviation);
+      csl::ForEachLeaf(temp_a,
+                       [&](csl::Expr& sub)
+                       {
+                         if (csl::IsConstant(sub) || csl::IsVariable(sub))
+                         {
+                           sub->setValue(CSL_UNDEF);
+                         }
+                       });
+      expressions.push_back(a[i]);
+      process_names.push_back(procname);
+      processes.push_back(proc);
+    }
+  }
+}
+
+void printArgument(csl::Expr a)
+{
+  for (size_t i = 0; i != Size(a); ++i)
+  {
+    std::cout << i << " : " << a[i] << std::endl;
+  }
+  // Also possible to call a->size()
+}
+
 int computeAndAddToLibFromList(mty::Model& model, // model
                                mty::Library& lib, // output library
-                               std::vector<Process2to2ToCompute> listofprocs,
-                               std::vector<Process2to2ToCompute> listofprocs_1to2,
+                               std::vector<Process2to2ToCompute> listofprocs, Process decaying_parts,
+                               Process decay_prods, std::vector<Particle> psm, std::vector<Particle> pbsm,
                                std::string nameSmBsmFile = "smBsm.hpp" // file to include in correspondance.hpp
 )
 {
@@ -93,7 +363,7 @@ int computeAndAddToLibFromList(mty::Model& model, // model
 
 #ifdef CORRESPONDANCE
   std::cout << "\nCreating correspondance file\n";
-  std::ofstream correspondancefileh;
+  std::ofstream correspondancefileh, widthfile;
 
   //     std::cout << "Building the directory if needed\n";
   //     sprintf(tempstring_c, "[ -d \"%s/include\" ] || mkdir -p \"%s/include\" ; [ -d \"%s/src\" ] || mkdir -p
@@ -131,7 +401,7 @@ int computeAndAddToLibFromList(mty::Model& model, // model
   correspondancefileh << "using CXXfptr_t = complex_t (*) (const param_t&);\n";
   correspondancefileh << "namespace corr{\n";
   correspondancefileh << "  using Entry_t = std::tuple<Cfptr_t, short int, short int>;\n";
-  correspondancefileh << "  using Entry_t_1to2 = std::tuple<CXXfptr_t, short int, short int>;\n";
+  correspondancefileh << "  using Entry_t_1to2 = std::tuple<CXXfptr_t>;\n";
   correspondancefileh << "  enum Part_t { \n";
   #ifdef DEBUG
   std::cout << "Writing particle names in enum Part_t\n";
@@ -229,6 +499,7 @@ int computeAndAddToLibFromList(mty::Model& model, // model
 
   correspondancefileh << "\nextern const std::unordered_map<std::string, Entry_t> squaredampl;\n";
   correspondancefileh << "\nextern const std::unordered_map<std::string, Entry_t_1to2> squaredampl_1to2;\n";
+  correspondancefileh << "\nextern const std::unordered_map<std::string, Entry_t> widths_map;\n";
 
   #ifdef DEBUG
   std::cout << "Writing getMassFirst\n";
@@ -262,7 +533,8 @@ int computeAndAddToLibFromList(mty::Model& model, // model
     #endif
   #endif
 
-  #ifndef DISABLE_LIB_CREATION
+#endif // end of #ifdef CORRESPONDANCE
+#ifndef DISABLE_LIB_CREATION
 
   std::cout << "Creating initialise_map.cpp file\n";
   sprintf(tempstring_c, "auxiliary_library/%s/initialise_map.cpp", lib.getName().c_str());
@@ -277,7 +549,7 @@ int computeAndAddToLibFromList(mty::Model& model, // model
                       << "namespace " << lib.getName() << "::corr{\n"
                       << "const std::unordered_map<std::string, Entry_t> squaredampl{ \n";
 
-  #endif // End of ifdef CORRESPONDANCE
+#endif // End of ifdef CORRESPONDANCE
 
   // Assigning the 1st values to the strings with the names
   // of the previous processes (starting with 0)
@@ -292,7 +564,7 @@ int computeAndAddToLibFromList(mty::Model& model, // model
     std::string nameSumSq = "sumSqAmpl_" + procname;
     std::string nameCombFac = "combFac_" + procname;
     std::cout << "Process n " << i + 1 << " / " << lastproc << "\n";
-
+    std::cout << nameSumSq << "\n";
     // Adding the process in the library
     std::cout << "Computing " << nameSumSq << " ";
     // Setting W boson gauge
@@ -304,9 +576,12 @@ int computeAndAddToLibFromList(mty::Model& model, // model
       if (!listofprocs[i].leading_order)
         return model.computeAmplitude(listofprocs[i].order, listofprocs[i].process);
       // If you want it at the leading order, let us compute the tree-level expression
+
+      std::cout << "bing\n";
       auto ampl_tree = model.computeAmplitude(mty::Order::TreeLevel, listofprocs[i].process);
       if (!ampl_tree.empty())
         return ampl_tree;
+      std::cout << "Computing the amplitude at One Loop order since the tree-level amplitude is null\n";
       auto ampl_one_loop = model.computeAmplitude(mty::Order::OneLoop, listofprocs[i].process);
       return ampl_one_loop;
     };
@@ -335,7 +610,7 @@ int computeAndAddToLibFromList(mty::Model& model, // model
     auto process_graphs = ampl.obtainGraphs();
     graphs.insert(graphs.end(), process_graphs.begin(), process_graphs.end());
 
-  #ifdef SQUAREDAMP
+#ifdef SQUAREDAMP
     s1 = model.computeSquaredAmplitude(ampl, false);
 
     if (s1 == CSL_0)
@@ -347,7 +622,7 @@ int computeAndAddToLibFromList(mty::Model& model, // model
     // You need to evaluate all the abbreviation to have the full set of parameters
     // as input data
     auto temp = csl::Evaluated(s1, csl::eval::abbreviation);
-    #ifdef FULL_PARAM
+  #ifdef FULL_PARAM
     csl::ForEachLeaf(temp,
                      [&](csl::Expr& sub)
                      {
@@ -356,17 +631,17 @@ int computeAndAddToLibFromList(mty::Model& model, // model
                          sub->setValue(CSL_UNDEF);
                        }
                      });
-    #endif
+  #endif
     if (temp->dependsOn(dirac4.C_matrix.get()))
     {
       std::cerr << "Found conjugation matrix dependence for " << nameSumSq << std::endl;
       exit(2);
     }
     lib.addFunction(nameSumSq, s1);
-    #ifdef DISPLAYSQUAREDAMPLITUDESEXPRESSIONS
+  #ifdef DISPLAYSQUAREDAMPLITUDESEXPRESSIONS
     std::cout << "|M|^2 = " << DeepRefreshed(temp) << std::endl;
-    #endif
   #endif
+#endif
     // computing the combinatorial factor
     comb_factor = ampl.getKinematics().getDegreesOfFreedomFactor();
     if (!csl::IsNumerical(comb_factor))
@@ -394,7 +669,7 @@ int computeAndAddToLibFromList(mty::Model& model, // model
 
     // Determining the CP symmetry factor
     C1234 = checkCPsymmetric(model, listofprocs[i].process) ? 2 : 1;
-  #ifdef CORRESPONDANCE
+#ifdef CORRESPONDANCE
     // Writing on the correspondance file
     correspondancefileh << "{ {";
     for (int j = 0; j <= 2; j++)
@@ -416,37 +691,211 @@ int computeAndAddToLibFromList(mty::Model& model, // model
     correspondancefileh << "} }";
     if (i != lastproc - 1)
       correspondancefileh << ",\n";
-  #endif // End of ifdef CORRESPONDANCE
+#endif // End of ifdef CORRESPONDANCE
   } // Ends the cycle on the processes
-  #ifdef CORRESPONDANCE
+#ifdef CORRESPONDANCE
   correspondancefileh << "};\n}\n";
   correspondancefileh.close();
-  #endif
-  #ifndef SQUAREDAMP
-    #ifdef UPDATE_PART_DETAILS
+#endif
+#ifndef SQUAREDAMP
+  #ifdef UPDATE_PART_DETAILS
   return 0;
-    #endif
   #endif
+#endif
 
-  #ifndef DISABLE_LIB_CREATION
+#ifndef DISABLE_LIB_CREATION
 
-  std::cout << "Creating initialise_map_1to2.cpp file\n";
+
+
+  // Assigning the 1st values to the strings with the names
+  // of the previous processes (starting with 0)~
+  model.getParticle("W")->setGaugeChoice(listofprocs[0].Wgauge);
+  /*
+  for (auto& particle : decaying_parts)
+  {
+    for (size_t i = 0; i != decay_prods.size(); ++i)
+    {
+      const auto& p1 = decay_prods[i];
+      for (size_t j = 1; j != decay_prods.size(); ++j)
+      {
+        const auto& p2 = decay_prods[j];
+        auto insertions = getIndependentDecays({Incoming(particle), Outgoing(p1), Outgoing(p2)});
+        for (const auto& ins : insertions)
+        {
+          mty::Amplitude ampl = model.computeAmplitude(mty::Order::TreeLevel, ins);
+          if (ampl.empty())
+          {
+            // ampl = computeAmplitude(mty::Order::OneLoop, ins);
+            continue;
+          }
+          csl::Expr squared, partial;
+          if (!ampl.empty())
+            squared = model.computeSquaredAmplitude(ampl);
+          else
+            continue;
+          if (squared != 0)
+          {
+            std::cout << "Found decay ";
+            std::cout << ins[0].getField()->getName() << " -> ";
+            std::cout << ins[1].getField()->getName() << " + ";
+            std::cout << ins[2].getField()->getName() << std::endl;
+            partial = model.squaredAmplitudeToPartialWidth(squared, ins, ampl);
+          }
+          std::string procname = processName(ins);
+          std::string nameSumSq = "sumSqAmpl_" + procname;
+          std::string namePartWidth = "partWidth_" + procname;
+          lib.addFunction(nameSumSq, squared);
+          lib.addFunction(namePartWidth, partial);
+          // computing the combinatorial factor
+          comb_factor = ampl.getKinematics().getDegreesOfFreedomFactor();
+          if (!csl::IsNumerical(comb_factor))
+          {
+            std::cerr << "The number of degrees of freedom is not numerical!\n";
+            exit(3);
+          }
+          comb_factor = Evaluated(comb_factor, csl::eval::all);
+
+          std::string mass_string = " ";
+          for (size_t j = 0; j < 3; j++)
+          {
+            Expr tempmass = ins[j].getField()->getMass();
+            std::string tempstring =
+                (tempmass != CSL_0) ? "static_cast<double>(input." + tempmass->getName() + ")" : "0.0";
+            mass_string += tempstring + ",";
+          }
+          // Determining the symmetry factor
+          Sf34 = (((ins[1].isOutgoingParticle() && ins[2].isOutgoingParticle()) ||
+                   (ins[1].isOutgoingAntiParticle() && ins[2].isOutgoingAntiParticle())) &&
+                  ins[1].getField()->getName() == ins[2].getField()->getName())
+                     ? 2
+                     : 1;
+
+          // Determining the CP symmetry factor
+          C1234 = 1;
+  #ifdef CORRESPONDANCE
+          // Writing on the correspondance file
+          correspondancefileh << "{ {";
+          for (int j = 0; j <= 1; j++)
+          {
+            if (!ins[j].isParticle())
+              correspondancefileh << "ANTICHAR,";
+            correspondancefileh << "EMPTYCHAR+corr::" << ins[j].getField()->getName() << ",";
+          }
+          if (!ins[2].isParticle())
+            correspondancefileh << "ANTICHAR,";
+          correspondancefileh << "EMPTYCHAR+corr::" << ins[2].getField()->getName() << "},";
+          // Writing the value field
+          correspondancefileh << "{ ";
+          // Writing the functions
+          correspondancefileh << " &" << nameSumSq << ", ";
+          correspondancefileh << " &" << namePartWidth << ", ";
+          correspondancefileh << comb_factor << ",";
+          // Writing the number
+          correspondancefileh << C1234;
+          correspondancefileh << "} }";
+          if (particle != decaying_parts.back() || i != decay_prods.size() - 1 || j != decay_prods.size() - 1)
+            correspondancefileh << ",\n";
+  #endif // End of ifdef CORRESPONDANCE
+        } // Ends the cycle on the processes
+  #ifdef CORRESPONDANCE
+        correspondancefileh << "};\n}\n";
+        correspondancefileh.close();
+  #endif
+      }
+    }
+  }
+  */
+
+  sprintf(tempstring_c, "auxiliary_library/%s/widths_map.cpp", lib.getName().c_str());
+  widthfile.open(tempstring_c);
+  widthfile << "#include \"correspondance.hpp\"\n"
+            << "namespace " << lib.getName() << "::corr{\n"
+            << "const std::unordered_map<std::string, Entry_t> widths_map{ \n";
+
   sprintf(tempstring_c, "auxiliary_library/%s/initialise_map_1to2.cpp", lib.getName().c_str());
   correspondancefileh.open(tempstring_c);
-  if (!correspondancefileh)
-  {
-    std::cerr << "Impossible to write the " << tempstring_c << " file\n";
-    return 1;
-  }
-
   correspondancefileh << "#include \"correspondance.hpp\"\n"
                       << "namespace " << lib.getName() << "::corr{\n"
                       << "const std::unordered_map<std::string, Entry_t_1to2> squaredampl_1to2{ \n";
 
-  #endif // End of ifdef CORRESPONDANCE
+  for (auto& particle : decaying_parts)
+  {
 
-  // Assigning the 1st values to the strings with the names
-  // of the previous processes (starting with 0)
+    std::string part_name = particle.getField()->getName();
+    std::string width_name = "width_" + part_name;
+    csl::Expr width_part = computeWidth_new(model, part_name, psm, pbsm);
+    csl::Expr width_true = model.computeWidth(Order::TreeLevel, part_name);
+
+    printArgument(width_part);
+
+    std::vector<std::string> process_names;
+    std::vector<Process> processes;
+    std::vector<csl::Expr> expressions;
+
+
+
+    auto temp = csl::Evaluated(width_part, csl::eval::abbreviation);
+    csl::ForEachLeaf(temp,
+                     [&](csl::Expr& sub)
+                     {
+                       if (csl::IsConstant(sub) || csl::IsVariable(sub))
+                       {
+                         sub->setValue(CSL_UNDEF);
+                       }
+                     });
+    auto temp_true = csl::Evaluated(width_true, csl::eval::abbreviation);
+    csl::ForEachLeaf(temp_true,
+                     [&](csl::Expr& sub)
+                     {
+                       if (csl::IsConstant(sub) || csl::IsVariable(sub))
+                       {
+                         sub->setValue(CSL_UNDEF);
+                       }
+                     });
+    getArguments(width_part, model, psm, pbsm, lib, process_names, processes, expressions);
+    lib.addFunction(width_name, width_true);
+
+    widthfile << "{ {";
+    widthfile << "EMPTYCHAR+corr::" << particle.getField()->getName() << ",";
+    widthfile << "},";
+    widthfile << "{ ";
+    // Writing the functions
+    widthfile << " &c_" << width_name << ", 1, 1";
+    // Writing the number
+    widthfile << "} }";
+
+    if (particle != decaying_parts.back())
+      widthfile << ",\n";
+
+    for (int i = 0; i < process_names.size(); i++)
+    {
+      std::cout << process_names[i];
+      lib.addFunction(process_names[i], expressions[i]);
+  #ifdef CORRESPONDANCE
+      // Writing on the correspondance file
+      correspondancefileh << "{ {";
+      for (int j = 0; j <= 1; j++)
+      {
+        if (!processes[i][j].isParticle())
+          correspondancefileh << "ANTICHAR,";
+        correspondancefileh << "EMPTYCHAR+corr::" << processes[i][j].getField()->getName() << ",";
+      }
+      if (!processes[i][2].isParticle())
+        correspondancefileh << "ANTICHAR,";
+      correspondancefileh << "EMPTYCHAR+corr::" << processes[i][2].getField()->getName() << "},";
+      // Writing the value field
+      correspondancefileh << "{ ";
+      // Writing the functions
+      correspondancefileh << " &" << process_names[i] << ", ";
+      // Writing the number
+      correspondancefileh << "} }";
+      correspondancefileh << ",\n";
+  #endif // End of ifdef CORRESPONDANCE
+    } // Ends the cycle on the processes
+  } // Ends the cycle on the particles
+  widthfile << "};\n}\n";
+  widthfile.close();
+  #ifndef PARTICLEDECAYS
   prevname1 = listofprocs_1to2[0].process[0].getField()->getName();
   prevname2 = listofprocs_1to2[0].process[1].getField()->getName();
 
@@ -456,23 +905,31 @@ int computeAndAddToLibFromList(mty::Model& model, // model
     count_converted++;
     std::string procname = processName(listofprocs_1to2[i].process);
     std::string nameSumSq = "sumSqAmpl_" + procname;
+    std::string namePartWidth = "partWidth_" + procname;
+    std::cout << nameSumSq << "\n";
     std::string nameCombFac = "combFac_" + procname;
     std::cout << "Process n " << i + 1 << " / " << lastproc_1to2 << "\n";
 
     // Adding the process in the library
+    std::cout << "Setting the process in the library\n";
     std::cout << "Computing " << nameSumSq << " ";
     // Setting W boson gauge
     model.getParticle("W")->setGaugeChoice(listofprocs_1to2[i].Wgauge);
-
+    std::cout << "W gauge set\n";
     // Creating a lambda function that returns the amplitude at the desired order
     auto lambda_ampl = [&]()
     {
+      std::cout << "bing\n";
       if (!listofprocs_1to2[i].leading_order)
+      {
         return model.computeAmplitude(listofprocs_1to2[i].order, listofprocs_1to2[i].process);
+        std::cout << "Amplitude computed at order " << listofprocs_1to2[i].order << "\n";
+      }
       // If you want it at the leading order, let us compute the tree-level expression
       auto ampl_tree = model.computeAmplitude(mty::Order::TreeLevel, listofprocs_1to2[i].process);
       if (!ampl_tree.empty())
         return ampl_tree;
+      std::cout << "Computing the amplitude at One Loop order since the tree-level amplitude is null\n";
       auto ampl_one_loop = model.computeAmplitude(mty::Order::OneLoop, listofprocs_1to2[i].process);
       return ampl_one_loop;
     };
@@ -485,7 +942,8 @@ int computeAndAddToLibFromList(mty::Model& model, // model
       continue;
     }
     std::cout << std::endl;
-    Expr s1;
+    Expr s1, p1;
+
     // Saving the single diagram
     SaveDiagrams(lib.getName() + "_graphs/" + procname + ".json", ampl);
     // Grouping diagrams and saving them
@@ -500,9 +958,9 @@ int computeAndAddToLibFromList(mty::Model& model, // model
     }
     auto process_graphs = ampl.obtainGraphs();
     graphs.insert(graphs.end(), process_graphs.begin(), process_graphs.end());
-  #ifdef SQUAREDAMP
+    #ifdef SQUAREDAMP
     s1 = model.computeSquaredAmplitude(ampl, false);
-
+    p1 = model.squaredAmplitudeToPartialWidth(s1, listofprocs_1to2[i].process, ampl, true);
     if (s1 == CSL_0)
     {
       std::cout << "The squared amplitude is null\n";
@@ -512,7 +970,8 @@ int computeAndAddToLibFromList(mty::Model& model, // model
     // You need to evaluate all the abbreviation to have the full set of parameters
     // as input data
     auto temp = csl::Evaluated(s1, csl::eval::abbreviation);
-    #ifdef FULL_PARAM
+    auto temp_p1 = csl::Evaluated(p1, csl::eval::abbreviation);
+      #ifdef FULL_PARAM
     csl::ForEachLeaf(temp,
                      [&](csl::Expr& sub)
                      {
@@ -521,17 +980,31 @@ int computeAndAddToLibFromList(mty::Model& model, // model
                          sub->setValue(CSL_UNDEF);
                        }
                      });
-    #endif
+
+    csl::ForEachLeaf(temp_p1,
+                     [&](csl::Expr& sub)
+                     {
+                       if (csl::IsConstant(sub) || csl::IsVariable(sub))
+                       {
+                         sub->setValue(CSL_UNDEF);
+                       }
+                     });
+
+      #endif
     if (temp->dependsOn(dirac4.C_matrix.get()))
     {
       std::cerr << "Found conjugation matrix dependence for " << nameSumSq << std::endl;
       exit(2);
     }
     lib.addFunction(nameSumSq, s1);
-    #ifdef DISPLAYSQUAREDAMPLITUDESEXPRESSIONS
+    lib.addFunction(namePartWidth, p1);
+      #ifdef DISPLAYSQUAREDAMPLITUDESEXPRESSIONS
     std::cout << "|M|^2 = " << DeepRefreshed(temp) << std::endl;
+      #endif
+      #ifdef DISPLAYPARTIALWIDTHEXPRESSIONS
+    std::cout << "Partial width " << namePartWidth << " = " << DeepRefreshed(temp_p1) << std::endl;
+      #endif
     #endif
-  #endif
     // computing the combinatorial factor
     comb_factor = ampl.getKinematics().getDegreesOfFreedomFactor();
     if (!csl::IsNumerical(comb_factor))
@@ -561,7 +1034,7 @@ int computeAndAddToLibFromList(mty::Model& model, // model
 
     // Determining the CP symmetry factor
     C1234 = 1;
-  #ifdef CORRESPONDANCE
+    #ifdef CORRESPONDANCE
     // Writing on the correspondance file
     correspondancefileh << "{ {";
     for (int j = 0; j <= 1; j++)
@@ -577,18 +1050,20 @@ int computeAndAddToLibFromList(mty::Model& model, // model
     correspondancefileh << "{ ";
     // Writing the functions
     correspondancefileh << " &" << nameSumSq << ", ";
+    correspondancefileh << " &" << namePartWidth << ", ";
     correspondancefileh << comb_factor << ",";
     // Writing the number
     correspondancefileh << C1234;
     correspondancefileh << "} }";
     if (i != lastproc_1to2 - 1)
       correspondancefileh << ",\n";
-  #endif // End of ifdef CORRESPONDANCE
+    #endif // End of ifdef CORRESPONDANCE
   } // Ends the cycle on the processes
-  #ifdef CORRESPONDANCE
+    #ifdef CORRESPONDANCE
   correspondancefileh << "};\n}\n";
   correspondancefileh.close();
-  #endif
-#endif // ended #ifndef DISABLE_LIB_CREATION
+    #endif
+  #endif // End of ifndef PARTICLEDECAYS
+#endif   // ended #ifndef DISABLE_LIB_CREATION
   return 0;
 }

@@ -164,7 +164,7 @@ else()
     message(STATUS "Documentation generation is disabled.")
 endif()
 
-add_subdirectory(src/Unit_tests)
+add_subdirectory(src/Tests_Idetection)
 add_subdirectory(src/Test)
 
 # Add a custom target to run clang-format on all source files

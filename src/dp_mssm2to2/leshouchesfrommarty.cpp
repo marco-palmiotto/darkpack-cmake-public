@@ -37,7 +37,8 @@ namespace mssm2to2::readmodule
     //     computeThetaWandMw(1./param.alpha_em_MZ_inv.get(), param.Gfermi.get(), param.m_Z_pole.get(), thetaW,
     //     m_W);
 
-    //     param.e_em = std::sqrt(4*M_PI/param.alpha_em_MZ_inv);
+    // param.Finite = 0.;
+    //        param.e_em = std::sqrt(4*M_PI/param.alpha_em_MZ_inv);
     param.e_em = std::sqrt(4 * M_PI / pdg2016Value::alpha_em_inv);
 
     //     param.m_Z = get_value(data, "MASS", 23, param.m_Z_pole.get());
@@ -450,7 +451,7 @@ namespace mssm2to2::readmodule
 #ifdef WIDTH_h
     param.Gamma_h = get_value(data, "ALLDECAYS", 25, width_h(param).real());
 #endif
-#ifdef WIDTH_TOP
+#ifdef WIDTH_top
     param.Gamma_top = get_value(data, "ALLDECAYS", 6, width_t(param).real());
 #endif
 #ifdef WIDTH_H0
@@ -513,7 +514,7 @@ namespace mssm2to2::readmodule
 #ifdef WIDTH_H0
     param.widths_vector[corr::H0] = param.Gamma_H0;
 #endif
-#ifdef WIDTH_TOP
+#ifdef WIDTH_top
     param.widths_vector[corr::t] = param.Gamma_top;
 #endif
 #ifdef WIDTH_Hp

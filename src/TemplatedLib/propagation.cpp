@@ -1,4 +1,5 @@
 #include "propagation.hpp"
+// #define DEBUG
 
 using namespace advmath;
 
@@ -11,7 +12,7 @@ namespace __SPEC_LIB_NAME__
 {
 
   Propagation_param_t::Propagation_param_t(const Param_t& input_in, enum propagation_models p_model,
-                                           enum halo_profiles halo_model, real_t r_earth_in, real_t rho_chi_local_in)
+                                           enum halo_profiles halo_model)
           : input(input_in), ind_param(input_in)
   {
     // Fetch the dark matter masses from the PPPC4DMID data
@@ -19,87 +20,96 @@ namespace __SPEC_LIB_NAME__
     ind_param.read_fermi_data();
 
     // Fetch the cross section data for antiproton production
-    ind_param.read_file(FILENAME_H_ON_H, 1, h_on_h_xsection);
-    ind_param.read_file(FILENAME_HE_ON_H, 1, he_on_h_xsection);
-    ind_param.read_file(FILENAME_HE_ON_HE, 1, he_on_he_xsection);
-    ind_param.read_file(FILENAME_H_ON_HE, 1, h_on_he_xsection);
+    ind_param.read_file(FILENAME_H_ON_H, DIM_TAB_PBAR + 1, h_on_h_xsection);
+    ind_param.read_file(FILENAME_HE_ON_H, DIM_TAB_PBAR + 1, he_on_h_xsection);
+    ind_param.read_file(FILENAME_HE_ON_HE, DIM_TAB_PBAR + 1, he_on_he_xsection);
+    ind_param.read_file(FILENAME_H_ON_HE, DIM_TAB_PBAR + 1, h_on_he_xsection);
 
     switch (p_model)
     {
     case (propagation_models::MAX):
-      equation_parameters = {0.0016, 0.46, 15.0, 1.0, 0.014};
+      equation_parameters = {0.0765 * pow(CM_TO_KPC, 2.) / SEC_TO_MGYR, 0.46, 15.0, 5.0 * 1.0e5, 117.6 * 1.0e5};
       break;
     case (propagation_models::MED):
-      equation_parameters = {0.0112, 0.7, 4.0, 12.0, 52.9};
+      equation_parameters = {0.0112 * pow(CM_TO_KPC, 2.) / SEC_TO_MGYR, 0.7, 4.0, 12.0 * 1.0e5, 52.9 * 1.0e5};
       break;
     case (propagation_models::MIN):
-      equation_parameters = {0.0016, 0.85, 1.0, 13.5, 22.4};
+      equation_parameters = {0.0016 * pow(CM_TO_KPC, 2.) / SEC_TO_MGYR, 0.85, 1.0, 13.5 * 1.0e5, 22.4 * 1.0e5};
       break;
     default:
       std::cerr << "Invalid propagation model specified. Using 'med' parameters by default." << std::endl;
-      equation_parameters = {0.0112, 0.7, 4.0, 12.0, 52.9};
+      equation_parameters = {0.0112 * pow(CM_TO_KPC, 2.) / SEC_TO_MGYR, 0.7, 4.0, 12.0 * 1.0e5, 52.9 * 1.0e5};
     }
 
     switch (halo_model)
     {
     case (halo_profiles::NFW):
       halo_profile = &nfw;
+      r_earth = 8.21;
+      rho_chi_local = 0.383;
       break;
     case (halo_profiles::BURKERT):
       halo_profile = &burkert;
+      r_earth = 7.94;
+      rho_chi_local = 0.487;
       break;
     case (halo_profiles::EINASTO):
       halo_profile = &einasto;
+      r_earth = 8.25;
+      rho_chi_local = 0.386;
       break;
     default:
       std::cerr << "Invalid halo model specified. Using NFW profile by default." << std::endl;
       halo_profile = &nfw;
     }
 
-    sample_option =
-        0; // default to the standard dSph sample unless a specific propagation model and halo profile is used
+    sample_option = sample_options::NOMINAL; // default to the nominal dSph sample unless a specific propagation model
+                                             // and halo profile is used
 
     if (p_model == propagation_models::MED && halo_model == halo_profiles::BURKERT)
-      sample_option = -1; // Conservative sample is in use
+      sample_option = sample_options::CONSERVATIVE; // Conservative sample is in use
     if (p_model == propagation_models::MED && halo_model == halo_profiles::EINASTO)
-      sample_option = 0; // Standard sample is in use
+      sample_option = sample_options::NOMINAL; // nominal sample is in use
     if (p_model == propagation_models::MAX && halo_model == halo_profiles::EINASTO)
-      sample_option = 1; // Stringent sample is in use
+      sample_option = sample_options::INCLUSIVE; // inclusive sample is in use
 
-    r_earth = r_earth_in;
-    rho_chi_local = rho_chi_local_in;
 
-    alpha_i.resize(N_BESSEL + 1);
-    q_i.resize(N_BESSEL + 1);
+    alpha_i.resize(N_BESSEL);
+    q_i.resize(N_BESSEL);
 
-    bessel_coef_proton_i.resize(DIM_TAB_PROTON + 1);
-    bessel_coef_helium_i.resize(DIM_TAB_PROTON + 1);
+    search_zeroes_J0(1e-8);
+    production();
+
+    bessel_coef_proton.resize(DIM_TAB_PROTON + 1);
+    bessel_coef_helium.resize(DIM_TAB_PROTON + 1);
     /* pt_Proton->BESSEL_COEF_Enuc_i is set to zero. */
     for (int i_nuc = 0; i_nuc <= DIM_TAB_PROTON; i_nuc++)
     {
-      bessel_coef_proton_i[i_nuc].resize(N_BESSEL + 1);
-      bessel_coef_helium_i[i_nuc].resize(N_BESSEL + 1);
+      bessel_coef_proton.at(i_nuc).resize(N_BESSEL);
+      bessel_coef_helium.at(i_nuc).resize(N_BESSEL);
     }
+
+    calculation_BESSEL_Ep_i();
 
     table_abar.resize(DIM_TAB_PBAR + 1);
 
     bessel_pri_pbar_spec.resize(DIM_TAB_PBAR + 1);
     bessel_sec_pbar_spec.resize(DIM_TAB_PBAR + 1);
     bessel_ter_pbar_spec.resize(DIM_TAB_PBAR + 1);
+    bessel_tot_pbar_spec.resize(DIM_TAB_PBAR + 1);
 
-    xs_uncertainties.resize(DIM_TAB_PBAR + 1);
     for (int i_pbar = 0; i_pbar <= DIM_TAB_PBAR; i_pbar++)
     /* bessel_sec_pbar_spec and TABLE_Abar_i are set to zero. */
     {
-      table_abar[i_pbar].resize(N_BESSEL + 1);
+      table_abar.at(i_pbar).resize(N_BESSEL);
 
-      bessel_pri_pbar_spec[i_pbar].resize(N_BESSEL + 1);
-      bessel_sec_pbar_spec[i_pbar].resize(N_BESSEL + 1);
-      bessel_ter_pbar_spec[i_pbar].resize(N_BESSEL + 1);
-
-      xs_uncertainties[i_pbar].resize(3); /* Element 0 is energy,
-      1 and 2 are the lower and upper bounds of the secondary spectra, respectively*/
+      bessel_pri_pbar_spec.at(i_pbar).resize(N_BESSEL);
+      bessel_sec_pbar_spec.at(i_pbar).resize(N_BESSEL);
+      bessel_ter_pbar_spec.at(i_pbar).resize(N_BESSEL);
+      bessel_tot_pbar_spec.at(i_pbar).resize(N_BESSEL);
     }
+
+    chi2_noDM = 0;
   };
 
 
@@ -176,7 +186,7 @@ namespace __SPEC_LIB_NAME__
   //-------------------------------LIKELIHOOD METHODS FOR FERMI-LAT DSphs----------------------------//
 
   real_t Propagation_param_t::max_likelihood_aux_func(const std::vector<real_t>& logJ, const std::vector<real_t>& xtra,
-                                                      const std::vector<std::vector<real_t>>& spec)
+                                                      const std::vector<std::vector<real_t>>& spect)
   {
     // Auxiliary function to be used in the maximization of the likelihood (needed redefinition to make the optimization
     // compatible with both fermi-LAT and AMS-02)
@@ -188,7 +198,8 @@ namespace __SPEC_LIB_NAME__
     return ind_param.likelihood_one_dsph(dsph, logJ0);
   }
 
-  real_t Propagation_param_t::max_likelihood_one_dsph(const int& dsph, std::vector<std::vector<real_t>>& logJ_factors)
+  real_t Propagation_param_t::max_likelihood_one_dsph(const int& dsph, std::vector<std::vector<real_t>>& logJ_factors,
+                                                      int& IDpowell_result)
   {
     // Calls max_likelihood_aux_func and returns the maximum log likelihood for one dSph by optimizing over logJ
     real_t logJ_obs = logJ_factors.at(dsph).at(0);
@@ -208,57 +219,62 @@ namespace __SPEC_LIB_NAME__
 
     std::vector<std::vector<real_t>> spect;
 
-    IDpowell(1, &Propagation_param_t::max_likelihood_aux_func, xtra, spect, xlim_min, xlim_max, &lhmax, logJ_opt,
-             1.0e-3, "max");
+    IDpowell_result = IDpowell(1, &Propagation_param_t::max_likelihood_aux_func, xtra, spect, xlim_min, xlim_max,
+                               &lhmax, logJ_opt, 1.0e-3, "max");
 
+    optimal_J_factors.push_back(pow(10., logJ_opt.at(0)));
     return lhmax;
   }
 
-  real_t Propagation_param_t::likelihood_all_dwarfs()
+  real_t Propagation_param_t::likelihood_all_dwarfs(int& IDpowell_result)
   /* Sum the maximum log-likelihood of every dSph to this sum is substracted the log-likelihood in the case of no dark
-  matter This delta log-likelihood is calculated for a "conservative", "standard" or "stringent" case, depending if
+  matter This delta log-likelihood is calculated for a "conservative", "nominal" or "inclusive" case, depending if
   sample_option=-1, 0 or 1 (default is 0)*/
   {
+    IDpowell_result = 1;
+    int IDpowell_fail = 0; // store the number failures of IDpowell
     std::vector<real_t> l = {0, 0, 0};
-    auto logJ_factors = ind_param.get_logJ();
+    auto logJ_factors = get_logJ_factors();
 
+    optimal_J_factors.clear();
     real_t tmp;
-    for (int i = 0; i < 47; i++)
+    for (int i = 0; i < 45; i++)
     {
-
+      logL_noDM.at(i) = ind_param.likelihood_one_dsph(i, 0.);
       real_t sigma_j = logJ_factors.at(i).at(1);
       if (sigma_j == -1)
       {
         switch (sample_option)
         {
-        case (-1):
+        case (sample_options::INCLUSIVE):
+          logJ_factors.at(i).at(1) = 0.4;
+          break;
+        case (sample_options::CONSERVATIVE):
           logJ_factors.at(i).at(1) = 0.8;
           break;
-        case (0):
-          logJ_factors.at(i).at(1) = 0.6;
-          break;
         default:
-          logJ_factors.at(i).at(1) = 0.4;
+          logJ_factors.at(i).at(1) = 0.6;
         }
       }
 
-      tmp = max_likelihood_one_dsph(i, logJ_factors) - logL_noDM.at(i);
+      tmp = max_likelihood_one_dsph(i, logJ_factors, IDpowell_result) - logL_noDM.at(i);
+      if (IDpowell_result == 0)
+        IDpowell_fail++;
 
       auto sample = (int)logJ_factors.at(i).at(2);
-
       switch (sample)
       {
-      case (-1):
+      case (sample_options::INCLUSIVE):
+        l.at(2) += tmp; // inclusive
+        break;
+      case (sample_options::CONSERVATIVE):
         l.at(0) += tmp;
         l.at(1) += tmp;
-        l.at(2) += tmp; // Conservative
-        break;
-      case (0):
-        l.at(1) += tmp;
-        l.at(2) += tmp; // Standard
+        l.at(2) += tmp; // conservative
         break;
       default:
-        l.at(2) += tmp; // Stringent
+        l.at(1) += tmp;
+        l.at(2) += tmp; // nominal
       }
     }
 
@@ -281,25 +297,30 @@ namespace __SPEC_LIB_NAME__
 
     real_t res;
 
+    std::cout << "Sample option is " << sample_option << std::endl;
     switch (sample_option)
     {
-    case (-1):
+    case (sample_options::INCLUSIVE):
+      res = l.at(0);
+      break;
+    case (sample_options::CONSERVATIVE):
       res = l.at(2);
       break;
-    case (0):
-      res = l.at(1);
-      break;
     default:
-      res = l.at(0);
+      res = l.at(1);
     }
 
-
+    if (IDpowell_fail != 0)
+    {
+      IDpowell_result = 0;
+      std::cerr << "WARNING: IDpowell failed for " << IDpowell_fail << " dSph's!!!" << std::endl;
+    }
     return res;
   }
 
 
 
-  void Propagation_param_t::search_zeros_J0(real_t tol)
+  void Propagation_param_t::search_zeroes_J0(const real_t tol)
   {
     int n_zero;
 
@@ -317,13 +338,13 @@ namespace __SPEC_LIB_NAME__
       {
         /* The zero of J0 Bessel function is between z and z+dz */
         zero = find_zero_secant(z, z + dz, besselj0, tol);
-        alpha_i[n_zero - 1] = zero;
+        alpha_i.at(n_zero - 1) = zero;
         n_zero += 1;
       }
     }
   }
 
-  real_t Propagation_param_t::f_PSRD(real_t u)
+  real_t Propagation_param_t::f_pulsar_distribution(real_t u)
   /*
     This function returns the distribution of primary cosmic-ray sources in the galactic plane.
      This radial profile follows the pulsar distribution. */
@@ -346,7 +367,7 @@ namespace __SPEC_LIB_NAME__
 
 
   void Propagation_param_t::production()
-  /* computes the flux of primary cosmic rays from the distribution of primary sources f_PSRD */
+  /* computes the flux of primary cosmic rays from the distribution of primary sources f_pulsar_distribution */
   {
 
     real_t u, du, sum, coefficient, weight_SIMPSON;
@@ -367,13 +388,13 @@ namespace __SPEC_LIB_NAME__
         weight_SIMPSON = (1. + (real_t)(i_int % 2)) * 2. / 3.;
       }
 
-      sum += weight_SIMPSON * f_PSRD(u) * u * du;
+      sum += weight_SIMPSON * f_pulsar_distribution(u) * u * du;
       u += du;
     }
-    coefficient = (1.0) / (M_PI * pow(CM_PAR_KPC * R_GAL, 2)) / sum; // [cm^{-2}]
+    coefficient = (1.0) / (M_PI * pow(CM_TO_KPC * R_GAL, 2)) / sum; // [cm^{-2}]
 
-    /* Calculation of integrals q_i of function f_PSRD Bessel's transforms. */
-    for (int i = 1; i <= N_BESSEL; i++)
+    /* Calculation of integrals q_i of function f_pulsar_distribution Bessel's transforms. */
+    for (int i = 0; i < N_BESSEL; i++)
     {
       sum = 0.0;
       du = 1. / (real_t)NINT_PRODUCTION;
@@ -389,7 +410,7 @@ namespace __SPEC_LIB_NAME__
           weight_SIMPSON = (1. + (real_t)(i_int % 2)) * 2. / 3.;
         }
 
-        sum += weight_SIMPSON * f_PSRD(u) * besselj0(alpha_i.at(i) * u) * u * du;
+        sum += weight_SIMPSON * f_pulsar_distribution(u) * besselj0(alpha_i.at(i) * u) * u * du;
         u += du;
       }
       q_i.at(i) = coefficient * sum / pow(besselj1(alpha_i.at(i)), 2); // [cm^{-2}]
@@ -464,21 +485,21 @@ namespace __SPEC_LIB_NAME__
   {
     real_t T, impulsion, resultat;
 
-    T = E_proton - MASSE_PROTON;
+    T = E_proton - PROTON_MASS;
     if (T <= 0.0)
     {
       return (0.0);
     }
     else
     {
-      impulsion = sqrt(pow(E_proton, 2) - pow(MASSE_PROTON, 2));
+      impulsion = sqrt(pow(E_proton, 2) - pow(PROTON_MASS, 2));
 
       /* AMS and CREAM parametrization with phi_fisk=724MV (2015) */
 
       real_t C = 2.716e+04, alpha = -0.5115, gamma = -2.885, InvRb = 0.002357, DeltaGamma = 0.242, s = 0.1556;
-      real_t R = sqrt(T * T + 2. * MASSE_PROTON * T);
-      real_t Beta = R / (T + MASSE_PROTON);
-      real_t dR_On_dT = (T + MASSE_PROTON) / R;
+      real_t R = sqrt(T * T + 2. * PROTON_MASS * T);
+      real_t Beta = R / (T + PROTON_MASS);
+      real_t dR_On_dT = (T + PROTON_MASS) / R;
       resultat = C * 1e-4 * dR_On_dT * Beta * (1 - exp(R * alpha)) * pow(R, gamma) *
                  pow(1 + pow((R * InvRb), DeltaGamma / s), s);
 
@@ -507,19 +528,19 @@ namespace __SPEC_LIB_NAME__
   {
     real_t T_nucleon, P_nucleon, resultat;
 
-    T_nucleon = E_nucleon - MASSE_PROTON;
+    T_nucleon = E_nucleon - PROTON_MASS;
     if (T_nucleon <= 0.0)
     {
       return 0.;
     }
     else
     {
-      P_nucleon = sqrt(pow(E_nucleon, 2) - pow(MASSE_PROTON, 2));
+      P_nucleon = sqrt(pow(E_nucleon, 2) - pow(PROTON_MASS, 2));
 
       /* AMS and CREAM parametrization with phi_fisk=724MV (2015) */
       real_t C = 3564, gamma = -2.765, InvRb = 0.001842, DeltaGamma = 0.2129, s = 0.04654;
       real_t Ttot = 4. * T_nucleon;
-      real_t Mtot = 4. * MASSE_PROTON;
+      real_t Mtot = 4. * PROTON_MASS;
       real_t R = sqrt(Ttot * (Ttot + 2. * Mtot)) / 2.;
       real_t Beta = sqrt(Ttot * (Ttot + 2. * Mtot)) / (Ttot + Mtot);
       real_t dR_On_dT = (Ttot + Mtot) / (R);
@@ -530,58 +551,59 @@ namespace __SPEC_LIB_NAME__
 
   //----------------------------------------PROTON AND HELIUM BESSEL
   // COEFFICIENTS--------------------------------------------//
-  void Propagation_param_t::calcul_method_B_BESSEL_i(real_t E_nucleon, std::vector<real_t>& bessel_coef_proton,
-                                                     std::vector<real_t>& bessel_coef_helium)
+  void Propagation_param_t::calcul_method_BESSEL_i(real_t E_nucleon, std::vector<real_t>& bessel_coef_proton_i,
+                                                   std::vector<real_t>& bessel_coef_helium_i)
   /* Calculates the flux of nuclei from its Bessel coefficients for a given energy per nucleon E_nucleon */
   {
-    long i;
-    real_t impulsion_nucleon, v_nucleon, K_proton, K_helium;
+    real_t momentum_nucleon, v_nucleon, K_proton, K_helium;
     real_t production_E_proton, Si_P, Ai_P;
     real_t production_E_helium, Si_He, Ai_He;
     real_t e_diffus = equation_parameters.at(2);
-    real_t v_conv = equation_parameters[3];
+    real_t v_conv = equation_parameters.at(3);
 
-    bessel_coef_proton.resize(N_BESSEL + 1);
-    bessel_coef_helium.resize(N_BESSEL + 1);
-
-
-    impulsion_nucleon = sqrt(pow(E_nucleon, 2) - pow(MASSE_PROTON, 2));
-    v_nucleon = CELERITY_LIGHT * impulsion_nucleon / E_nucleon;
-    K_proton = K_space_diffusion(E_nucleon, MASSE_PROTON, 1.0);
-    K_helium = K_space_diffusion((4.0 * E_nucleon), (4.0 * MASSE_PROTON), 2.0);
+    bessel_coef_proton_i.resize(N_BESSEL);
+    bessel_coef_helium_i.resize(N_BESSEL);
 
 
-    for (i = 1; i <= N_BESSEL; i++)
+    momentum_nucleon = sqrt(pow(E_nucleon, 2) - pow(PROTON_MASS, 2));
+    v_nucleon = CELERITY_LIGHT * momentum_nucleon / E_nucleon;
+    K_proton = K_space_diffusion(E_nucleon, PROTON_MASS, 1.0);
+    K_helium = K_space_diffusion((4.0 * E_nucleon), (4.0 * PROTON_MASS), 2.0);
+
+
+    for (int i = 0; i < N_BESSEL; i++)
     {
-      Si_P = sqrt(pow(2.0 * alpha_i.at(i) / R_GAL, 2) + pow(v_conv * CM_PAR_KPC / K_helium, 2));
+      Si_P = sqrt(pow(2.0 * alpha_i.at(i) / R_GAL, 2) + pow(v_conv * CM_TO_KPC / K_helium, 2));
 
-      /* Ai est exprime en [cm s^{-1}]. */
+      /* Ai is in [cm s^{-1}]. */
       Ai_P = v_conv;
-      Ai_P += 2.0 * E_DISC * CM_PAR_KPC * (pow(1.0, 2.2 / 3.) * sigma_total_pH(E_nucleon) * v_nucleon * DENSITE_H_DISC);
-      Ai_P += K_proton * Si_P / CM_PAR_KPC / tanh(Si_P * e_diffus / 2.);
+      Ai_P += 2.0 * E_DISC * CM_TO_KPC * (pow(1.0, 2.2 / 3.) * sigma_total_pH(E_nucleon) * v_nucleon * DENSITY_H_DISC);
+      Ai_P += K_proton * Si_P / CM_TO_KPC / tanh(Si_P * e_diffus / 2.);
 
-      bessel_coef_proton.at(i) = q_i.at(i) / Ai_P; /* expressed in [s^{+1} cm^{-3}]. */
+
+      bessel_coef_proton_i.at(i) = q_i.at(i) / Ai_P; /* expressed in [s^{+1} cm^{-3}]. */
+
       /* Si is in [kpc^{-1}]. */
-      Si_He = sqrt(pow(2.0 * alpha_i.at(i) / R_GAL, 2) + pow(v_conv * CM_PAR_KPC / K_helium, 2));
+      Si_He = sqrt(pow(2.0 * alpha_i.at(i) / R_GAL, 2) + pow(v_conv * CM_TO_KPC / K_helium, 2));
 
-      /* Ai est exprime en [cm s^{-1}]. */
+      /* Ai is in [cm s^{-1}]. */
       Ai_He = v_conv;
       Ai_He +=
-          2.0 * E_DISC * CM_PAR_KPC * (pow(4.0, 2.2 / 3.) * sigma_total_pH(E_nucleon) * v_nucleon * DENSITE_HE_DISC);
-      Ai_He += K_helium * Si_He / CM_PAR_KPC / tanh(Si_He * e_diffus / 2.);
+          2.0 * E_DISC * CM_TO_KPC * (pow(4.0, 2.2 / 3.) * sigma_total_pH(E_nucleon) * v_nucleon * DENSITY_HE_DISC);
+      Ai_He += K_helium * Si_He / CM_TO_KPC / tanh(Si_He * e_diffus / 2.);
 
-      bessel_coef_helium.at(i) = q_i.at(i) / Ai_He; /* expressed in [s^{+1} cm^{-3}]. */
+      bessel_coef_helium_i.at(i) = q_i.at(i) / Ai_He; /* expressed in [s^{+1} cm^{-3}]. */
     }
-
-    production_E_proton = flux_proton_EXP(E_nucleon) / GENERIC_FLUX(r_earth, 0., E_nucleon, MASSE_PROTON, 1.,
-                                                                    bessel_coef_proton); /* [protons s^{-1} GeV^{-1}] */
+    production_E_proton =
+        flux_proton_EXP(E_nucleon) /
+        GENERIC_FLUX(r_earth, 0., E_nucleon, PROTON_MASS, 1., bessel_coef_proton_i); /* [protons s^{-1} GeV^{-1}] */
     production_E_helium = flux_helium_EXP(E_nucleon) /
-                          GENERIC_FLUX(r_earth, 0., (4.0 * E_nucleon), (4.0 * MASSE_PROTON), 2.0,
-                                       bessel_coef_helium); /* expressed in  [helions s^{-1} (GeV/nucleon)^{-1}] */
-    for (i = 1; i <= N_BESSEL; i++)
+                          GENERIC_FLUX(r_earth, 0., (4.0 * E_nucleon), (4.0 * PROTON_MASS), 2.0,
+                                       bessel_coef_helium_i); /* expressed in  [helions s^{-1} (GeV/nucleon)^{-1}] */
+    for (int i = 0; i < N_BESSEL; i++)
     {
-      bessel_coef_proton.at(i) *= production_E_proton; /* expressed now in [protons cm^{-3} GeV^{-1}]. */
-      bessel_coef_helium.at(i) *= production_E_helium; /* Expressed now in [helions cm^{-3} (GeV/nucleon)^{-1}]. */
+      bessel_coef_proton_i.at(i) *= production_E_proton; /* expressed now in [protons cm^{-3} GeV^{-1}]. */
+      bessel_coef_helium_i.at(i) *= production_E_helium; /* Expressed now in [helions cm^{-3} (GeV/nucleon)^{-1}]. */
     }
   }
 
@@ -594,29 +616,29 @@ namespace __SPEC_LIB_NAME__
 
     for (int i_nuc = 0; i_nuc <= DIM_TAB_PROTON; i_nuc++)
     {
-      std::vector<real_t> bessel_coef_proton;
-      std::vector<real_t> bessel_coef_helium;
+      std::vector<real_t> bessel_coef_proton_i;
+      std::vector<real_t> bessel_coef_helium_i;
       E_nuc = E_PROTON_MIN * pow((E_PROTON_MAX / E_PROTON_MIN), ((real_t)i_nuc / (real_t)DIM_TAB_PROTON));
-      calcul_method_B_BESSEL_i(E_nuc, bessel_coef_proton, bessel_coef_helium);
-      for (int i = 1; i <= N_BESSEL; i++)
+      calcul_method_BESSEL_i(E_nuc, bessel_coef_proton_i, bessel_coef_helium_i);
+      for (int i = 0; i < N_BESSEL; i++)
       {
-        bessel_coef_proton_i[i_nuc].at(i) = bessel_coef_proton.at(i);
-        bessel_coef_helium_i[i_nuc].at(i) = bessel_coef_helium.at(i);
+        bessel_coef_proton.at(i_nuc).at(i) = bessel_coef_proton_i.at(i);
+        bessel_coef_helium.at(i_nuc).at(i) = bessel_coef_helium_i.at(i);
       }
     }
   }
 
   //----------------------------------------PRIMARY CONTRIBUTION TO THE ANTIPROTON
   // FLUX--------------------------------------------//
-  void Propagation_param_t::calculation_BESSEL_PBAR_PRIMARY_Epbar_i(long int n_vert, long int n_rad,
-                                                                    std::vector<real_t>& primary_source_term)
+  void Propagation_param_t::calculation_BESSEL_PBAR_PRIMARY(long int n_vert, long int n_rad,
+                                                            std::vector<real_t>& primary_source_term)
   /* This routine calculates Bessel coefficients bessel_pri_pbar_spec
-     for antiproton kinetic energy T_pbar et and Bessel coefficient i. */
+     for antiproton kinetic energy T_pbar and Bessel coefficient i. */
   {
-    real_t T_pbar, E_pbar, impulsion_pbar, v_pbar, K_pbar;
+    real_t T_pbar, E_pbar, momentum_pbar, v_pbar, K_pbar;
     real_t Si, Abar_i;
     real_t e_diffus = equation_parameters.at(2);
-    real_t v_conv = equation_parameters[3];
+    real_t v_conv = equation_parameters.at(3);
 
     real_t x_vert, z_vert, dx_vert, weight_SIMPSON_vert;
     real_t x_rad, r_rad, dx_rad, weight_SIMPSON_rad;
@@ -632,14 +654,14 @@ namespace __SPEC_LIB_NAME__
     /* bessel_pri_pbar_spec is set to zero. */
     for (int i_pbar = 0; i_pbar <= DIM_TAB_PBAR; i_pbar++)
     {
-      for (int i = 0; i <= N_BESSEL; i++)
+      for (int i = 0; i < N_BESSEL; i++)
       {
-        bessel_pri_pbar_spec[i_pbar].at(i) = 0.0;
+        bessel_pri_pbar_spec.at(i_pbar).at(i) = 0.0;
       }
     }
 
     /* bessel_pri_pbar_spec is filled. */
-    for (int i = 1; i <= N_BESSEL; i++)
+    for (int i = 0; i < N_BESSEL; i++)
     {
       /* The radial integral q_pbar_primary_i_z is first calculated.
          \beq
@@ -657,7 +679,7 @@ namespace __SPEC_LIB_NAME__
       for (int i_vert = 0; i_vert <= (2 * n_vert); i_vert++)
       {
         z_vert = e_diffus * x_vert; /* z_vert is the vertical coordinate expressed in [kpc]. */
-        q_pbar_primary_i_z[i_vert] = 0.0;
+        q_pbar_primary_i_z.at(i_vert) = 0.0;
         dx_rad = 1. / (real_t)(2 * n_rad);
         x_rad = 0.0;
         for (int i_rad = 0; i_rad <= (2 * n_rad); i_rad++)
@@ -672,12 +694,13 @@ namespace __SPEC_LIB_NAME__
             weight_SIMPSON_rad = (1. + (real_t)(i_rad % 2)) * 2. / 3.;
           }
 
-          q_pbar_primary_i_z[i_vert] += (x_rad * dx_rad * weight_SIMPSON_rad) * besselj0(alpha_i.at(i) * x_rad) *
-                                        pow(halo_profile(r_rad, z_vert), 2.0); //[NO UNIT].
+          q_pbar_primary_i_z.at(i_vert) += (x_rad * dx_rad * weight_SIMPSON_rad) * besselj0(alpha_i.at(i) * x_rad) *
+                                           pow(halo_profile(r_rad, z_vert), 2.0); //[NO UNIT].
+
 
           x_rad += dx_rad;
         }
-        q_pbar_primary_i_z[i_vert] *= 2. / pow(besselj1(alpha_i.at(i)), 2.0); /* [NO UNIT]. */
+        q_pbar_primary_i_z.at(i_vert) *= 2. / pow(besselj1(alpha_i.at(i)), 2.0); /* [NO UNIT]. */
 
         x_vert += dx_vert;
       }
@@ -687,28 +710,27 @@ namespace __SPEC_LIB_NAME__
       for (int i_pbar = 0; i_pbar <= DIM_TAB_PBAR; i_pbar++)
       {
         T_pbar = T_PBAR_MIN * pow((T_PBAR_MAX / T_PBAR_MIN), ((real_t)i_pbar / (real_t)DIM_TAB_PBAR));
-        E_pbar = T_pbar + MASSE_PROTON;
-        impulsion_pbar = sqrt(pow(E_pbar, 2) - pow(MASSE_PROTON, 2));
-        v_pbar = CELERITY_LIGHT * impulsion_pbar / E_pbar;
-        K_pbar = K_space_diffusion(E_pbar, MASSE_PROTON, 1.0);
-
+        E_pbar = T_pbar + PROTON_MASS;
+        momentum_pbar = sqrt(pow(E_pbar, 2) - pow(PROTON_MASS, 2));
+        v_pbar = CELERITY_LIGHT * momentum_pbar / E_pbar;
+        K_pbar = K_space_diffusion(E_pbar, PROTON_MASS, 1.0);
 
         Si = sqrt(pow(2.0 * alpha_i.at(i) / R_GAL, 2) +
-                  pow(v_conv * CM_PAR_KPC / K_pbar, 2)); /* Si is expressed in [kpc^{-1}]. */
+                  pow(v_conv * CM_TO_KPC / K_pbar, 2)); /* Si is expressed in [kpc^{-1}]. */
 
         Abar_i = v_conv; /* Abar_i is expressed in [cm s^{-1}]. */
-        Abar_i += 2.0 * E_DISC * CM_PAR_KPC *
+        Abar_i += 2.0 * E_DISC * CM_TO_KPC *
                   ((sigma_inelastic_pbarH_TAN_and_NG(E_pbar) - sigma_inelastic_NOANN_pbarH_TAN_and_NG(E_pbar)) *
-                   v_pbar * (DENSITE_H_DISC + pow(4., (2. / 3.)) * 1.0 * DENSITE_HE_DISC));
-        Abar_i += K_pbar * Si / CM_PAR_KPC / tanh(Si * e_diffus / 2.);
+                   v_pbar * (DENSITY_H_DISC + pow(4., (2. / 3.)) * 1.0 * DENSITY_HE_DISC));
+        Abar_i += K_pbar * Si / CM_TO_KPC / tanh(Si * e_diffus / 2.);
 
-        table_abar[i_pbar].at(i) = Abar_i;
+        table_abar.at(i_pbar).at(i) = Abar_i;
 
 
         /* Integration over the vertical variable x_vert and over the radial variable x_rad. */
         dx_vert = 1. / (real_t)(2 * n_vert);
         x_vert = 0.;
-        bessel_pri_pbar_spec[i_pbar].at(i) = 0.0;
+        bessel_pri_pbar_spec.at(i_pbar).at(i) = 0.0;
         for (int i_vert = 0; i_vert <= (2 * n_vert); i_vert++)
         {
           z_vert = e_diffus * x_vert;
@@ -722,15 +744,15 @@ namespace __SPEC_LIB_NAME__
             weight_SIMPSON_vert = (1. + (real_t)(i_vert % 2)) * 2. / 3.;
           }
 
-          bessel_pri_pbar_spec[i_pbar].at(i) +=
-              (dx_vert * weight_SIMPSON_vert) * q_pbar_primary_i_z[i_vert] * primary_source_term[i_pbar] *
-              exp(-v_conv * z_vert * CM_PAR_KPC / (2. * K_pbar)) * sinh((Si / 2.) * (e_diffus - z_vert)) /
+          bessel_pri_pbar_spec.at(i_pbar).at(i) +=
+              (dx_vert * weight_SIMPSON_vert) * q_pbar_primary_i_z.at(i_vert) * primary_source_term.at(i_pbar) *
+              exp(-v_conv * z_vert * CM_TO_KPC / (2. * K_pbar)) * sinh((Si / 2.) * (e_diffus - z_vert)) /
               sinh((Si / 2.) * e_diffus); //[antiprotons cm^{-3} s^{-1} GeV^{-1}].
 
           x_vert += dx_vert;
         }
-        bessel_pri_pbar_spec[i_pbar].at(i) *=
-            2. * e_diffus * CM_PAR_KPC / Abar_i; /* expressed in [antiprotons cm^{-3} GeV^{-1}]. */
+        bessel_pri_pbar_spec.at(i_pbar).at(i) *=
+            2. * e_diffus * CM_TO_KPC / Abar_i; /* expressed in [antiprotons cm^{-3} GeV^{-1}]. */
       }
     }
     return;
@@ -740,58 +762,122 @@ namespace __SPEC_LIB_NAME__
   //----------------------------------------CALCULATING PRIMARY SOURCE
   // TERM--------------------------------------------//
   std::vector<real_t>
-  Propagation_param_t::DNPBAR_ON_DTPBAR_gaelle_read_file(real_t mass_chi,
-                                                         std::vector<std::vector<real_t>>& primary_source_terms_inf,
-                                                         std::vector<std::vector<real_t>>& primary_source_terms_sup)
+  Propagation_param_t::DNPBAR_ON_DTPBAR_read_file(real_t mass_chi,
+                                                  std::vector<std::vector<real_t>>& primary_source_terms_inf,
+                                                  std::vector<std::vector<real_t>>& primary_source_terms_sup)
   /* read tabulated primary par spectra at production for DM masses m_inf and m_sup such that m_inf<=mass_chi<=m_sup
    * aand save the spectra in pt_Primary_Source_Term. */
   {
-    std::vector<real_t> inf_sup_masses;
     std::string filename_inf;
     std::string filename_sup;
-    real_t mass_min, mass_max;
+    real_t mass_min, mass_max, mass_inf, mass_sup;
 
-    std::vector<real_t> mass_list = ind_param.get_DM_masses();
+    std::vector<real_t> mass_list = get_DM_masses();
+
     const int N_MASS = mass_list.size();
-    int i_mass = N_MASS;
+
+
 
     mass_min = mass_list.at(0);
     mass_max = mass_list.at(N_MASS - 1);
 
+    auto read_file_new = [&](const std::string& filename, std::vector<std::vector<real_t>>& primary_source_terms)
+    {
+      // Replicate ind_param.read_file, but adapted to sum contributions from different processes that belong to the
+      // same channel
+      std::fstream file;
+      file.open(filename);
+      if (!file.is_open())
+      {
+        std::cerr << "Could not open read_file " << filename << "\n";
+        exit(1);
+      }
+      std::string line;
+      while (std::getline(file, line))
+      {
+        if (line.empty() || line.at(0) == '#')
+          continue; // Skip comment lines
+        real_t val;
+        int count = 0;
+        std::vector<real_t> values;
+        values.clear();
+        std::stringstream ss(line);
+        if (!std::isdigit(line.at(0)) && line.at(0) != '-' && line.at(0) != '+')
+        {
+          std::string dummy;
+          ss >> dummy; // Skip non-numeric starting values
+        }
+        while (ss >> val)
+        {
+          values.push_back(val);
+        }
+
+        // Assuming 14 channels
+        std::vector<real_t> channels;
+        channels.resize(14);
+        channels.at(0) = (values.at(1) + values.at(2)) / 2.;
+        channels.at(1) = (values.at(3) + values.at(4)) / 2.;
+        channels.at(2) = (values.at(5) + values.at(6)) / 2.;
+        channels.at(3) = values.at(7);
+        channels.at(4) = values.at(8);
+        channels.at(5) = values.at(9);
+        channels.at(6) = values.at(10);
+        channels.at(7) = (2. * values.at(12) + values.at(11)) / 3.;
+        channels.at(8) = (2. * values.at(14) + values.at(13)) / 3.;
+        channels.at(9) = values.at(15);
+        channels.at(10) = values.at(16);
+        channels.at(11) = values.at(17);
+        channels.at(12) = values.at(18);
+        channels.at(13) = values.at(19);
+        primary_source_terms.emplace_back(channels);
+      }
+      std::vector<real_t> dummy_zeros(14, 0);
+      primary_source_terms.emplace_back(dummy_zeros);
+    };
+
     if ((mass_chi < mass_min) || (mass_chi > mass_max))
     {
-      printf("\n ERREUR ! \n Fonction : 'DNPBAR_ON_DTPBAR_gaelle_read_file'  \n mass_chi is out of range ! \n");
+      printf("\n ERROR ! \n Function : 'DNPBAR_ON_DTPBAR_read_file'  \n mass_chi is out of range ! \n");
       exit(0);
     }
     if ((mass_chi >= mass_min) && (mass_chi <= mass_max))
     {
       int ind_mass = 0;
-      for (const auto& file : std::filesystem::directory_iterator(PRIMARY_PBAR_SOURCES))
+      while (mass_chi < mass_list.at(ind_mass) || mass_chi >= mass_list.at(ind_mass + 1))
       {
-        if (mass_chi >= mass_list.at(ind_mass) && mass_chi < mass_list.at(ind_mass + 1))
-        {
-          i_mass = ind_mass;
-          filename_inf = file.path().string();
-          ind_param.read_file(filename_inf, 15, primary_source_terms_inf);
-          inf_sup_masses.push_back(mass_list.at(ind_mass));
-        }
-
-        if (ind_mass == i_mass + 1)
-        {
-          filename_sup = file.path().string();
-          ind_param.read_file(filename_sup, 15, primary_source_terms_sup);
-          inf_sup_masses.push_back(mass_list.at(ind_mass));
-          break;
-        }
         ind_mass++;
       }
+      // prevents the singularities due to the opening of W, Z, or t channels
+      if (mass_chi < 90 && mass_chi > 80)
+        ind_mass++;
+      if (mass_chi < 100 && mass_chi > 90)
+        ind_mass++;
+      if (mass_chi < 200 && mass_chi > 173)
+        ind_mass++;
+      for (const auto& file : std::filesystem::directory_iterator(PRIMARY_PBAR_SOURCES))
+      {
+        std::string filename = file.path().string();
+        if (std::stod(file.path().stem().string()) == mass_list.at(ind_mass))
+        {
+          filename_inf = file.path().string();
+          read_file_new(filename_inf, primary_source_terms_inf);
+          mass_inf = mass_list.at(ind_mass);
+        }
+        else if (std::stod(file.path().stem().string()) == mass_list.at(ind_mass + 1))
+        {
+          filename_sup = file.path().string();
+          read_file_new(filename_sup, primary_source_terms_sup);
+          mass_sup = mass_list.at(ind_mass + 1);
+        }
+      }
     }
-    return inf_sup_masses;
+
+    return {mass_inf, mass_sup};
   }
 
 
 
-  real_t Propagation_param_t::dNpbar_on_dEpbar_primary_calculation_Br(std::vector<real_t>& dNpbar_on_dEpbar_vec)
+  int Propagation_param_t::dNpbar_on_dEpbar_calculation(std::vector<real_t>& dNpbar_on_dEpbar_vec)
   /* Calculates the primary pbar spectrum for a DM particle whose mass and annihilation channels ared defined in spec
    * and save it in pt_Primary_Source_Term */
   {
@@ -800,30 +886,34 @@ namespace __SPEC_LIB_NAME__
     real_t dNpbar_on_dEpbar_xi_m, dNpbar_on_dEpbar_xi_plus_un_m;
     int DM_candidate = input.getLightestBSMpart();
     real_t mass_chi = input.masses_vector.at(DM_candidate);
-    auto sigma_v_process = ind_param.get_sigma_v_process();
-    auto processes = ind_param.get_processes();
+    auto energy_table = get_energy_table();
 
-    ind_param.fill_spectrum(processes, sigma_v_process, 2. * mass_chi);
-    auto sigma_v_table = ind_param.get_sigma_v_table();
+    if (energy_table.size() == 0)
+    {
+      std::cerr << "Energy table is empty, filling the spectrum with the processes and sigma_v_process\n";
+      ind_param.fill_spectrum();
+      energy_table = get_energy_table();
+    }
+
+    auto sigma_v_table = get_sigma_v_table();
     int n1 = sigma_v_table.at(0).size();
     int number_channels = sigma_v_table.size();
+    dNpbar_on_dEpbar_vec.resize(DIM_TAB_PBAR + 1);
+
+    std::vector<std::vector<real_t>> temp_source_terms_inf, temp_source_terms_sup;
+
+
 
     for (int i_mass = 0; i_mass < n1; i_mass++)
     {
-
-      std::vector<std::vector<real_t>> temp_source_terms_inf, temp_source_terms_sup;
-
-
-      dNpbar_on_dEpbar_vec.resize(DIM_TAB_PBAR + 1);
-
-      auto inf_sup_masses = DNPBAR_ON_DTPBAR_gaelle_read_file(mass_chi, temp_source_terms_inf, temp_source_terms_sup);
+      real_t mass_chi_new = energy_table.at(i_mass);
+      auto inf_sup_masses = DNPBAR_ON_DTPBAR_read_file(mass_chi_new, temp_source_terms_inf, temp_source_terms_sup);
       real_t mass_inf = inf_sup_masses.at(0);
       real_t mass_sup = inf_sup_masses.at(1);
-
       for (int i_pbar = 0; i_pbar <= DIM_TAB_PBAR; i_pbar++)
       {
         T_pbar = T_PBAR_MIN * pow((T_PBAR_MAX / T_PBAR_MIN), ((real_t)i_pbar / (real_t)DIM_TAB_PBAR));
-        x_pbar = T_pbar / mass_chi;
+        x_pbar = T_pbar / mass_chi_new;
 
         if (x_pbar < x_pbar_scan_min)
         {
@@ -836,49 +926,48 @@ namespace __SPEC_LIB_NAME__
           if (xi_x_pbar > ((real_t)N_x_pbar_scan))
           {
             printf(
-                "\n ERREUR ! \n Fonction : 'dNpbar_on_dEpbar_primary_calculation'  \n xi_x_pbar >= N_x_pbar_scan ! \n");
-            exit(0);
+                "\n ERROR ! \n Function : 'dNpbar_on_dEpbar_primary_calculation'  \n xi_x_pbar >= N_x_pbar_scan ! \n");
+            return 0;
           }
           else if (xi_x_pbar == ((real_t)N_x_pbar_scan))
           {
-            for (int channel = 1; channel <= number_channels; channel++)
+            for (int channel = 0; channel < number_channels; channel++)
             {
-              dNpbar_on_dEpbar_vec[i_pbar] +=
-                  sigma_v_table[i_mass][channel - 1] * temp_source_terms_inf[channel][N_x_pbar_scan];
-              dNpbar_on_dEpbar_vec[i_pbar] +=
-                  sigma_v_table[i_mass][channel - 1] *
-                  (temp_source_terms_sup[channel][N_x_pbar_scan] - temp_source_terms_inf[channel][N_x_pbar_scan]) *
-                  (mass_chi - mass_inf) / (mass_sup - mass_inf);
+              dNpbar_on_dEpbar_vec.at(i_pbar) +=
+                  sigma_v_table.at(channel).at(i_mass) * temp_source_terms_inf.at(N_x_pbar_scan).at(channel);
+              dNpbar_on_dEpbar_vec.at(i_pbar) += sigma_v_table.at(channel).at(i_mass) *
+                                                 (temp_source_terms_sup.at(N_x_pbar_scan).at(channel) -
+                                                  temp_source_terms_inf.at(N_x_pbar_scan).at(channel)) *
+                                                 (mass_chi_new - mass_inf) / (mass_sup - mass_inf);
             }
           }
           else
           {
             i_scan_pbar = xi_x_pbar;
-
-            for (int channel = 1; channel <= number_channels; channel++)
+            for (int channel = 0; channel < number_channels; channel++)
             {
-              dNpbar_on_dEpbar_xi_m = temp_source_terms_inf[channel][i_scan_pbar];
-              dNpbar_on_dEpbar_xi_m +=
-                  (temp_source_terms_sup[channel][i_scan_pbar] - temp_source_terms_inf[channel][i_scan_pbar]) *
-                  (mass_chi - mass_inf) / (mass_sup - mass_inf);
+              dNpbar_on_dEpbar_xi_m = temp_source_terms_inf.at(i_scan_pbar).at(channel);
+              dNpbar_on_dEpbar_xi_m += (temp_source_terms_sup.at(i_scan_pbar).at(channel) -
+                                        temp_source_terms_inf.at(i_scan_pbar).at(channel)) *
+                                       (mass_chi_new - mass_inf) / (mass_sup - mass_inf);
 
 
-              dNpbar_on_dEpbar_xi_plus_un_m = temp_source_terms_inf[channel][i_scan_pbar + 1];
-              dNpbar_on_dEpbar_xi_plus_un_m +=
-                  (temp_source_terms_sup[channel][i_scan_pbar + 1] - temp_source_terms_inf[channel][i_scan_pbar + 1]) *
-                  (mass_chi - mass_inf) / (mass_sup - mass_inf);
+              dNpbar_on_dEpbar_xi_plus_un_m = temp_source_terms_inf.at(i_scan_pbar + 1).at(channel);
+              dNpbar_on_dEpbar_xi_plus_un_m += (temp_source_terms_sup.at(i_scan_pbar + 1).at(channel) -
+                                                temp_source_terms_inf.at(i_scan_pbar + 1).at(channel)) *
+                                               (mass_chi_new - mass_inf) / (mass_sup - mass_inf);
 
 
-              dNpbar_on_dEpbar_vec[i_pbar] += sigma_v_table[i_mass][channel - 1] * dNpbar_on_dEpbar_xi_m;
-              dNpbar_on_dEpbar_vec[i_pbar] += sigma_v_table[i_mass][channel - 1] *
-                                              (dNpbar_on_dEpbar_xi_plus_un_m - dNpbar_on_dEpbar_xi_m) *
-                                              (xi_x_pbar - (real_t)i_scan_pbar);
+              dNpbar_on_dEpbar_vec.at(i_pbar) += sigma_v_table.at(channel).at(i_mass) * dNpbar_on_dEpbar_xi_m;
+              dNpbar_on_dEpbar_vec.at(i_pbar) += sigma_v_table.at(channel).at(i_mass) *
+                                                 (dNpbar_on_dEpbar_xi_plus_un_m - dNpbar_on_dEpbar_xi_m) *
+                                                 (xi_x_pbar - (real_t)i_scan_pbar);
             }
           }
         }
         if (x_pbar_scan_max <= x_pbar)
         {
-          dNpbar_on_dEpbar_vec[i_pbar] += 0.0;
+          dNpbar_on_dEpbar_vec.at(i_pbar) += 0.0;
         }
       }
     }
@@ -886,28 +975,28 @@ namespace __SPEC_LIB_NAME__
   }
 
 
-
-  void Propagation_param_t::primary_source_calculation(real_t mass_chi, real_t sigmav,
-                                                       std::vector<real_t>& dNpbar_on_dEpbar_vec,
+  void Propagation_param_t::primary_source_calculation(real_t mass_chi, std::vector<real_t>& dNpbar_on_dEpbar_vec,
                                                        std::vector<real_t>& primary_source_term)
   /* modulates the primary pbar spectrum at production with the total annihilation cross section and the DM number
    * density */
   {
+    std::cerr << "Calculating primary source term...\n";
+
     primary_source_term.resize(DIM_TAB_PBAR + 1);
 
-    dNpbar_on_dEpbar_primary_calculation_Br(dNpbar_on_dEpbar_vec);
+    dNpbar_on_dEpbar_calculation(dNpbar_on_dEpbar_vec);
 
     for (int i_pbar = 0; i_pbar <= DIM_TAB_PBAR; i_pbar++)
     {
-      if (dNpbar_on_dEpbar_vec[i_pbar] > 1.0e-100)
-        primary_source_term[i_pbar] = 0.5 * sigmav * pow((RHO_CHI_0 / mass_chi), 2.0) *
-                                      dNpbar_on_dEpbar_vec[i_pbar]; // [#pbar cm{-3} s{-1} GeV{-1}]
+      if (dNpbar_on_dEpbar_vec.at(i_pbar) > 1.0e-100)
+        primary_source_term.at(i_pbar) = 0.5 * sigma_v_annihilation * pow((RHO_CHI_0 / mass_chi), 2.0) *
+                                         dNpbar_on_dEpbar_vec.at(i_pbar); // [#pbar cm{-3} s{-1} GeV{-1}]
     }
   }
 
-  void Propagation_param_t::primary_spectra_BCGS_2014_Br(std::vector<real_t>& dNpbar_on_dEpbar_vec,
-                                                         std::vector<real_t>& primary_source_term,
-                                                         std::vector<std::vector<real_t>>& PBAR_SPECTRUM)
+  void Propagation_param_t::primary_spectra_BCGS_2014(std::vector<real_t>& dNpbar_on_dEpbar_vec,
+                                                      std::vector<real_t>& primary_source_term,
+                                                      std::vector<std::vector<real_t>>& PBAR_SPECTRUM)
   /* Calculates the primary pbar spectrum at Earth position for a DM particle defined in structure spec and save the
    * result in array PBAR_SPECTRUM */
   {
@@ -918,7 +1007,6 @@ namespace __SPEC_LIB_NAME__
 
     real_t T_pbar_IS, E_pbar_IS, flux_antiproton_IS;
 
-    std::vector<real_t> BESSEL_PBARi;
     PBAR_SPECTRUM.resize(DIM_TAB_PBAR + 1);
 
     for (int i = 0; i <= DIM_TAB_PBAR; i++)
@@ -927,63 +1015,64 @@ namespace __SPEC_LIB_NAME__
     }
 
 
-    real_t sigma_v_annihilation = ind_param.get_total_sigma_v();
-    primary_source_calculation(mass_chi, sigma_v_annihilation, dNpbar_on_dEpbar_vec, primary_source_term);
+    primary_source_calculation(mass_chi, dNpbar_on_dEpbar_vec, primary_source_term);
+
 
     /* We define the parameters determined by FIORENZA, DAVID et RICHARD -- hereafter called FDR. */
 
     /* pt_Pbar->BESSEL_PBAR_SEC_Epbar_i and pt_Pbar->BESSEL_PBAR_TER_Epbar_i are set to zero. */
     for (int i_pbar = 0; i_pbar <= DIM_TAB_PBAR; i_pbar++)
     {
-      for (int i = 0; i <= N_BESSEL; i++)
+      for (int i = 0; i < N_BESSEL; i++)
       {
-        bessel_pri_pbar_spec[i_pbar].at(i) = 0.0;
-        bessel_sec_pbar_spec[i_pbar].at(i) = 0.0;
-        bessel_ter_pbar_spec[i_pbar].at(i) = 0.0;
+        bessel_pri_pbar_spec.at(i_pbar).at(i) = 0.0;
+        bessel_sec_pbar_spec.at(i_pbar).at(i) = 0.0;
+        bessel_ter_pbar_spec.at(i_pbar).at(i) = 0.0;
       }
     }
 
     /* CALCULATION OF THE PRIMARY CONTRIBUTION FROM NEUTRALINO ANNIHILATION */
-    calculation_BESSEL_PBAR_PRIMARY_Epbar_i(100, 500, primary_source_term);
+    calculation_BESSEL_PBAR_PRIMARY(100, 500, primary_source_term);
 
     /* CALCULATION OF SECONDARY CONTRIBUTION FROM THE INTERSTELLAR GAS SPALLATION BY COSMIC-RAY PROTONS AND HELIONS */
-    calculation_BESSEL_PBAR_SUM_123_Epbar_i();
+    calculation_BESSEL_PBAR_SUM();
 
     /* CALCULATION OF FINAL ANTIPROTON SPECTRUM */
     for (int i_iteration = 1; i_iteration <= 5; i_iteration++)
     {
-      calculation_BESSEL_PBAR_TERTIARY_Epbar_i();
-      calculation_BESSEL_PBAR_SUM_123_Epbar_i();
+      calculation_BESSEL_PBAR_TERTIARY();
+      calculation_BESSEL_PBAR_SUM();
     }
 
     for (int i_iteration = 1; i_iteration <= 5; i_iteration++)
     {
-      calculation_BESSEL_PBAR_TERTIARY_Epbar_i();
-      calculation_BESSEL_PBAR_TOT_direct_inversion_A();
+      calculation_BESSEL_PBAR_TERTIARY();
+      calculation_BESSEL_PBAR_direct_inversion();
     }
 
     /* We compute now the antiproton spectrum */
     for (int i_pbar = 0; i_pbar <= DIM_TAB_PBAR; i_pbar++)
     {
+      std::vector<real_t> BESSEL_PBARi;
       T_pbar_IS = T_PBAR_MIN * pow((T_PBAR_MAX / T_PBAR_MIN), ((real_t)i_pbar / (real_t)DIM_TAB_PBAR));
-      PBAR_SPECTRUM[i_pbar].at(0) = log10(T_pbar_IS);
-      E_pbar_IS = T_pbar_IS + MASSE_PROTON;
-      for (int i = 1; i <= N_BESSEL; i++)
+      PBAR_SPECTRUM.at(i_pbar).at(0) = log10(T_pbar_IS);
+      E_pbar_IS = T_pbar_IS + PROTON_MASS;
+      for (int i = 0; i < N_BESSEL; i++)
       {
-        BESSEL_PBARi.push_back(bessel_tot_pbar_spec[i_pbar].at(i));
+        BESSEL_PBARi.push_back(bessel_tot_pbar_spec.at(i_pbar).at(i));
       }
-      flux_antiproton_IS = GENERIC_FLUX_04(r_earth, 0., E_pbar_IS, MASSE_PROTON, 1., BESSEL_PBARi);
-      PBAR_SPECTRUM[i_pbar].at(1) = flux_antiproton_IS * 1.0e+4 / 3.e-26;
+      flux_antiproton_IS = GENERIC_FLUX_04(r_earth, 0., E_pbar_IS, PROTON_MASS, 1., BESSEL_PBARi);
+      PBAR_SPECTRUM.at(i_pbar).at(1) = flux_antiproton_IS * 1.0e+4 / 3.e-26;
     }
   }
 
   //----------------------------------------SECONDARY CONTRIBUTION--------------------------------------------//
-  void Propagation_param_t::calculation_BESSEL_PBAR_SECONDARY_Epbar_i()
+  void Propagation_param_t::calculation_BESSEL_PBAR_SECONDARY()
   /* This routine computes the elements of the array  bessel_sec_pbar_spec
      as a function of the antiproton kinetic energy T_pbar and BESSEL coefficients i. */
   {
 
-    real_t T_pbar, E_pbar, impulsion_pbar, v_pbar, K_pbar;
+    real_t T_pbar, E_pbar, momentum_pbar, v_pbar, K_pbar;
     real_t Si, Abar_i;
     real_t dlog_E_proton, E_proton;
     std::vector<real_t> impulsion_proton, weight_SIMSPON;
@@ -992,14 +1081,14 @@ namespace __SPEC_LIB_NAME__
 
 
     real_t e_diffus = equation_parameters.at(2);
-    real_t v_conv = equation_parameters[3];
+    real_t v_conv = equation_parameters.at(3);
 
     for (int i_pbar = 0; i_pbar <= DIM_TAB_PBAR; i_pbar++)
     /* bessel_sec_pbar_spec and table_abar are set to zero. */
     {
-      for (int i = 0; i <= N_BESSEL; i++)
+      for (int i = 0; i < N_BESSEL; i++)
       {
-        bessel_sec_pbar_spec[i_pbar].at(i) = 0.0;
+        bessel_sec_pbar_spec.at(i_pbar).at(i) = 0.0;
       }
     }
 
@@ -1008,15 +1097,15 @@ namespace __SPEC_LIB_NAME__
     /* Loop on the protons in order to calulate E_proton, v_proton and weight_SIMSPON. */
     {
       E_proton = E_PROTON_MIN * pow((E_PROTON_MAX / E_PROTON_MIN), ((real_t)i_proton / (real_t)DIM_TAB_PROTON));
-      impulsion_proton[i_proton] = sqrt(pow(E_proton, 2) - pow(MASSE_PROTON, 2));
+      impulsion_proton.at(i_proton) = sqrt(pow(E_proton, 2) - pow(PROTON_MASS, 2));
 
       if (i_proton == 0 || i_proton == DIM_TAB_PROTON)
       {
-        weight_SIMSPON[i_proton] = 1. / 3.;
+        weight_SIMSPON.at(i_proton) = 1. / 3.;
       }
       else
       {
-        weight_SIMSPON[i_proton] = (1. + (real_t)(i_proton % 2)) * 2. / 3.;
+        weight_SIMSPON.at(i_proton) = (1. + (real_t)(i_proton % 2)) * 2. / 3.;
       }
     }
 
@@ -1024,53 +1113,53 @@ namespace __SPEC_LIB_NAME__
     for (int i_pbar = 0; i_pbar <= DIM_TAB_PBAR; i_pbar++)
     /* Array BESSEL_PBAR_SEC_Epbar_i is filled. */
     {
-      table_abar[i_pbar].resize(N_BESSEL + 1);
+      table_abar.at(i_pbar).resize(N_BESSEL);
       T_pbar = T_PBAR_MIN * pow((T_PBAR_MAX / T_PBAR_MIN), ((real_t)i_pbar / (real_t)DIM_TAB_PBAR));
-      E_pbar = T_pbar + MASSE_PROTON;
-      impulsion_pbar = sqrt(pow(E_pbar, 2) - pow(MASSE_PROTON, 2));
-      v_pbar = CELERITY_LIGHT * impulsion_pbar / E_pbar;
-      K_pbar = K_space_diffusion(E_pbar, MASSE_PROTON, 1.0);
+      E_pbar = T_pbar + PROTON_MASS;
+      momentum_pbar = sqrt(pow(E_pbar, 2) - pow(PROTON_MASS, 2));
+      v_pbar = CELERITY_LIGHT * momentum_pbar / E_pbar;
+      K_pbar = K_space_diffusion(E_pbar, PROTON_MASS, 1.0);
 
-      for (int i = 1; i <= N_BESSEL; i++)
+      for (int i = 0; i < N_BESSEL; i++)
       {
         /* Si is in [kpc^{-1}]. */
-        Si = sqrt(pow(2.0 * alpha_i.at(i) / R_GAL, 2) + pow(v_conv * CM_PAR_KPC / K_pbar, 2));
+        Si = sqrt(pow(2.0 * alpha_i.at(i) / R_GAL, 2) + pow(v_conv * CM_TO_KPC / K_pbar, 2));
         /* Abar_i in [cm s^{-1}]. */
         Abar_i = v_conv;
-        Abar_i += 2.0 * E_DISC * CM_PAR_KPC *
+        Abar_i += 2.0 * E_DISC * CM_TO_KPC *
                   ((sigma_inelastic_pbarH_TAN_and_NG(E_pbar) - sigma_inelastic_NOANN_pbarH_TAN_and_NG(E_pbar)) *
-                   v_pbar * (DENSITE_H_DISC + pow(4., (2. / 3.)) * 1.0 * DENSITE_HE_DISC));
-        Abar_i += K_pbar * Si / CM_PAR_KPC / tanh(Si * e_diffus / 2.);
-        table_abar[i_pbar].at(i) = Abar_i;
+                   v_pbar * (DENSITY_H_DISC + pow(4., (2. / 3.)) * 1.0 * DENSITY_HE_DISC));
+        Abar_i += K_pbar * Si / CM_TO_KPC / tanh(Si * e_diffus / 2.);
+        table_abar.at(i_pbar).at(i) = Abar_i;
 
 
         for (int i_proton = 0; i_proton <= DIM_TAB_PROTON; i_proton++)
         {
           /* CONTRIBUTION H ON H */
-          bessel_sec_pbar_spec[i_pbar].at(i) += h_on_h_xsection[i_pbar][i_proton] *
-                                                bessel_coef_proton_i[i_proton].at(i) * DENSITE_H_DISC *
-                                                impulsion_proton[i_proton] * CELERITY_LIGHT * weight_SIMSPON[i_proton] *
-                                                dlog_E_proton; // [antiprotons GeV^{-1} s^{-1} cm^{-3}]
+          bessel_sec_pbar_spec.at(i_pbar).at(i) +=
+              h_on_h_xsection.at(i_proton).at(i_pbar) * bessel_coef_proton.at(i_proton).at(i) * DENSITY_H_DISC *
+              impulsion_proton.at(i_proton) * CELERITY_LIGHT * weight_SIMSPON.at(i_proton) *
+              dlog_E_proton; // [antiprotons GeV^{-1} s^{-1} cm^{-3}]
 
           /* CONTRIBUTION H ON HE */
-          bessel_sec_pbar_spec[i_pbar].at(i) += h_on_he_xsection[i_pbar][i_proton] *
-                                                bessel_coef_proton_i[i_proton].at(i) * DENSITE_HE_DISC *
-                                                impulsion_proton[i_proton] * CELERITY_LIGHT * weight_SIMSPON[i_proton] *
-                                                dlog_E_proton; // [antiprotons GeV^{-1} s^{-1} cm^{-3}]
+          bessel_sec_pbar_spec.at(i_pbar).at(i) +=
+              h_on_he_xsection.at(i_proton).at(i_pbar) * bessel_coef_proton.at(i_proton).at(i) * DENSITY_HE_DISC *
+              impulsion_proton.at(i_proton) * CELERITY_LIGHT * weight_SIMSPON.at(i_proton) *
+              dlog_E_proton; // [antiprotons GeV^{-1} s^{-1} cm^{-3}]
 
           /* CONTRIBUTION HE ON H */
-          bessel_sec_pbar_spec[i_pbar].at(i) += he_on_h_xsection[i_pbar][i_proton] *
-                                                bessel_coef_helium_i[i_proton].at(i) * DENSITE_H_DISC *
-                                                impulsion_proton[i_proton] * CELERITY_LIGHT * weight_SIMSPON[i_proton] *
-                                                dlog_E_proton; // [antiprotons GeV^{-1} s^{-1} cm^{-3}]
+          bessel_sec_pbar_spec.at(i_pbar).at(i) +=
+              he_on_h_xsection.at(i_proton).at(i_pbar) * bessel_coef_helium.at(i_proton).at(i) * DENSITY_H_DISC *
+              impulsion_proton.at(i_proton) * CELERITY_LIGHT * weight_SIMSPON.at(i_proton) *
+              dlog_E_proton; // [antiprotons GeV^{-1} s^{-1} cm^{-3}]
 
           /* CONTRIBUTION HE ON HE */
-          bessel_sec_pbar_spec[i_pbar].at(i) += he_on_he_xsection[i_pbar][i_proton] *
-                                                bessel_coef_helium_i[i_proton].at(i) * DENSITE_HE_DISC *
-                                                impulsion_proton[i_proton] * CELERITY_LIGHT * weight_SIMSPON[i_proton] *
-                                                dlog_E_proton; //[antiprotons GeV^{-1} s^{-1} cm^{-3}]
+          bessel_sec_pbar_spec.at(i_pbar).at(i) +=
+              he_on_he_xsection.at(i_proton).at(i_pbar) * bessel_coef_helium.at(i_proton).at(i) * DENSITY_HE_DISC *
+              impulsion_proton.at(i_proton) * CELERITY_LIGHT * weight_SIMSPON.at(i_proton) *
+              dlog_E_proton; //[antiprotons GeV^{-1} s^{-1} cm^{-3}]
         }
-        bessel_sec_pbar_spec[i_pbar].at(i) *= 2. * E_DISC * CM_PAR_KPC / Abar_i;
+        bessel_sec_pbar_spec.at(i_pbar).at(i) *= 2. * E_DISC * CM_TO_KPC / Abar_i;
         /* expressed in [antiprotons cm^{-3} GeV^{-1}]. */
       }
     }
@@ -1079,14 +1168,19 @@ namespace __SPEC_LIB_NAME__
   void Propagation_param_t::preliminary_secondary_spectrum_IS_calculation()
   /* Routine which computes the secondary antiproton spectrum */
   {
+    xs_uncertainties.resize(DIM_TAB_PBAR + 1);
+
     for (int i_pbar = 0; i_pbar <= DIM_TAB_PBAR; i_pbar++)
     {
-      for (int i = 0; i <= N_BESSEL; i++)
+      xs_uncertainties.at(i_pbar).resize(3); /* Element 0 is energy,
+      1 and 2 are the lower and upper bounds of the secondary spectra, respectively*/
+
+      for (int i = 0; i < N_BESSEL; i++)
       {
-        bessel_pri_pbar_spec[i_pbar].at(i) = 0.0;
-        bessel_sec_pbar_spec[i_pbar].at(i) = 0.0;
-        bessel_ter_pbar_spec[i_pbar].at(i) = 0.0;
-        bessel_tot_pbar_spec[i_pbar].at(i) = 0.0;
+        bessel_pri_pbar_spec.at(i_pbar).at(i) = 0.0;
+        bessel_sec_pbar_spec.at(i_pbar).at(i) = 0.0;
+        bessel_ter_pbar_spec.at(i_pbar).at(i) = 0.0;
+        bessel_tot_pbar_spec.at(i_pbar).at(i) = 0.0;
       }
     }
 
@@ -1095,48 +1189,47 @@ namespace __SPEC_LIB_NAME__
     calculation_BESSEL_Ep_i();
 
     /* PBAR_IS_spectrum_II_MIN is filled */
-    calculation_BESSEL_PBAR_SECONDARY_Epbar_i();
+    calculation_BESSEL_PBAR_SECONDARY();
     calculation_XS_UNCERTAINTIES_ON_BESSEL_PBAR_SECONDARY(-1);
-    calculation_BESSEL_PBAR_SUM_123_Epbar_i();
+    calculation_BESSEL_PBAR_SUM();
     ELDR_effect_calculation();
 
     real_t T_pbar_IS, E_pbar_IS, flux_antiproton_IS;
 
-    std::vector<real_t> BESSEL_PBARi;
 
     for (int i_pbar = 0; i_pbar <= DIM_TAB_PBAR; i_pbar++)
     {
-
+      std::vector<real_t> BESSEL_PBARi_minus;
       T_pbar_IS = T_PBAR_MIN * pow((T_PBAR_MAX / T_PBAR_MIN), ((real_t)i_pbar / (real_t)DIM_TAB_PBAR));
-      E_pbar_IS = T_pbar_IS + MASSE_PROTON;
-      for (int i = 1; i <= N_BESSEL; i++)
+      E_pbar_IS = T_pbar_IS + PROTON_MASS;
+      for (int i = 0; i < N_BESSEL; i++)
       {
-        BESSEL_PBARi.push_back(bessel_tot_pbar_spec[i_pbar].at(i));
+        BESSEL_PBARi_minus.push_back(bessel_tot_pbar_spec.at(i_pbar).at(i));
       }
-      flux_antiproton_IS = GENERIC_FLUX_04(r_earth, 0., E_pbar_IS, MASSE_PROTON, 1., BESSEL_PBARi);
+      flux_antiproton_IS = GENERIC_FLUX_04(r_earth, 0., E_pbar_IS, PROTON_MASS, 1., BESSEL_PBARi_minus);
 
-      xs_uncertainties[i_pbar].at(0) = (T_pbar_IS);
-      xs_uncertainties[i_pbar].at(1) = flux_antiproton_IS * 1.0e4; /* [#pbar cm^{-2} sr^{-1} s^{-1} GeV^{-1}] */
+      xs_uncertainties.at(i_pbar).at(0) = (T_pbar_IS);
+      xs_uncertainties.at(i_pbar).at(1) = flux_antiproton_IS * 1.0e4; /* [#pbar cm^{-2} sr^{-1} s^{-1} GeV^{-1}] */
     }
 
     /* PBAR_IS_spectrum_II_MAX is filled */
-    calculation_BESSEL_PBAR_SECONDARY_Epbar_i();
+    calculation_BESSEL_PBAR_SECONDARY();
     calculation_XS_UNCERTAINTIES_ON_BESSEL_PBAR_SECONDARY(1);
-    calculation_BESSEL_PBAR_SUM_123_Epbar_i();
+    calculation_BESSEL_PBAR_SUM();
     ELDR_effect_calculation();
 
     for (int i_pbar = 0; i_pbar <= DIM_TAB_PBAR; i_pbar++)
     {
-
+      std::vector<real_t> BESSEL_PBARi_plus;
       T_pbar_IS = T_PBAR_MIN * pow((T_PBAR_MAX / T_PBAR_MIN), ((real_t)i_pbar / (real_t)DIM_TAB_PBAR));
-      E_pbar_IS = T_pbar_IS + MASSE_PROTON;
-      for (int i = 1; i <= N_BESSEL; i++)
+      E_pbar_IS = T_pbar_IS + PROTON_MASS;
+      for (int i = 0; i < N_BESSEL; i++)
       {
-        BESSEL_PBARi.at(i) = bessel_tot_pbar_spec[i_pbar].at(i);
+        BESSEL_PBARi_plus.push_back(bessel_tot_pbar_spec[i_pbar].at(i));
       }
-      flux_antiproton_IS = GENERIC_FLUX_04(r_earth, 0., E_pbar_IS, MASSE_PROTON, 1., BESSEL_PBARi);
+      flux_antiproton_IS = GENERIC_FLUX_04(r_earth, 0., E_pbar_IS, PROTON_MASS, 1., BESSEL_PBARi_plus);
 
-      xs_uncertainties[i_pbar].at(2) = flux_antiproton_IS * 1.0e+4; /* [#pbar cm^{-2} sr^{-1} s^{-1} GeV^{-1}] */
+      xs_uncertainties.at(i_pbar).at(2) = flux_antiproton_IS * 1.0e+4; /* [#pbar cm^{-2} sr^{-1} s^{-1} GeV^{-1}] */
     }
 
     return;
@@ -1155,11 +1248,11 @@ namespace __SPEC_LIB_NAME__
     {
 
 
-      std::vector<real_t> ENERGY, F_Q_PBAR_SEC_PLUS, F_Q_PBAR_SEC_MOINS;
+      std::vector<real_t> ENERGY, F_Q_PBAR_SEC_PLUS, F_Q_PBAR_SEC_MINUS;
       ENERGY.resize(DIM_TAB_PBAR_MFGS);
       F_Q_PBAR_SEC_PLUS.resize(DIM_TAB_PBAR_MFGS);
-      F_Q_PBAR_SEC_MOINS.resize(DIM_TAB_PBAR_MFGS);
-      real_t T_pbar, q_pbar, q_pbar_sec_moins, q_pbar_sec_plus;
+      F_Q_PBAR_SEC_MINUS.resize(DIM_TAB_PBAR_MFGS);
+      real_t T_pbar, q_pbar, q_pbar_sec_minus, q_pbar_sec_plus;
 
       std::vector<std::vector<real_t>> temp_errors;
       ind_param.read_file(XSECTION_ERRORS, 4, temp_errors);
@@ -1167,62 +1260,62 @@ namespace __SPEC_LIB_NAME__
       for (int i_pbar = 0; i_pbar < DIM_TAB_PBAR_MFGS; i_pbar++)
       {
 
-        T_pbar = temp_errors[i_pbar].at(0);
-        q_pbar = temp_errors[i_pbar].at(1);
-        q_pbar_sec_moins = temp_errors[i_pbar].at(2);
-        q_pbar_sec_plus = temp_errors[i_pbar][3];
+        T_pbar = temp_errors.at(i_pbar).at(0);
+        q_pbar = temp_errors.at(i_pbar).at(1);
+        q_pbar_sec_minus = temp_errors.at(i_pbar).at(2);
+        q_pbar_sec_plus = temp_errors.at(i_pbar).at(3);
 
-        ENERGY[i_pbar] = T_pbar;
-        F_Q_PBAR_SEC_PLUS[i_pbar] = q_pbar_sec_plus / q_pbar;
-        F_Q_PBAR_SEC_MOINS[i_pbar] = q_pbar_sec_moins / q_pbar;
+
+        ENERGY.at(i_pbar) = T_pbar;
+        F_Q_PBAR_SEC_PLUS.at(i_pbar) = q_pbar_sec_plus / q_pbar;
+        F_Q_PBAR_SEC_MINUS.at(i_pbar) = q_pbar_sec_minus / q_pbar;
       }
 
       for (int i_pbar = 0; i_pbar <= DIM_TAB_PBAR; i_pbar++)
       {
-        real_t Energie_pbar = pow((T_PBAR_MAX / T_PBAR_MIN), ((real_t)i_pbar / (real_t)DIM_TAB_PBAR)) * T_PBAR_MIN;
+        real_t Energy_pbar = pow((T_PBAR_MAX / T_PBAR_MIN), ((real_t)i_pbar / (real_t)DIM_TAB_PBAR)) * T_PBAR_MIN;
 
         int j_mem = -1;
 
-        if (Energie_pbar < ENERGY.at(0))
+        if (Energy_pbar < ENERGY.at(0))
         {
           j_mem = 0;
         }
-        else if (Energie_pbar > ENERGY[DIM_TAB_PBAR_MFGS - 1])
+        else if (Energy_pbar > ENERGY.at(DIM_TAB_PBAR_MFGS - 1))
         {
           j_mem = DIM_TAB_PBAR_MFGS - 2;
         }
         else
         {
           int j;
-          for (j = 0; j < DIM_TAB_PBAR_MFGS; j++)
+          for (j = 0; j < DIM_TAB_PBAR_MFGS - 1; j++)
           {
 
-            if (Energie_pbar >= ENERGY.at(j) && Energie_pbar <= ENERGY.at(j + 1))
+            if (Energy_pbar >= ENERGY.at(j) && Energy_pbar <= ENERGY.at(j + 1))
             {
               j_mem = j;
             }
           }
         }
-
         if (j_mem == -1)
         {
-          printf("PB AVEC LA FONCTION UNCERTAINTIES_XS \t j_mem = %d", j_mem);
+          printf("PB WITH FUNCTION XS_UNCERTAINTIES \t j_mem = %d", j_mem);
         }
-        for (int i = 0; i <= N_BESSEL; i++)
+        for (int i = 0; i < N_BESSEL; i++)
         {
           if (option == -1)
           {
-            bessel_sec_pbar_spec[i_pbar].at(i) *=
-                ((F_Q_PBAR_SEC_MOINS[j_mem + 1] - F_Q_PBAR_SEC_MOINS[j_mem]) / (ENERGY[j_mem + 1] - ENERGY[j_mem]) *
-                     (Energie_pbar - ENERGY[j_mem]) +
-                 F_Q_PBAR_SEC_MOINS[j_mem]);
+            bessel_sec_pbar_spec.at(i_pbar).at(i) *=
+                ((F_Q_PBAR_SEC_MINUS.at(j_mem + 1) - F_Q_PBAR_SEC_MINUS.at(j_mem)) /
+                     (ENERGY.at(j_mem + 1) - ENERGY.at(j_mem)) * (Energy_pbar - ENERGY.at(j_mem)) +
+                 F_Q_PBAR_SEC_MINUS.at(j_mem));
           }
           if (option == 1)
           {
-            bessel_sec_pbar_spec[i_pbar].at(i) *=
-                ((F_Q_PBAR_SEC_PLUS[j_mem + 1] - F_Q_PBAR_SEC_PLUS[j_mem]) / (ENERGY[j_mem + 1] - ENERGY[j_mem]) *
-                     (Energie_pbar - ENERGY[j_mem]) +
-                 F_Q_PBAR_SEC_PLUS[j_mem]);
+            bessel_sec_pbar_spec.at(i_pbar).at(i) *=
+                ((F_Q_PBAR_SEC_PLUS.at(j_mem + 1) - F_Q_PBAR_SEC_PLUS.at(j_mem)) /
+                     (ENERGY.at(j_mem + 1) - ENERGY.at(j_mem)) * (Energy_pbar - ENERGY.at(j_mem)) +
+                 F_Q_PBAR_SEC_PLUS.at(j_mem));
           }
         }
       }
@@ -1236,6 +1329,12 @@ namespace __SPEC_LIB_NAME__
   /* Computes secondary pbar spectrum for parameter A  at energies logE */
   {
     int N = xs_uncertainties.size();
+
+    if (N == 0) // Calls the function to compute the cross section uncertainties if the vector has not been filled
+    {
+      preliminary_secondary_spectrum_IS_calculation();
+      N = xs_uncertainties.size();
+    }
     int j = 0;
 
     auto n = logE.size();
@@ -1273,20 +1372,19 @@ namespace __SPEC_LIB_NAME__
         result.at(i).at(1) = result_down + A * (result_up - result_down);
       }
     }
-
     return 1;
   }
 
   //----------------------------------------TERTIARY CONTRIBUTION-----------------------------------------//
 
-  void Propagation_param_t::calculation_BESSEL_PBAR_TERTIARY_Epbar_i()
+  void Propagation_param_t::calculation_BESSEL_PBAR_TERTIARY()
   /* This routine computes the elements of the array  bessel_ter_pbar_spec
      as a function of the antiproton kinetic energy T_pbar and BESSEL coefficients i. */
   {
 
-    real_t dlog_T_pbar, T_pbar, E_pbar, impulsion_pbar, v_pbar;
-    static std::vector<real_t> S_inel_NOANN_fois_v_pbar;
-    S_inel_NOANN_fois_v_pbar.resize(DIM_TAB_PBAR + 1);
+    real_t dlog_T_pbar, T_pbar, E_pbar, momentum_pbar, v_pbar;
+    static std::vector<real_t> S_inel_NOANN_times_v_pbar;
+    S_inel_NOANN_times_v_pbar.resize(DIM_TAB_PBAR + 1);
     real_t Abar_i, SUM;
 
     for (int i_pbar = 0; i_pbar <= DIM_TAB_PBAR; i_pbar++)
@@ -1294,39 +1392,37 @@ namespace __SPEC_LIB_NAME__
      * will be used in the following loops. */
     {
       T_pbar = T_PBAR_MIN * pow((T_PBAR_MAX / T_PBAR_MIN), ((real_t)i_pbar / (real_t)DIM_TAB_PBAR));
-      E_pbar = T_pbar + MASSE_PROTON;
-      impulsion_pbar = sqrt(pow(E_pbar, 2) - pow(MASSE_PROTON, 2));
-      v_pbar = CELERITY_LIGHT * impulsion_pbar / E_pbar;
+      E_pbar = T_pbar + PROTON_MASS;
+      momentum_pbar = sqrt(pow(E_pbar, 2) - pow(PROTON_MASS, 2));
+      v_pbar = CELERITY_LIGHT * momentum_pbar / E_pbar;
 
-      S_inel_NOANN_fois_v_pbar[i_pbar] = sigma_inelastic_NOANN_pbarH_TAN_and_NG(E_pbar) * v_pbar;
+      S_inel_NOANN_times_v_pbar.at(i_pbar) = sigma_inelastic_NOANN_pbarH_TAN_and_NG(E_pbar) * v_pbar;
     }
 
     for (int i_pbar = 0; i_pbar <= DIM_TAB_PBAR; i_pbar++)
     /* bessel_ter_pbar_spec is set to zero. */
     {
-      for (int i = 0; i <= N_BESSEL; i++)
+      for (int i = 0; i < N_BESSEL; i++)
       {
-        bessel_ter_pbar_spec[i_pbar].at(i) = 0.0;
+        bessel_ter_pbar_spec.at(i_pbar).at(i) = 0.0;
       }
     }
 
     dlog_T_pbar = pow((T_PBAR_MAX / T_PBAR_MIN), (1. / (real_t)DIM_TAB_PBAR)) - 1.;
-    for (int i = 1; i <= N_BESSEL; i++)
+    for (int i = 0; i < N_BESSEL; i++)
     /* bessel_ter_pbar_spec is now filled. */
     {
       SUM = 0.0;
       for (int i_pbar = DIM_TAB_PBAR; i_pbar >= 0; i_pbar--)
       {
-        Abar_i = table_abar[i_pbar].at(i); /* Abar_i is in [cm s^{-1}]. */
-
-        SUM += dlog_T_pbar * S_inel_NOANN_fois_v_pbar[i_pbar] * bessel_tot_pbar_spec[i_pbar].at(i);
-
-        bessel_ter_pbar_spec[i_pbar].at(i) =
-            SUM - S_inel_NOANN_fois_v_pbar[i_pbar] * bessel_tot_pbar_spec[i_pbar].at(i);
+        Abar_i = table_abar.at(i_pbar).at(i); /* Abar_i is in [cm s^{-1}]. */
+        SUM += dlog_T_pbar * S_inel_NOANN_times_v_pbar.at(i_pbar) * bessel_tot_pbar_spec.at(i_pbar).at(i);
+        bessel_ter_pbar_spec.at(i_pbar).at(i) =
+            SUM - S_inel_NOANN_times_v_pbar.at(i_pbar) * bessel_tot_pbar_spec.at(i_pbar).at(i);
         /* expressed in [antiprotons GeV^{-1} s^{-1}]. */
 
-        bessel_ter_pbar_spec[i_pbar].at(i) *=
-            2. * E_DISC * CM_PAR_KPC * (DENSITE_H_DISC + pow(4., (2. / 3.)) * 1.0 * DENSITE_HE_DISC) / Abar_i;
+        bessel_ter_pbar_spec.at(i_pbar).at(i) *=
+            2. * E_DISC * CM_TO_KPC * (DENSITY_H_DISC + pow(4., (2. / 3.)) * 1.0 * DENSITY_HE_DISC) / Abar_i;
         /* expressed now in [antiprotons cm^{-3} GeV^{-1}]. */
       }
     }
@@ -1335,7 +1431,7 @@ namespace __SPEC_LIB_NAME__
   //----------------------------------------SUM OF PRIMARY, SECONDARY AND TERTIARY
   // CONTRIBUTIONS-----------------------------------------//
 
-  void Propagation_param_t::calculation_BESSEL_PBAR_SUM_123_Epbar_i()
+  void Propagation_param_t::calculation_BESSEL_PBAR_SUM()
   /* This routine calculates the elements ofpt_Pbar->BESSEL_PBAR_TOT_Epbar_i
      and the sum of the primary, secondary and tertiary antiproton contributions
     as a function of the antiproton kinetic energy T_pbar and BESSEL coefficients i. */
@@ -1344,10 +1440,11 @@ namespace __SPEC_LIB_NAME__
     for (long int i_pbar = 0; i_pbar <= DIM_TAB_PBAR; i_pbar++)
     /* pt_Pbar->BESSEL_PBAR_TOT_Epbar_i is filled. */
     {
-      for (long int i = 1; i <= N_BESSEL; i++)
+      for (long int i = 0; i < N_BESSEL; i++)
       {
-        bessel_tot_pbar_spec[i_pbar].at(i) = bessel_pri_pbar_spec[i_pbar].at(i) + bessel_sec_pbar_spec[i_pbar].at(i) +
-                                             bessel_ter_pbar_spec[i_pbar].at(i);
+        bessel_tot_pbar_spec.at(i_pbar).at(i) = bessel_pri_pbar_spec.at(i_pbar).at(i) +
+                                                bessel_sec_pbar_spec.at(i_pbar).at(i) +
+                                                bessel_ter_pbar_spec.at(i_pbar).at(i);
       }
     }
   }
@@ -1361,26 +1458,31 @@ namespace __SPEC_LIB_NAME__
     real_t m = 938.2720813e-03;
     real_t e = 1.;
 
-    real_t K, K_, logK_;
+    real_t K, K_prime, logK_prime;
     size_t size = spectrum.size();
     result.resize(size);
+
     for (size_t i = 0; i < size; i++)
     {
       result.at(i).resize(2);
       K = pow(10., spectrum.at(i).at(0));
-      K_ = K + e * phi_f * Z / A;
-      logK_ = log10(K_);
+      K_prime = K + e * phi_f * Z / A;
+      logK_prime = log10(K_prime);
 
-      if (fabs(logK_ - spectrum[size - 1].at(0)) < 1.e-4)
-        logK_ = spectrum[size - 1].at(0);
+      if (fabs(logK_prime - spectrum.at(size - 1).at(0)) < 1.e-4)
+        logK_prime = spectrum.at(size - 1).at(0);
 
-      if (logK_ >= spectrum.at(0).at(0) && logK_ <= spectrum[size - 1].at(0))
+      if (logK_prime >= spectrum.at(0).at(0) && logK_prime <= spectrum.at(size - 1).at(0))
       {
         result.at(i).at(0) = spectrum.at(i).at(0);
-        result.at(i).at(1) = ind_param.logx_interpol(spectrum, logK_) * (2. * m * K + K * K) / (2. * m * K_ + K_ * K_);
+        result.at(i).at(1) = ind_param.logx_interpol(spectrum, logK_prime) * (2. * m * K + K * K) /
+                             (2. * m * K_prime + K_prime * K_prime);
       }
       else
-        result.at(i).at(0) = result.at(i).at(1) = 0;
+      {
+        result.at(i).at(0) = spectrum.at(i).at(0);
+        result.at(i).at(1) = 0;
+      }
     }
   }
 
@@ -1389,7 +1491,7 @@ namespace __SPEC_LIB_NAME__
   // COEFFICIENTS-----------------------------------------//
 
   real_t Propagation_param_t::GENERIC_FLUX(real_t r, real_t z, real_t energy, real_t mass, real_t Z_em,
-                                           std::vector<real_t> BESSEL_COEFFICIENTi)
+                                           std::vector<real_t> bes_coef)
   /* GENERIC_FLUX is a generic routine which returns a cosmic-ray flux from Bessel coefficients calculated beforehand */
   {
     real_t x, az;
@@ -1401,7 +1503,7 @@ namespace __SPEC_LIB_NAME__
     resultat = 0.0;
 
     real_t e_diffus = equation_parameters.at(2);
-    real_t v_conv = equation_parameters[3];
+    real_t v_conv = equation_parameters.at(3);
 
     if (az >= e_diffus || x >= 1.0)
     {
@@ -1413,11 +1515,11 @@ namespace __SPEC_LIB_NAME__
       velocity = CELERITY_LIGHT * momentum / energy;
       K = K_space_diffusion(energy, mass, Z_em);
 
-      for (long int i = 1; i <= N_BESSEL; i++)
+      for (long int i = 0; i < N_BESSEL; i++)
       {
         /* Si is expressed in [kpc^{-1}]. */
-        Si = sqrt(pow(2.0 * alpha_i.at(i) / R_GAL, 2) + pow(v_conv * CM_PAR_KPC / K, 2));
-        resultat += BESSEL_COEFFICIENTi.at(i) * besselj0(alpha_i.at(i) * x) * exp(v_conv * az * CM_PAR_KPC / (2. * K)) *
+        Si = sqrt(pow(2.0 * alpha_i.at(i) / R_GAL, 2) + pow(v_conv * CM_TO_KPC / K, 2));
+        resultat += bes_coef.at(i) * besselj0(alpha_i.at(i) * x) * exp(v_conv * az * CM_TO_KPC / (2. * K)) *
                     sinh((Si / 2.) * (e_diffus - az)) / sinh((Si / 2.) * e_diffus);
       }
       resultat *= (1. / 4. / M_PI) * velocity;
@@ -1426,7 +1528,7 @@ namespace __SPEC_LIB_NAME__
   }
 
   real_t Propagation_param_t::GENERIC_FLUX_04(real_t r, real_t z, real_t energy, real_t mass, real_t Z_em,
-                                              std::vector<real_t> BESSEL_COEFFICIENTi)
+                                              std::vector<real_t> bes_coef)
   /* GENERIC_FLUX_04 is a generic routine which returns a cosmic-ray flux from Bessel coefficients calculated
   beforehand. The result is modulated by Torsten Bringman's coefficients to speed up convergence. */
   {
@@ -1440,7 +1542,7 @@ namespace __SPEC_LIB_NAME__
     resultat = 0.0;
 
     real_t e_diffus = equation_parameters.at(2);
-    real_t v_conv = equation_parameters[3];
+    real_t v_conv = equation_parameters.at(3);
 
     if (az >= e_diffus || x >= 1.0)
     {
@@ -1453,10 +1555,10 @@ namespace __SPEC_LIB_NAME__
       K = K_space_diffusion(energy, mass, Z_em);
 
 
-      for (long int i = 1; i <= N_BESSEL; i++)
+      for (long int i = 0; i < N_BESSEL; i++)
       {
         /* Si est exprime en [kpc^{-1}]. */
-        Si = sqrt(pow(2.0 * alpha_i.at(i) / R_GAL, 2) + pow(v_conv * CM_PAR_KPC / K, 2));
+        Si = sqrt(pow(2.0 * alpha_i.at(i) / R_GAL, 2) + pow(v_conv * CM_TO_KPC / K, 2));
         switch (i)
         {
         case (N_BESSEL - 15):
@@ -1509,8 +1611,8 @@ namespace __SPEC_LIB_NAME__
           break;
         }
 
-        resultat += coefficient_torsten * BESSEL_COEFFICIENTi.at(i) * besselj0(alpha_i.at(i) * x) *
-                    exp(v_conv * az * CM_PAR_KPC / (2. * K)) * sinh((Si / 2.) * (e_diffus - az)) /
+        resultat += coefficient_torsten * bes_coef.at(i) * besselj0(alpha_i.at(i) * x) *
+                    exp(v_conv * az * CM_TO_KPC / (2. * K)) * sinh((Si / 2.) * (e_diffus - az)) /
                     sinh((Si / 2.) * e_diffus);
       }
       resultat *= (1. / 4. / M_PI) * velocity;
@@ -1521,7 +1623,7 @@ namespace __SPEC_LIB_NAME__
 
   /********************************************************************************************/
 
-  void Propagation_param_t::calculation_BESSEL_PBAR_TOT_direct_inversion_A()
+  void Propagation_param_t::calculation_BESSEL_PBAR_direct_inversion()
   /* We need to solve the differential equation that describes the energy behaviour
   of the BESSEL transforms \bar{\cal{P}}_{i} :
 
@@ -1550,24 +1652,24 @@ namespace __SPEC_LIB_NAME__
     for (long int i_pbar = 0; i_pbar <= DIM_TAB_PBAR + 1; i_pbar++)
     {
       T_pbar = T_PBAR_MIN * pow((T_PBAR_MAX / T_PBAR_MIN), ((-0.5 + (real_t)i_pbar) / (real_t)DIM_TAB_PBAR));
-      E_pbar = T_pbar + MASSE_PROTON;
-      a_coeff[i_pbar] = D_energy_diffusion(E_pbar, MASSE_PROTON, 1.0) / T_pbar; /* in [GeV s^{-1}]. */
+      E_pbar = T_pbar + PROTON_MASS;
+      a_coeff.at(i_pbar) = D_energy_diffusion(E_pbar, PROTON_MASS, 1.0) / T_pbar; /* in [GeV s^{-1}]. */
     }
 
     /* We compute the coefficients b_{j} = b_coeff.at(j) with j = i_pbar. */
     for (long int i_pbar = 0; i_pbar <= DIM_TAB_PBAR; i_pbar++)
     {
       T_pbar = T_PBAR_MIN * pow((T_PBAR_MAX / T_PBAR_MIN), ((real_t)i_pbar / (real_t)DIM_TAB_PBAR));
-      E_pbar = T_pbar + MASSE_PROTON;
-      b_coeff[i_pbar] = b_energy_losses(E_pbar, MASSE_PROTON, 1.0); /* in [GeV s^{-1}]. */
+      E_pbar = T_pbar + PROTON_MASS;
+      b_coeff.at(i_pbar) = b_energy_losses(E_pbar, PROTON_MASS, 1.0); /* in [GeV s^{-1}]. */
     }
 
     for (long int i_pbar = 0; i_pbar <= DIM_TAB_PBAR; i_pbar++)
     /* BESSEL_PBAR_TOT_Epbar_i is set to zero. */
     {
-      for (long int i = 0; i <= N_BESSEL; i++)
+      for (long int i = 0; i < N_BESSEL; i++)
       {
-        bessel_tot_pbar_spec[i_pbar].at(i) = 0.0;
+        bessel_tot_pbar_spec.at(i_pbar).at(i) = 0.0;
       }
     }
 
@@ -1576,17 +1678,16 @@ namespace __SPEC_LIB_NAME__
     bessel_ter_pbar_spec by inversing the tridiagonal matrix. */
 
     DELTA_x = log(T_PBAR_MAX / T_PBAR_MIN) / (real_t)DIM_TAB_PBAR; /* [no unit] */
-    for (long int i = 1; i <= N_BESSEL; i++)
+    for (long int i = 0; i < N_BESSEL; i++)
     {
       for (long int i_pbar = 0; i_pbar <= DIM_TAB_PBAR; i_pbar++)
       {
-        vec_r[i_pbar] = bessel_pri_pbar_spec[i_pbar].at(i) + bessel_sec_pbar_spec[i_pbar].at(i) +
-                        bessel_ter_pbar_spec[i_pbar].at(i);
+        vec_r.at(i_pbar) = bessel_pri_pbar_spec.at(i_pbar).at(i) + bessel_sec_pbar_spec.at(i_pbar).at(i) +
+                           bessel_ter_pbar_spec.at(i_pbar).at(i);
 
-        Abar_i = table_abar[i_pbar].at(i); /* in [cm s^{-1}]. */
+        Abar_i = table_abar.at(i_pbar).at(i); /* in [cm s^{-1}]. */
         T_pbar = T_PBAR_MIN * pow((T_PBAR_MAX / T_PBAR_MIN), ((real_t)i_pbar / (real_t)DIM_TAB_PBAR));
-        grand_C_cal = 2. * E_DISC * CM_PAR_KPC / T_pbar / Abar_i;
-
+        grand_C_cal = 2. * E_DISC * CM_TO_KPC / T_pbar / Abar_i;
         /* Fill the tridiagonal matrix before computing the inverse. */
         if (i_pbar == 0)
         {
@@ -1599,35 +1700,35 @@ namespace __SPEC_LIB_NAME__
         }
         else if (i_pbar == DIM_TAB_PBAR)
         {
-          vec_a[DIM_TAB_PBAR] = 0.0;
-          vec_b[DIM_TAB_PBAR] = 1.0;
-          vec_c[DIM_TAB_PBAR] = 0.0;
+          vec_a.at(DIM_TAB_PBAR) = 0.0;
+          vec_b.at(DIM_TAB_PBAR) = 1.0;
+          vec_c.at(DIM_TAB_PBAR) = 0.0;
         }
         else
         {
-          vec_a[i_pbar] = -grand_C_cal * b_coeff[i_pbar - 1] / 2. / DELTA_x;
-          vec_a[i_pbar] -= grand_C_cal * a_coeff[i_pbar] / pow(DELTA_x, 2);
-          vec_b[i_pbar] = 1.0;
-          vec_b[i_pbar] += grand_C_cal * (a_coeff[i_pbar] + a_coeff[i_pbar + 1]) / pow(DELTA_x, 2);
-          vec_c[i_pbar] = grand_C_cal * b_coeff[i_pbar + 1] / 2. / DELTA_x;
-          vec_c[i_pbar] -= grand_C_cal * a_coeff[i_pbar + 1] / pow(DELTA_x, 2);
+          vec_a.at(i_pbar) = -grand_C_cal * b_coeff.at(i_pbar - 1) / 2. / DELTA_x;
+          vec_a.at(i_pbar) -= grand_C_cal * a_coeff.at(i_pbar) / pow(DELTA_x, 2);
+          vec_b.at(i_pbar) = 1.0;
+          vec_b.at(i_pbar) += grand_C_cal * (a_coeff.at(i_pbar) + a_coeff.at(i_pbar + 1)) / pow(DELTA_x, 2);
+          vec_c.at(i_pbar) = grand_C_cal * b_coeff.at(i_pbar + 1) / 2. / DELTA_x;
+          vec_c.at(i_pbar) -= grand_C_cal * a_coeff.at(i_pbar + 1) / pow(DELTA_x, 2);
         }
       }
       inversion_tridiagonal(vec_a, vec_b, vec_c, vec_r, vec_u);
       for (int i_pbar = 0; i_pbar <= DIM_TAB_PBAR; i_pbar++)
       {
-        bessel_tot_pbar_spec[i_pbar].at(i) = vec_u[i_pbar];
+        bessel_tot_pbar_spec.at(i_pbar).at(i) = vec_u.at(i_pbar);
       }
     }
   }
 
   /********************************************************************************************/
 
-  void Propagation_param_t::inversion_tridiagonal(std::array<real_t, DIM_TAB_PBAR + 1> a,
-                                                  std::array<real_t, DIM_TAB_PBAR + 1> b,
-                                                  std::array<real_t, DIM_TAB_PBAR + 1> c,
-                                                  std::array<real_t, DIM_TAB_PBAR + 1> r,
-                                                  std::array<real_t, DIM_TAB_PBAR + 1> u)
+  void Propagation_param_t::inversion_tridiagonal(std::array<real_t, DIM_TAB_PBAR + 1>& a,
+                                                  std::array<real_t, DIM_TAB_PBAR + 1>& b,
+                                                  std::array<real_t, DIM_TAB_PBAR + 1>& c,
+                                                  std::array<real_t, DIM_TAB_PBAR + 1>& r,
+                                                  std::array<real_t, DIM_TAB_PBAR + 1>& u)
   /* This routine solves the matrix equation [A] * [u] = [r] in the case of a tridiagonal matrix [A]. Pivoting is not
    * used. */
   {
@@ -1646,7 +1747,7 @@ namespace __SPEC_LIB_NAME__
     u.at(0) = r.at(0) / bet;
     for (long int j = 1; j <= DIM_TAB_PBAR; j++)
     {
-      gam.at(j) = c[j - 1] / bet;
+      gam.at(j) = c.at(j - 1) / bet;
       bet = b.at(j) - a.at(j) * gam.at(j);
       if (bet == 0.0)
       {
@@ -1655,7 +1756,7 @@ namespace __SPEC_LIB_NAME__
                j, bet);
         return;
       }
-      u.at(j) = (r.at(j) - a.at(j) * u[j - 1]) / bet;
+      u.at(j) = (r.at(j) - a.at(j) * u.at(j - 1)) / bet;
     }
     for (int j = DIM_TAB_PBAR - 1; j >= 0; j--)
     {
@@ -1712,8 +1813,8 @@ namespace __SPEC_LIB_NAME__
     momentum = sqrt(pow(energy, 2) - pow(mass, 2)); /* [GeV]        */
     beta = momentum / energy;                       /* NO DIMENSION */
 
-    real_t delta = equation_parameters.at(1); /* PUISSANCE_COEFF_DIFF */
-    real_t v_alpha = equation_parameters[4];  /* [cm s^{-1}] */
+    real_t delta = equation_parameters.at(1);   /* PUISSANCE_COEFF_DIFF */
+    real_t v_alpha = equation_parameters.at(4); /* [cm s^{-1}] */
 #ifdef DR_energy_drift
     D_EE = 4.0 / 3.0 * pow(v_alpha, 2.0) / K_space_diffusion(energy, mass, Z_em) * pow(beta, 2.0) *
            pow(momentum, 2.0);                                 // [GeV^{2} s^{-1}]
@@ -1747,7 +1848,7 @@ namespace __SPEC_LIB_NAME__
     real_t dE_dt;
     real_t drift;
 
-    real_t v_conv = equation_parameters[3]; /* [cm s^{-1}] */
+    real_t v_conv = equation_parameters.at(3); /* [cm s^{-1}] */
     /* The energy loss dE_dt is expressed in [GeV sec^{-1}]. */
 
     momentum = sqrt(pow(energy, 2) - pow(mass, 2)); /* [GeV]        */
@@ -1760,6 +1861,7 @@ namespace __SPEC_LIB_NAME__
     Q_max =
         2. * MASSE_ELECTRON * pow((beta * gamma_lorentz), 2.) / (1.0 + (2. * gamma_lorentz * MASSE_ELECTRON / mass));
 
+
     /* B1 and B2 coefficients are dimensionless. */
     B1 = log(2. * MASSE_ELECTRON * pow((beta * gamma_lorentz), 2.) * Q_max / pow(V_ION_H, 2.));
     B1 -= 2. * pow(beta, 2.);
@@ -1768,7 +1870,8 @@ namespace __SPEC_LIB_NAME__
 
     /* The energy loss from ionisation is expressed in [GeV s^{-1}]. */
     ionisation = (-1.) * 2. * M_PI * pow(RADIUS_ELECTRON, 2) * MASSE_ELECTRON * CELERITY_LIGHT * pow(Z_em, 2) *
-                 ((DENSITE_H_DISC * B1) + (DENSITE_HE_DISC * B2)) / beta; /* [GeV s^{-1}] */
+                 ((DENSITY_H_DISC * B1) + (DENSITY_HE_DISC * B2)) / beta; /* [GeV s^{-1}] */
+
 
     /* COULOMB CONTRIBUTION
      ******************** */
@@ -1776,11 +1879,11 @@ namespace __SPEC_LIB_NAME__
 
     ln_lambda = mass / (mass + 2. * gamma_lorentz * MASSE_ELECTRON);
     ln_lambda *= pow((MASSE_ELECTRON / H_BAR / CELERITY_LIGHT), 2.) / RADIUS_ELECTRON; /* [cm^{-3}] */
-    ln_lambda *= pow(gamma_lorentz, 2.) * pow(beta, 4.) / M_PI / DENSITE_FREE_ELECTRON;
+    ln_lambda *= pow(gamma_lorentz, 2.) * pow(beta, 4.) / M_PI / DENSITY_FREE_ELECTRON;
     ln_lambda = 0.5 * log(ln_lambda);
 
     coulomb = (-1.) * 4. * M_PI * pow(RADIUS_ELECTRON, 2) * MASSE_ELECTRON * CELERITY_LIGHT * pow(Z_em, 2) *
-              DENSITE_FREE_ELECTRON * ln_lambda * pow(beta, 2.) / (pow(x_m, 3.) + pow(beta, 3.)); /* [GeV s^{-1}] */
+              DENSITY_FREE_ELECTRON * ln_lambda * pow(beta, 2.) / (pow(x_m, 3.) + pow(beta, 3.)); /* [GeV s^{-1}] */
 
     /* ADIABATIC CONTRIBUTION
        **********************
@@ -1791,7 +1894,7 @@ namespace __SPEC_LIB_NAME__
        b_adiab \; = \; - \, E \, \frac{V_{c}}{3h} \;\; .
        \eeq */
 
-    adiabatic = (-1.) * (momentum * momentum / energy) * (v_conv / (3. * E_DISC * CM_PAR_KPC)); /* [GeV s^{-1}] */
+    adiabatic = (-1.) * (momentum * momentum / energy) * (v_conv / (3. * E_DISC * CM_TO_KPC)); /* [GeV s^{-1}] */
 
 #ifdef DR_energy_drift
     /* DRIFT TERM
@@ -1810,7 +1913,6 @@ namespace __SPEC_LIB_NAME__
 
     /* WE SUM UP BOTH CONTRIBUTIONS
      **************************** */
-
     dE_dt = ionisation + coulomb + adiabatic + drift;
     return dE_dt;
   }
@@ -1821,8 +1923,8 @@ namespace __SPEC_LIB_NAME__
 
     for (int i_iteration = 1; i_iteration <= 15; i_iteration++)
     {
-      calculation_BESSEL_PBAR_TERTIARY_Epbar_i();
-      calculation_BESSEL_PBAR_TOT_direct_inversion_A();
+      calculation_BESSEL_PBAR_TERTIARY();
+      calculation_BESSEL_PBAR_direct_inversion();
     }
     return;
   }
@@ -1836,7 +1938,7 @@ namespace __SPEC_LIB_NAME__
     real_t EK_proton, U, Cp;
     real_t resultat;
 
-    EK_proton = E_proton - MASSE_PROTON;
+    EK_proton = E_proton - PROTON_MASS;
     resultat = 0.0;
     if (EK_proton <= 0.0)
     {
@@ -1889,7 +1991,7 @@ namespace __SPEC_LIB_NAME__
     real_t EK_pbar;
     real_t resultat;
 
-    EK_pbar = E_pbar - MASSE_PROTON;
+    EK_pbar = E_pbar - PROTON_MASS;
     resultat = 0.0;
     if (EK_pbar <= 0.0)
     {
@@ -1917,7 +2019,7 @@ namespace __SPEC_LIB_NAME__
     real_t p;
     real_t resultat;
 
-    p = sqrt(pow(E_proton, 2.) - pow(MASSE_PROTON, 2.));
+    p = sqrt(pow(E_proton, 2.) - pow(PROTON_MASS, 2.));
 
     if (p <= p_seuil_pp_tot)
     {
@@ -1938,7 +2040,7 @@ namespace __SPEC_LIB_NAME__
     real_t EK_pbar, sigma_ANN_pbarH_TAN_and_NG;
     real_t resultat;
 
-    EK_pbar = E_pbar - MASSE_PROTON;
+    EK_pbar = E_pbar - PROTON_MASS;
     if (EK_pbar <= 0.0)
     {
       sigma_ANN_pbarH_TAN_and_NG = 0.0;
@@ -2003,7 +2105,7 @@ namespace __SPEC_LIB_NAME__
     for (i = 0; i < n; i++)
       x0.at(i) = (xlim_min.at(i) + xlim_max.at(i)) / 2.;
     int test = IDpowellaux(n, func, xtra, spect, x0, xlim_min, xlim_max, fmin, xmin, ftol, factor);
-    if (option != "max")
+    if (option == "max")
       *fmin = -*fmin;
 
     return test;
@@ -2029,10 +2131,10 @@ namespace __SPEC_LIB_NAME__
     vect.resize(nmax);
 
     /* initializes set of vectors */
-    for (int i = 0; i < n; i++)
+    for (int i = 0; i < nmax; i++)
     {
       vect.at(i).resize(nmax);
-      for (int j = 0; j < n; j++)
+      for (int j = 0; j < nmax; j++)
       {
         if (i == j)
           vect.at(i).at(j) = 1;
@@ -2049,10 +2151,10 @@ namespace __SPEC_LIB_NAME__
     std::vector<real_t> vecti; // current vector in the iteration
     vecti.resize(nmax);
     real_t fmintemp;
-    int imax;
+    int imax, j;
     real_t fdeltamax;
-    *fmin = factor * (this->*func)(x0, xtra, spect);
 
+    *fmin = factor * (this->*func)(x0, xtra, spect);
     real_t fiter;
     std::vector<real_t> xiter;
     xiter.resize(nmax);
@@ -2067,22 +2169,22 @@ namespace __SPEC_LIB_NAME__
 
     for (int iter = 0; iter <= ITMAX; iter++)
     {
-
       fiter = *fmin;
-      for (int j = 0; j < n; j++)
+      for (j = 0; j < n; j++)
         xiter.at(j) = xmin.at(j);
 
       fdeltamax = 0;
       for (int i = 0; i < n; i++)
       {
-        for (int j = 0; j < n; j++)
+        for (j = 0; j < n; j++)
           vecti.at(j) = vect.at(j).at(i);
+
         fmintemp = *fmin;
         testbrent = IDbrentmethod(n, func, xtra, spect, xmin, vecti, xlim_min, xlim_max, fmin, factor);
         if (testbrent == 0)
         {
 #ifdef DEBUG
-          std::cout << "Brent method unsuccessful\n";
+          std::cerr << "Brent method unsuccessful\n";
 #endif
           return 0;
         }
@@ -2096,19 +2198,21 @@ namespace __SPEC_LIB_NAME__
 
 
       if (2. * (fiter - (*fmin)) <= ftol * (fabs(fiter) + fabs(*fmin)) + TINY)
-        return 0;
+        return 1;
 
       if (iter == ITMAX)
       {
 #ifdef DEBUG
-        std::cout << "Powell exceeding maximum iterations.\n";
+        std::cerr << "Powell exceeding maximum iterations.\n";
 #endif
         return 0;
       }
 
-      for (int j = 0; j < n; j++)
+      if (n == 1)
+        continue; // no need to check the mean displacement vector in a 1D problem
+      for (j = 0; j < n; j++)
       {
-        // check if it is worth to keep the mean deplacement vector
+        // check if it is worth to keep the mean displacement vector
         meanvect.at(j) = xmin.at(j) - xiter.at(j);
         xextrapol.at(j) = xmin.at(j) + meanvect.at(j);
       }
@@ -2125,17 +2229,21 @@ namespace __SPEC_LIB_NAME__
         if (t < 0.)
         {
           IDbrentmethod(n, func, xtra, spect, xmin, meanvect, xlim_min, xlim_max, fmin, factor);
-          for (int j = 0; j < n; j++)
+
+          // vect.at(j).at(n) = meanvect.at(j);
+          // Delayed directional update: only update the direction after the next iteration, if the extrapolation is
+          // successful. Avoid updating if vect[j][n] has not been used yet, i.e. if iter == 0.
+          for (int j = 0; j < n; ++j)
           {
-            vect.at(j).at(imax) = meanvect.at(j);
+            if (iter > 0)
+              vect.at(j).at(imax) = vect.at(j).at(n);
+            vect.at(j).at(n) = meanvect.at(j);
           }
         }
       }
     }
-
     return 1;
   }
-
 
   /*--------------------------------------------------------------------*/
 
@@ -2151,12 +2259,13 @@ namespace __SPEC_LIB_NAME__
     xitemp.resize(n);
     int i;
 
-    IDbraket(n, func, xtra, spect, &a0, &x0, &b0, xmin, xi, xlim_min, xlim_max, factor);
+    IDbracket(n, func, xtra, spect, &a0, &x0, &b0, xmin, xi, xlim_min, xlim_max, factor);
 
     int test = IDbrentmethod1D(func, xtra, spect, a0, x0, b0, fmin, &xmin1d, factor, xmin, xi, n);
     for (i = 0; i < n; i++)
+    {
       xmin.at(i) = xmin.at(i) + xmin1d * xi.at(i);
-
+    }
     return test;
   }
 
@@ -2181,12 +2290,12 @@ namespace __SPEC_LIB_NAME__
                                            const std::vector<std::vector<real_t>>& spect, real_t a0, real_t x0,
                                            real_t b0, real_t* fmin, real_t* xmin, real_t factor,
                                            const std::vector<real_t>& xmini, std::vector<real_t> xi, int n)
-  /* finds the minimum of DDbrentmethod1Dfunc for x between a0 and b0, starting with an initial value x=x0 */
+  /* finds the minimum of IDbrentmethod1Dfunc for x between a0 and b0, starting with an initial value x=x0 */
   {
     int brent_iter_max = 1000;
     real_t ZEPS = 1.0e-70;
     real_t CGOLD = 0.1;
-    real_t tol = 1.0e-8;
+    real_t tol = 1.0e-3;
 
     real_t a, b;
 
@@ -2214,24 +2323,31 @@ namespace __SPEC_LIB_NAME__
     fx = fw = fv = factor * IDbrentmethod1Dfunc(func, xtra, spect, x0, xmini, xi, n);
     xm = 0.5 * (a + b);
 
-    real_t tol1 = tol * fabs(x) + ZEPS;
-    real_t tol2 = e * tol1;
+    real_t tol1, tol2;
 
-    while (iter < brent_iter_max && fabs(x - xm) + 0.5 * (b - a) > 2 * tol1)
+    do
     {
+      // std::cout << "Brent iteration " << iter << ": a= " << a << " b= " << b << " x= " << x << " w= " << w
+      //<< " v= " << v << "\n";
+      // printf("Brent iteration %d: fx = %f, fw = %f, fv = %f\n", iter, fx, fw, fv);
       tol1 = tol * fabs(x) + ZEPS;
       tol2 = e * tol1;
 
       if (fabs(e) > tol1)
       {
+        // printf("Brent iteration %d: parabolic fit\n", iter);
         pa2 = ((fw - fx) / (w - x) - (fv - fx) / (v - x)) / (w - v); // parabolic fit
+        // printf("%f     %f\n", ((fw - fx) / (w - x) - (fv - fx) / (v - x)), (w - v));
         pa1 = (fv - fx) / (v - x) - pa2 * (v + x);
+        // printf("%f     %f\n", (fv - fx) / (v - x), (v + x));
         pamin = -0.5 * pa1 / pa2;
+        // printf("Brent iteration %d: parabolic fit minimum = %f\n", iter, pamin);
         etmp = e;
         e = d;
-        if (fabs(x - pamin) > 0.5 * etmp || pamin < a || pamin > b)
+        if (fabs(x - pamin) > 0.5 * etmp || pamin < a || pamin > b || !std::isnormal(pamin))
         {
-          // cannot use the parabolic fit
+          // printf("Brent iteration %d: parabolic fit not acceptable\n", iter);
+          //  cannot use the parabolic fit
           if (x >= xm)
             e = a - x;
           else
@@ -2240,6 +2356,7 @@ namespace __SPEC_LIB_NAME__
         }
         else
         {
+          // printf("Brent iteration %d: using parabolic fit\n", iter);
           d = pamin - x;
           u = pamin;
           if ((u - a) < tol2 || (b - u) < tol2)
@@ -2253,6 +2370,7 @@ namespace __SPEC_LIB_NAME__
       }
       else
       {
+        // printf("Brent iteration %d: parabolic fit not attempted\n", iter);
         if (x >= xm)
           e = a - x;
         else
@@ -2270,9 +2388,10 @@ namespace __SPEC_LIB_NAME__
           u = x + fabs(tol1);
       }
       fu = factor * IDbrentmethod1Dfunc(func, xtra, spect, u, xmini, xi, n);
-
+      // printf("Brent iteration %d: u = %f, f(u) = %f\n", iter, u, fu);
       if (fu <= fx)
       {
+        // printf("Brent iteration %d: new minimum found\n", iter);
         if (u >= x)
           a = x;
         else
@@ -2286,6 +2405,7 @@ namespace __SPEC_LIB_NAME__
       }
       else
       {
+        // printf("Brent iteration %d: no improvement\n", iter);
         if (u < x)
           a = u;
         else
@@ -2305,6 +2425,7 @@ namespace __SPEC_LIB_NAME__
       }
 
       xm = 0.5 * (a + b);
+      // std::cout << "Brent iteration " << iter << ": a= " << a << " b= " << b << " x= " << x << "\n";
 
 #ifdef DEBUG
       std::vector<real_t> xtemp, utemp;
@@ -2316,21 +2437,20 @@ namespace __SPEC_LIB_NAME__
         xtemp.at(i) = xmini.at(i) + x * xi.at(i);
       }
 
-      std::cout << "Brent iteration " << iter << ": x = " << x << " f(x) = " << fx << " u = " << u << " f(u) = " << fu
+      std::cerr << "Brent iteration " << iter << ": x = " << x << " f(x) = " << fx << " u = " << u << " f(u) = " << fu
                 << "\n";
 
 #endif
-
       iter++;
-    }
-
+      // std::cout << fabs(x - xm) + 0.5 * (b - a) << " " << 2 * tol1 << "\n";
+    } while (iter < brent_iter_max && fabs(x - xm) + 0.5 * (b - a) > 2 * tol1);
 
     *xmin = x;
     *fmin = fx;
 
     if (iter == brent_iter_max)
     {
-      std::cout << "WARNING: too many iterations in Brent's method, precision decreased\n";
+      std::cerr << "WARNING: too many iterations in Brent's method\n";
       return 0;
     }
     else
@@ -2339,11 +2459,11 @@ namespace __SPEC_LIB_NAME__
 
   /*--------------------------------------------------------------------*/
 
-  void Propagation_param_t::IDbraket(int n, input_function_t func, const std::vector<real_t>& xtra,
-                                     const std::vector<std::vector<real_t>>& spect, real_t* a0, real_t* x0, real_t* b0,
-                                     std::vector<real_t> xinit, std::vector<real_t> xi,
-                                     const std::vector<real_t>& xlim_min, const std::vector<real_t>& xlim_max,
-                                     real_t factor)
+  void Propagation_param_t::IDbracket(int n, input_function_t func, const std::vector<real_t>& xtra,
+                                      const std::vector<std::vector<real_t>>& spect, real_t* a0, real_t* x0, real_t* b0,
+                                      std::vector<real_t> xinit, std::vector<real_t> xi,
+                                      const std::vector<real_t>& xlim_min, const std::vector<real_t>& xlim_max,
+                                      real_t factor)
   /* find values  of a0, b0 and x0 required in function IDbrentmethod1D */
   {
     int BRAKETMAX = 50;
@@ -2361,34 +2481,38 @@ namespace __SPEC_LIB_NAME__
 
     int afirst = 1;
     int bfirst = 1;
-    for (i = 0; i < n; i++)
-    {
-      if (xi.at(i) != 0)
-      {
-        a0tmp = (xlim_min.at(i) - xinit.at(i)) / xi.at(i);
-        b0tmp = (xlim_max.at(i) - xinit.at(i)) / xi.at(i);
+    bool first = true;
 
-        if (a0tmp > *a0 || afirst)
+    for (int i = 0; i < n; i++)
+    {
+      if (xi.at(i) != 0.0)
+      {
+        real_t l1 = (xlim_min.at(i) - xinit.at(i)) / xi.at(i);
+        real_t l2 = (xlim_max.at(i) - xinit.at(i)) / xi.at(i);
+
+        real_t lo = std::min(l1, l2);
+        real_t hi = std::max(l1, l2);
+
+        if (first)
         {
-          *a0 = a0tmp;
-          afirst = 0;
+          *a0 = lo;
+          *b0 = hi;
+          first = false;
         }
-        if (b0tmp < *b0 || bfirst)
+        else
         {
-          *b0 = b0tmp;
-          bfirst = 0;
+          *a0 = std::max(*a0, lo);
+          *b0 = std::min(*b0, hi);
         }
       }
     }
 
-
-
-    while (*a0 > *b0)
+    if (first || *a0 > *b0)
     {
-      a0tmp = *a0;
-      *a0 = *b0;
-      *b0 = a0tmp;
+      *a0 = 0;
+      *b0 = 0;
       *x0 = 0;
+      return;
     }
     for (i = 0; i < n; i++)
     {
@@ -2397,6 +2521,7 @@ namespace __SPEC_LIB_NAME__
     }
     fa = factor * (this->*func)(xa, xtra, spect);
     fb = factor * (this->*func)(xb, xtra, spect);
+    // printf("fa = %f, fb = %f\n", fa, fb);
     if (fa < fb)
     {
       *x0 = *a0;
@@ -2430,34 +2555,31 @@ namespace __SPEC_LIB_NAME__
 
   //-------------------------------CHI SQUARED FUNCTIONS (AMS-02)----------------------------//
 
-  int Propagation_param_t::add_spectra(const std::vector<std::vector<real_t>>& a1,
-                                       const std::vector<std::vector<real_t>>& a2,
-                                       std::vector<std::vector<real_t>>& add)
+  void Propagation_param_t::add_spectra(const std::vector<std::vector<real_t>>& a1,
+                                        const std::vector<std::vector<real_t>>& a2,
+                                        std::vector<std::vector<real_t>>& add)
   /* sums two spectra a1 and a2 */
   {
     auto a1_size = a1.size();
     auto a2_size = a2.size();
     add.resize(a1_size);
 
-    if (a1.at(0).size() != a2.at(0).size() || a1_size != a2_size)
-      return 0;
     for (size_t i = 0; i < a1_size; i++)
     {
       add.at(i).resize(2);
-
       add.at(i).at(0) = a1.at(i).at(0);
       add.at(i).at(1) = a1.at(i).at(1);
-      if (a1.at(i).at(0) >= a2.at(0).at(0) && a1.at(i).at(0) <= a2[a2_size - 1].at(0))
+      if (a1.at(i).at(0) >= a2.at(0).at(0) && a1.at(i).at(0) <= a2.at(a2_size - 1).at(0))
       {
         add.at(i).at(1) += ind_param.logx_interpol(a2, a1.at(i).at(0));
       }
     }
-    return 1;
+    return;
   }
 
 
   real_t Propagation_param_t::dchi_bkg(const std::vector<real_t>& param, const std::vector<real_t>& logE,
-                                       const std::vector<std::vector<real_t>>& spec)
+                                       const std::vector<std::vector<real_t>>& spect)
   /* AMS-02 chi^2 with background only */
   {
     std::vector<std::vector<real_t>> back, backS;
@@ -2467,18 +2589,18 @@ namespace __SPEC_LIB_NAME__
     if (!background_spectAMS(logE, A, back))
       return -1.e30;
     solar_mod(back, phi_f, backS);
-    real_t chi = chi_2AMS(backS);
+    real_t chi = chi2_AMS(backS);
     return chi;
   }
 
-  void Propagation_param_t::chi2_bkg()
+  std::vector<real_t> Propagation_param_t::chi2_bkg(int& IDpowell_result)
   /* returns AMS-02 delta-chi2 in the hypothesis of no DM */
   {
     std::vector<real_t> logE;
     logE.resize(N_AMS02 + 1);
     for (int i = 0; i < N_AMS02; i++)
       logE.at(i) = log10(AMS02.at(i).at(0));
-    logE[N_AMS02] = 2.6;
+    logE.at(N_AMS02) = 2.6;
 
     std::vector<real_t> xlimmin = {0, 0.1};
     std::vector<real_t> xlimmax = {1, 1.1};
@@ -2489,12 +2611,15 @@ namespace __SPEC_LIB_NAME__
     real_t chi_min;
 
 
-    IDpowell(2, &Propagation_param_t::dchi_bkg, logE, spect, xlimmin, xlimmax, &chi_min, xmin, 1.0e-3, "min");
+    IDpowell_result =
+        IDpowell(2, &Propagation_param_t::dchi_bkg, logE, spect, xlimmin, xlimmax, &chi_min, xmin, 1.0e-8, "min");
 
     chi2_noDM = chi_min;
+
+    return xmin;
   }
 
-  real_t Propagation_param_t::chi_2AMS(const std::vector<std::vector<real_t>>& spectrum)
+  real_t Propagation_param_t::chi2_AMS(const std::vector<std::vector<real_t>>& spectrum)
   /* computes the chi^2 between expected spectrum and experimental data */
   {
     real_t chi = 0;
@@ -2512,7 +2637,7 @@ namespace __SPEC_LIB_NAME__
   }
 
   real_t Propagation_param_t::dchi_tot(const std::vector<real_t>& param, const std::vector<real_t>& logE,
-                                       const std::vector<std::vector<real_t>>& spec)
+                                       const std::vector<std::vector<real_t>>& spect)
   /* AMS-02 chi^2 for the total (primary+secondary) pbar spectrum */
   {
     std::vector<std::vector<real_t>> tot, back, totS;
@@ -2520,53 +2645,58 @@ namespace __SPEC_LIB_NAME__
     real_t phi_f = param.at(1);
     if (!background_spectAMS(logE, A, back))
       return -1.e30;
-    if (!add_spectra(back, spec, tot))
-      return -1.e30;
+    add_spectra(back, spect, tot);
     solar_mod(tot, phi_f, totS);
-    real_t chi2 = chi_2AMS(totS);
+    real_t chi2 = chi2_AMS(totS);
     return chi2;
   }
 
-  real_t Propagation_param_t::deltachi2_AMS()
+  real_t Propagation_param_t::deltachi2_AMS(int& IDpowell_result, std::vector<real_t>& xmin)
   /* computes AMS-02 delta-chi2 for a DM particle with annihilation spectrum spec and halo and propagation parameters
    * pparam */
   {
+    int IDpowell_bkg = 1;
+    if (chi2_noDM == 0.)
+      auto optimal_params_bkg = chi2_bkg(IDpowell_bkg);
     if (chi2_noDM < -1.e29)
       return -1.e30;
 
     std::vector<real_t> dEpbar_on_dNpbar_temp, primary_source_temp;
     std::vector<std::vector<real_t>> spect;
-    primary_spectra_BCGS_2014_Br(dEpbar_on_dNpbar_temp, primary_source_temp, spect);
-
+    primary_spectra_BCGS_2014(dEpbar_on_dNpbar_temp, primary_source_temp, spect);
+    std::cout << "Primary spectrum computed\n";
     real_t chiDM_min = 0;
     std::vector<real_t> logE;
     logE.resize(N_AMS02 + 1);
     for (int i = 0; i < N_AMS02; i++)
       logE.at(i) = log10(AMS02.at(i).at(0));
-    logE[N_AMS02] = 2.6;
+    logE.at(N_AMS02) = 2.6;
 
     std::vector<real_t> xlimmin = {0, 0.1};
     std::vector<real_t> xlimmax = {1, 1.1};
-    std::vector<real_t> xmin;
+    xmin.clear();
     xmin.resize(2);
 
-    IDpowell(2, &Propagation_param_t::dchi_tot, logE, spect, xlimmin, xlimmax, &chiDM_min, xmin, 1.0e-3, "min");
+    IDpowell_result =
+        IDpowell(2, &Propagation_param_t::dchi_tot, logE, spect, xlimmin, xlimmax, &chiDM_min, xmin, 1.0e-3, "min");
 
+    if (IDpowell_bkg == 0)
+      IDpowell_result = 0;
     return chiDM_min - chi2_noDM;
   }
 
 
   //-------------------------------CHI SQUARED FUNCTIONS (FERMI-LAT)----------------------------//
 
-  real_t Propagation_param_t::deltalikelihood_fermi()
-  /* calculates Fermi-LAT dSphs delta log-likelihood for options "conservative", "standard" or "stringent" */
+  real_t Propagation_param_t::deltalikelihood_fermi(int& IDpowell_result)
+  /* calculates Fermi-LAT dSphs delta log-likelihood for options "conservative", "nominal" or "inclusive" */
   {
-    std::vector<real_t> mass_list = ind_param.get_DM_masses();
+    std::vector<real_t> mass_list = get_DM_masses();
     size_t N_MASS = mass_list.size();
 
     int DM_candidate = input.getLightestBSMpart();
     real_t mass_chi = input.masses_vector.at(DM_candidate);
-    if (mass_chi < mass_list.at(0) || mass_chi > mass_list[N_MASS - 1])
+    if (mass_chi < mass_list.at(0) || mass_chi > mass_list.at(N_MASS - 1))
     {
       printf("Mass out of range, mDM must be between 5 and 1.0e+5 GeV\n");
       return -1;
@@ -2575,11 +2705,7 @@ namespace __SPEC_LIB_NAME__
     std::vector<std::vector<real_t>> production_spectrum;
     ind_param.compute_fluxes(production_spectrum);
 
-    /*	FILE* ff=fopen("test.out", "w");*/
-    /*	for (i=0; i<fe->Nenergybins; i++) fprintf(ff, "%e\t %e\n", fe->Emin.at(i), fe->eflux.at(i));*/
-    /*	fclose(ff);*/
-
-    return 2 * likelihood_all_dwarfs();
+    return 2 * likelihood_all_dwarfs(IDpowell_result);
   }
 
   Propagation_param_t::~Propagation_param_t() = default;

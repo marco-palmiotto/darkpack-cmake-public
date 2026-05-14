@@ -58,7 +58,7 @@
             "name": "(gdb) Launch-marty-scalar",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/src/models/scalar.x",
+            "program": "${workspaceFolder}/src/models/MSSM.x",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
@@ -73,6 +73,54 @@
                 }
             ],
             "preLaunchTask": "lib_generate_scalar", // You need to define this task in tasks.json
+            "miDebuggerPath": "/usr/bin/gdb",
+            "targetArchitecture": "x86_64",
+            "internalConsoleOptions": "openOnSessionStart",
+            "logging": { "engineLogging": false }
+        },
+         {
+            "name": "(gdb) Unit tests",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/src/Unit_tests/tests.x",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+            "preLaunchTask": "build", // Make sure the build task runs before debugging
+            "miDebuggerPath": "/usr/bin/gdb",
+            "targetArchitecture": "x86_64",
+            "internalConsoleOptions": "openOnSessionStart",
+            "logging": { "engineLogging": false }
+        },
+        {
+            "name": "(gdb) Param restrictions",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/src/Unit_tests/param_test.x",
+            "args": ["${workspaceFolder}/src/models/mssm.lha", "chi2_AMS_test.txt"],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+            "preLaunchTask": "build", // Make sure the build task runs before debugging
             "miDebuggerPath": "/usr/bin/gdb",
             "targetArchitecture": "x86_64",
             "internalConsoleOptions": "openOnSessionStart",

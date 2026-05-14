@@ -21,9 +21,8 @@ namespace __SPEC_LIB_NAME__
     setSanitNames();
     int i;
     runlightquarks = false;
-    runcharm = true;
+    runcharm = false;
     higgsloops = true;
-
     // Initialising class fixed parametrs
     alphas_MZ = input.alpha_str_Mz;
     mass_Z = input.m_Z_pole;
@@ -72,6 +71,7 @@ namespace __SPEC_LIB_NAME__
         LastQuarkMassQ[i] = QuarkMassQ[i];
       }
       Param_t input_copy(input);
+
       HandleParamRunning(input_copy, mass_Z);
     }
     else
@@ -83,7 +83,9 @@ namespace __SPEC_LIB_NAME__
       LastQuarkMass[BEAUTY] = input.m_b;
       LastQuarkMass[TOP] = input.m_t;
       for (i = TOP; i >= UP; i--)
+      {
         LastQuarkMassQ[i] = input.Running_scale;
+      }
     }
 #ifdef DEBUG
     std::cout << "Running class correctly built\n";
@@ -1535,13 +1537,14 @@ namespace __SPEC_LIB_NAME__
       input.m_s = GetQuarkMass(RunningSM::STRANGE, Q);
       input.masses_vector[corr::u] = input.m_u;
       input.masses_vector[corr::d] = input.m_d;
-      input.masses_vector[corr::u] = input.m_s;
+      input.masses_vector[corr::s] = input.m_s;
     }
+
 
     if (runcharm)
     {
       input.m_c = GetQuarkMass(RunningSM::CHARM, Q);
-      input.masses_vector[corr::c] = input.m_c;
+      input.masses_vector[corr::c] = GetQuarkMass(RunningSM::CHARM, Q);
     }
 
 #ifdef DEBUG

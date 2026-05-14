@@ -356,6 +356,7 @@ namespace __SPEC_LIB_NAME__
                                     real_t& E3) const
   {
     // In this function we suppose that the running is already taken care of
+    real_t TINY = 1.e-8; // Small tolerance to account for floating point errors
 
     if ((sqrts < getMass(3, input) + getMass(4, input)) || (sqrts < getMass(1, input) + getMass(2, input)))
       return false;
@@ -367,13 +368,13 @@ namespace __SPEC_LIB_NAME__
     if (E3 < 0.0)
       return false;
     real_t temp = SQUARE(E1) - SQUARE(getMass(1, input));
-    if (temp < 0.0)
+    if (temp + TINY < 0.0)
       return false;
-    p1 = std::sqrt(temp);
+    p1 = (temp < 0.0) ? 0 : std::sqrt(temp); // if temp falls within the tolerance but is negative, set it to zero
     temp = SQUARE(E3) - SQUARE(getMass(3, input));
-    if (temp < 0.0)
+    if (temp + TINY < 0.0)
       return false;
-    p3 = std::sqrt(temp);
+    p3 = (temp < 0.0) ? 0 : std::sqrt(temp);
 
     return true;
   }

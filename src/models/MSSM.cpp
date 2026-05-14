@@ -76,6 +76,8 @@ typedef struct
   std::vector<mty::gauge::Type> Wgauge;
 } Process2to2ToComputeVec;
 
+
+
 std::vector<Process2to2ToCompute> convertToVecofP(Process2to2ToComputeVec input)
 {
   std::vector<Process2to2ToCompute> output;
@@ -87,6 +89,7 @@ std::vector<Process2to2ToCompute> convertToVecofP(Process2to2ToComputeVec input)
     temp.process = input.process[i];
     temp.order = input.order[i];
     temp.leading_order = input.leading_order[i];
+    temp.Wgauge = input.Wgauge[i];
 
     output.push_back(temp);
   }
@@ -417,27 +420,15 @@ int main()
   // For the sake of clarity we save the total number of processes in a new variable
   const size_t n_decays = vec2.process.size();
   std::cout << "We just read " << n_decays << " decay processes\n";
-  std::cin.get();
 
   // Setting Feynman gauge to each process as default
 
   for (size_t i = 0; i < n_decays; i++)
   {
-    // If either of the final state particles is a photon or a gluon, we know that the process is forbidden at tree level and we set it to be computed at one loop level. This is a workaround to avoid computing the amplitudes and then checking that they are zero.
-    if (vec2.namesiso[i].back() == 'a' || vec2.namesiso[i].back() == 'g' || *(vec2.namesiso[i].end() - 2) == 'a' ||
-        *(vec2.namesiso[i].end() - 2) == 'g')
-    {
-      vec2.order.push_back(mty::Order::OneLoop);
-      vec2.Wgauge.push_back(mty::gauge::Type::Feynman);
-      vec2.leading_order.push_back(true);
-    }
 
-    else
-    {
     vec2.order.push_back(mty::Order::TreeLevel);
     vec2.Wgauge.push_back(mty::gauge::Type::Feynman);
     vec2.leading_order.push_back(false);
-    }
   }
 
   std::vector<Process2to2ToCompute> list_of_processes_1to2 = convertToVecofP(vec2);
@@ -449,22 +440,47 @@ int main()
     list_of_processes_1to2[i].printname();
   }
 
-  computeAndAddToLibFromList(mssm, lib, list_of_processes, list_of_processes_1to2, "smBsm.hpp");
+  Process decaying_parts = {"h", "H0", "Hp", "A0"};
+  Process decay_prods;
+  for (size_t i = 0; i < part.size(); i++)
+  {
+    decay_prods.emplace_back(part[i]->getName());
+  }
+  computeAndAddToLibFromList(mssm, lib, list_of_processes, decaying_parts, decay_prods, psm, pbsm, "smBsm.hpp");
 #ifndef DISABLE_LIB_CREATION
 
   // Computation of the widths at the three TreeLevel
-  Expr width_h = mssm.computeWidth(Order::TreeLevel, "h");
+
   Expr width_W = mssm.computeWidth(Order::TreeLevel, "W");
   Expr width_Z = mssm.computeWidth(Order::TreeLevel, "Z");
   Expr width_t = mssm.computeWidth(Order::TreeLevel, "t");
-  Expr width_H0 = mssm.computeWidth(Order::TreeLevel, "H0");
-  Expr width_Hp = mssm.computeWidth(Order::TreeLevel, "Hp");
-  Expr width_A0 = mssm.computeWidth(Order::TreeLevel, "A0");
 
-  const std::array<Expr, 7> expr_to_expand = {width_h, width_W, width_Z, width_t, width_H0, width_Hp, width_A0};
+
+  /*
+  #ifdef INDIRECT_DETECTION_ONLY
+   Expr width_h = mssm.computeWidth(Order::OneLoop, "h");
+  Expr width_W = mssm.computeWidth(Order::TreeLevel, "W");
+  Expr width_Z = mssm.computeWidth(Order::TreeLevel, "Z");
+  Expr width_t = mssm.computeWidth(Order::TreeLevel, "t");
+  Expr width_H0 = mssm.computeWidth(Order::OneLoop, "H0");
+  Expr width_Hp = mssm.computeWidth(Order::OneLoop, "Hp");
+  Expr width_A0 = mssm.computeWidth(Order::OneLoop, "A0");
+  #endif
+  */
+  const std::array<Expr, 3> expr_to_expand = {width_W, width_Z, width_t};
+
+  std::ofstream correspondancefile;
+  char tempstring[300];
+  sprintf(tempstring, "auxiliary_library/%s/initialise_map_1to2.cpp", lib.getName().c_str());
+  correspondancefile.open(tempstring, std::ios::app);
+
+
 
   for (Expr expression : expr_to_expand)
   {
+    std::vector<std::string> process_names;
+    std::vector<Process> processes;
+    std::vector<csl::Expr> expressions;
     auto temp = csl::Evaluated(expression, csl::eval::abbreviation);
     csl::ForEachLeaf(temp,
                      [&](csl::Expr& sub)
@@ -474,15 +490,43 @@ int main()
                          sub->setValue(CSL_UNDEF);
                        }
                      });
-  }
+    getArguments(expression, mssm, psm, pbsm, lib, process_names, processes, expressions);
+    for (int i = 0; i < process_names.size(); i++)
+    {
+      std::cout << process_names[i];
+      lib.addFunction(process_names[i], expressions[i]);
+  #ifdef CORRESPONDANCE
+      // Writing on the correspondance file
+      correspondancefile << "{ {";
+      for (int j = 0; j <= 1; j++)
+      {
+        if (!processes[i][j].isParticle())
+          correspondancefile << "ANTICHAR,";
+        correspondancefile << "EMPTYCHAR+corr::" << processes[i][j].getField()->getName() << ",";
+      }
+      if (!processes[i][2].isParticle())
+        correspondancefile << "ANTICHAR,";
+      correspondancefile << "EMPTYCHAR+corr::" << processes[i][2].getField()->getName() << "},";
+      // Writing the value field
+      correspondancefile << "{ ";
+      // Writing the functions
+      correspondancefile << " &" << process_names[i] << ", ";
+      // Writing the number
+      correspondancefile << "} }";
+      if (i != process_names.size() - 1 || expression != expr_to_expand.back())
+        correspondancefile << ",\n";
+  #endif // End of ifdef CORRESPONDANCE
+    } // Ends the cycle on the processes
+  } // Ends the cycle on the particles
+  #ifdef CORRESPONDANCE
+  correspondancefile << "};\n}\n";
+  correspondancefile.close();
+  #endif
 
-  lib.addFunction("width_h", width_h);
+
   lib.addFunction("width_W", width_W);
   lib.addFunction("width_Z", width_Z);
   lib.addFunction("width_t", width_t);
-  lib.addFunction("width_H0", width_H0);
-  lib.addFunction("width_Hp", width_Hp);
-  lib.addFunction("width_A0", width_A0);
 
   #ifdef SQUAREDAMP
   std::cout << "Writing the library on disk\n";

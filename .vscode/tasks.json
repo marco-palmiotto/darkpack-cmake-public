@@ -50,7 +50,7 @@
             "type": "process",
             "dependsOn": "PWD",
             "command": ".vscode/debug_lib_generate.sh",
-            "args": ["scalar2to2", "scalar"]
+            "args": ["mssm2to2", "MSSM"]
         }
 
     ]

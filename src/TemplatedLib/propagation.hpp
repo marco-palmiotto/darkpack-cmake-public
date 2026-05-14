@@ -765,8 +765,8 @@ public:
     /**
      * @brief Returns the chi squared from the AMS-02 experiment in the background-only hypothesis.
      *
-     * @param param Vector of nuisance parameters, A and \f$\phi_f\f$ (uncertainties from cross sections and solar modulation,
-     * respectively).
+     * @param param Vector of nuisance parameters, A and \f$\phi_f\f$ (uncertainties from cross sections and solar
+     * modulation, respectively).
      *
      * @param logE The antiproton energies in log space (the tabulated spectra are interpolated to these values).
      *
@@ -776,8 +776,8 @@ public:
                     const std::vector<std::vector<real_t>>& spect);
 
     /**
-     * @brief Finds the combination of A and \f$\phi_f\f$ that minimizes the chi squared in the background only hypothesis.
-     * Stores the result in chi2_noDM.
+     * @brief Finds the combination of A and \f$\phi_f\f$ that minimizes the chi squared in the background only
+     * hypothesis. Stores the result in chi2_noDM.
      *
      * @param IDpowell_result Integer that assesses whether IDpowell ran without issues.
      */
@@ -806,8 +806,8 @@ public:
                     const std::vector<std::vector<real_t>>& spect);
 
     /**
-     * @brief Finds the values of A and \f$\phi_f\f$ that minimize the \f$\chi^2\f$ for the total spectrum. Subtracts the \f$\chi^2\f$
-     * of the background-only hypothesis to return deltachi2_AMS.
+     * @brief Finds the values of A and \f$\phi_f\f$ that minimize the \f$\chi^2\f$ for the total spectrum. Subtracts
+     * the \f$\chi^2\f$ of the background-only hypothesis to return deltachi2_AMS.
      * @param IDpowell_result Integer that assesses whether IDpowell ran without issues.
      */
     real_t deltachi2_AMS(int& IDpowell_result, std::vector<real_t>& xmin);
@@ -855,8 +855,9 @@ public:
     /**
      * @brief Changes the private Indirect_param_t member.
      *
-     * @param new_sigma_v New value for the total \f$\langle \sigma v \rangle\f$. If set to zero, this parameter is not changed.
-     * 
+     * @param new_sigma_v New value for the total \f$\langle \sigma v \rangle\f$. If set to zero, this parameter is not
+     * changed.
+     *
      * @param new_mass_DM New value for the DM mass. If set to zero, this parameter is not changed.
      */
     inline void change_ind_param(real_t new_sigma_v, real_t new_mass_DM)
